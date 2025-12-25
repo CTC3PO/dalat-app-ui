@@ -40,15 +40,25 @@ function generateGoogleCalendarUrl({
   // Default to 2 hours if no end time
   const end = endsAt ? new Date(endsAt) : new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
-  // Use Google Maps URL if available (links directly to the place)
-  // Otherwise fall back to location name
-  const location = googleMapsUrl || locationName || "";
+  // Build location string with Da Lat suffix for better Google search results
+  // Include Google Maps URL in description instead since Calendar doesn't handle URLs well
+  let location = "";
+  if (locationName) {
+    location = `${locationName}, Da Lat, Vietnam`;
+  }
+
+  // Build description with optional maps link
+  let details = description || "";
+  if (googleMapsUrl) {
+    details += `\n\nLocation: ${googleMapsUrl}`;
+  }
+  details += `\n\nEvent page: ${url}`;
 
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: title,
     dates: `${formatDateForGoogle(start)}/${formatDateForGoogle(end)}`,
-    details: `${description || ""}\n\nEvent page: ${url}`.trim(),
+    details: details.trim(),
     location,
   });
 
