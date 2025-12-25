@@ -12,7 +12,8 @@ import {
 interface AddToCalendarProps {
   title: string;
   description?: string | null;
-  location?: string | null;
+  locationName?: string | null;
+  googleMapsUrl?: string | null;
   startsAt: string;
   endsAt?: string | null;
   url: string;
@@ -29,7 +30,8 @@ function formatDateForICS(date: Date): string {
 function generateGoogleCalendarUrl({
   title,
   description,
-  location,
+  locationName,
+  googleMapsUrl,
   startsAt,
   endsAt,
   url,
@@ -38,12 +40,16 @@ function generateGoogleCalendarUrl({
   // Default to 2 hours if no end time
   const end = endsAt ? new Date(endsAt) : new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
+  // Use Google Maps URL if available (links directly to the place)
+  // Otherwise fall back to location name
+  const location = googleMapsUrl || locationName || "";
+
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: title,
     dates: `${formatDateForGoogle(start)}/${formatDateForGoogle(end)}`,
     details: `${description || ""}\n\nEvent page: ${url}`.trim(),
-    location: location || "",
+    location,
   });
 
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
@@ -52,7 +58,8 @@ function generateGoogleCalendarUrl({
 function generateICSContent({
   title,
   description,
-  location,
+  locationName,
+  googleMapsUrl,
   startsAt,
   endsAt,
   url,
@@ -61,6 +68,11 @@ function generateICSContent({
   // Default to 2 hours if no end time
   const end = endsAt ? new Date(endsAt) : new Date(start.getTime() + 2 * 60 * 60 * 1000);
   const now = new Date();
+
+  // For ICS, include both name and maps URL if available
+  const location = googleMapsUrl
+    ? `${locationName || ""} - ${googleMapsUrl}`.trim().replace(/^- /, "")
+    : locationName || "";
 
   const icsContent = [
     "BEGIN:VCALENDAR",
@@ -75,7 +87,7 @@ function generateICSContent({
     `UID:${start.getTime()}@dalat.app`,
     `SUMMARY:${title}`,
     `DESCRIPTION:${(description || "").replace(/\n/g, "\\n")}\\n\\nEvent page: ${url}`,
-    `LOCATION:${location || ""}`,
+    `LOCATION:${location}`,
     `URL:${url}`,
     "END:VEVENT",
     "END:VCALENDAR",

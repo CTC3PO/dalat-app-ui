@@ -267,7 +267,8 @@ export default async function EventPage({ params }: PageProps) {
                 <AddToCalendar
                   title={event.title}
                   description={event.description}
-                  location={event.location_name}
+                  locationName={event.location_name}
+                  googleMapsUrl={event.google_maps_url}
                   startsAt={event.starts_at}
                   endsAt={event.ends_at}
                   url={`https://dalat.app/events/${event.slug}`}
