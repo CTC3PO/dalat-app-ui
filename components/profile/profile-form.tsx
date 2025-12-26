@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
+import { detectBrowserLocale } from "@/lib/locale";
+import type { Locale } from "@/lib/types";
 
 interface ProfileFormProps {
   userId: string;
@@ -23,6 +25,11 @@ export function ProfileForm({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  const [detectedLocale, setDetectedLocale] = useState<Locale>('en');
+
+  useEffect(() => {
+    setDetectedLocale(detectBrowserLocale());
+  }, []);
 
   function validateUsername(value: string): boolean {
     if (value.length < 3) {
@@ -69,12 +76,13 @@ export function ProfileForm({
         return;
       }
 
-      // Update profile
+      // Update profile with detected locale
       const { error: updateError } = await supabase
         .from("profiles")
         .update({
           username,
           display_name: displayName || null,
+          locale: detectedLocale,
         })
         .eq("id", userId);
 
