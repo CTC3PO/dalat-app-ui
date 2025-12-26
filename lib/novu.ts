@@ -76,6 +76,10 @@ const translations = {
     getDirections: { en: 'Get Directions', fr: 'Itinéraire', vi: 'Chỉ đường' },
     changePlans: { en: 'Change plans', fr: 'Modifier', vi: 'Thay đổi' },
   },
+  email: {
+    clickToConfirm: { en: 'Click below to confirm:', fr: 'Cliquez ci-dessous pour confirmer :', vi: 'Nhấn bên dưới để xác nhận:' },
+    seeYouThere: { en: 'See you there!', fr: 'À bientôt !', vi: 'Hẹn gặp bạn!' },
+  },
 };
 
 export async function notifyRsvpConfirmation(
@@ -115,6 +119,7 @@ export async function notifyConfirmAttendance24h(
       primaryActionUrl: `${baseUrl}?confirm=yes`,
       secondaryActionLabel: translations.buttons.changePlans[locale],
       secondaryActionUrl: `${baseUrl}?cancel=true`,
+      emailPrompt: translations.email.clickToConfirm[locale],
     },
   });
 }
@@ -139,6 +144,7 @@ export async function notifyFinalReminder2h(
       primaryActionUrl: googleMapsUrl || eventUrl,
       secondaryActionLabel: translations.buttons.changePlans[locale],
       secondaryActionUrl: eventUrl,
+      emailBody: translations.email.seeYouThere[locale],
     },
   });
 }
