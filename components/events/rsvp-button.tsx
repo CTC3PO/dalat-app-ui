@@ -68,13 +68,25 @@ export function RsvpButton({
     const supabase = createClient();
 
     startTransition(async () => {
-      const { error: rpcError } = await supabase.rpc("cancel_rsvp", {
+      const { data, error: rpcError } = await supabase.rpc("cancel_rsvp", {
         p_event_id: eventId,
       });
 
       if (rpcError) {
         setError(rpcError.message);
         return;
+      }
+
+      // Notify promoted user if someone got bumped up from waitlist
+      if (data?.promoted_user) {
+        fetch("/api/notifications/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            eventId,
+            promotedUserId: data.promoted_user,
+          }),
+        }).catch(console.error);
       }
 
       router.refresh();

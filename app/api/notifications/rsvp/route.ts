@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { notifyRsvpConfirmation } from '@/lib/novu';
+import { notifyRsvpConfirmation, scheduleEventReminders } from '@/lib/novu';
 import type { Locale } from '@/lib/types';
 
 export async function POST(request: Request) {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       .single(),
     supabase
       .from('events')
-      .select('title, slug, description')
+      .select('title, slug, description, starts_at, location_name, google_maps_url')
       .eq('id', eventId)
       .single(),
   ]);
@@ -35,16 +35,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Event not found' }, { status: 404 });
   }
 
+  const locale = (profile?.locale as Locale) || 'en';
+
   try {
+    // Send immediate RSVP confirmation
     await notifyRsvpConfirmation(
       user.id,
-      (profile?.locale as Locale) || 'en',
+      locale,
       event.title,
       event.slug,
       event.description
     );
 
-    return NextResponse.json({ success: true });
+    // Schedule 24h and 2h reminders
+    const scheduled = await scheduleEventReminders(
+      user.id,
+      locale,
+      eventId,
+      event.title,
+      event.slug,
+      event.starts_at,
+      event.location_name,
+      event.google_maps_url
+    );
+
+    return NextResponse.json({ success: true, scheduled });
   } catch (error) {
     console.error('RSVP notification error:', error);
     return NextResponse.json({ error: String(error) }, { status: 500 });

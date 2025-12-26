@@ -256,3 +256,81 @@ export async function createOrUpdateSubscriber(
     locale,
   });
 }
+
+// Schedule event reminders using Novu's delay feature
+// This triggers workflows that will be delayed until the specified time
+export async function scheduleEventReminders(
+  subscriberId: string,
+  locale: Locale,
+  eventId: string,
+  eventTitle: string,
+  eventSlug: string,
+  startsAt: string,
+  locationName?: string | null,
+  googleMapsUrl?: string | null
+) {
+  const eventStart = new Date(startsAt);
+  const now = new Date();
+
+  const time24hBefore = new Date(eventStart.getTime() - 24 * 60 * 60 * 1000);
+  const time2hBefore = new Date(eventStart.getTime() - 2 * 60 * 60 * 1000);
+
+  const baseUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
+
+  // Format time for display (e.g., "3:00 PM")
+  const eventTime = eventStart.toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'Asia/Ho_Chi_Minh',
+  });
+
+  const results = { scheduled24h: false, scheduled2h: false };
+
+  // Schedule 24h reminder if event is more than 24h away
+  if (time24hBefore > now) {
+    await getNovu().trigger('24h-reminder-scheduled', {
+      to: { subscriberId },
+      payload: {
+        eventId,
+        eventTitle,
+        eventSlug,
+        eventTime,
+        subject: translations.confirmAttendance24h[locale](eventTitle, eventTime),
+        primaryActionLabel: translations.buttons.yes[locale],
+        primaryActionUrl: `${baseUrl}?confirm=yes`,
+        secondaryActionLabel: translations.buttons.changePlans[locale],
+        secondaryActionUrl: `${baseUrl}?confirm=no`,
+        emailPrompt: translations.email.clickToConfirm[locale],
+        delayTill: time24hBefore.toISOString(),
+      },
+    });
+    results.scheduled24h = true;
+  }
+
+  // Schedule 2h reminder if event is more than 2h away
+  if (time2hBefore > now) {
+    await getNovu().trigger('2h-reminder-scheduled', {
+      to: { subscriberId },
+      payload: {
+        eventId,
+        eventTitle,
+        eventSlug,
+        locationName: locationName || 'the venue',
+        googleMapsUrl: googleMapsUrl || undefined,
+        subject: translations.finalReminder2h[locale](eventTitle, locationName || 'the venue'),
+        primaryActionLabel: googleMapsUrl
+          ? translations.buttons.getDirections[locale]
+          : translations.buttons.viewEvent[locale],
+        primaryActionUrl: googleMapsUrl || baseUrl,
+        secondaryActionLabel: translations.buttons.changePlans[locale],
+        secondaryActionUrl: baseUrl,
+        emailBody: translations.email.seeYouThere[locale],
+        delayTill: time2hBefore.toISOString(),
+      },
+    });
+    results.scheduled2h = true;
+  }
+
+  return results;
+}
