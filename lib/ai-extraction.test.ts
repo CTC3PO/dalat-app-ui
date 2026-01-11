@@ -152,10 +152,4 @@ describe("checkDuplicates", () => {
 
     expect(result[0].duplicate_of).toBeUndefined();
   });
-
-  // TODO: Implement this test case
-  // This is a meaningful edge case: what should happen when titles are
-  // similar but at different venues on the same day?
-  // Example: "Live Music" at "Cafe A" vs "Live Music" at "Cafe B"
-  // Currently the code doesn't consider venue - is that the right behavior?
 });
