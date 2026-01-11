@@ -22,18 +22,22 @@ export function ImmersiveImage({ src, alt, children }: ImmersiveImageProps) {
     }
   }, []);
 
-  // Extreme landscape (>2:1) gets cropped, everything else shows full image
+  // Extreme landscape (>2:1) gets cropped to fill
   const useObjectCover = aspectRatio !== null && aspectRatio > 2.0;
+  // Portrait images are already mobile-optimized, no blur needed
+  const needsBlurredBackground = aspectRatio !== null && aspectRatio >= 0.9 && !useObjectCover;
 
   return (
     <>
-      {/* Blurred background layer - fills the container */}
-      <img
-        src={src}
-        alt=""
-        aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-50"
-      />
+      {/* Blurred background layer - only for landscape images */}
+      {needsBlurredBackground && (
+        <img
+          src={src}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover scale-110 blur-2xl opacity-50"
+        />
+      )}
 
       {/* Main image - smart object-fit based on aspect ratio */}
       <img
