@@ -1,11 +1,13 @@
 "use client";
 
 import { Bell, BellOff, BellRing, Loader2, AlertCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { usePushNotifications } from "@/lib/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
 import { triggerHaptic } from "@/lib/haptics";
 
 export function NotificationSettings() {
+  const t = useTranslations("notifications");
   const {
     permission,
     isSubscribed,
@@ -29,9 +31,9 @@ export function NotificationSettings() {
       <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 text-muted-foreground">
         <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
         <div className="space-y-1">
-          <p className="text-sm font-medium">Push notifications unavailable</p>
+          <p className="text-sm font-medium">{t("unavailable")}</p>
           <p className="text-xs">
-            Your browser doesn&apos;t support push notifications. Try using a modern browser or install the app.
+            {t("unavailableDescription")}
           </p>
         </div>
       </div>
@@ -43,9 +45,9 @@ export function NotificationSettings() {
       <div className="flex items-start gap-3 p-4 rounded-lg bg-destructive/10 text-destructive">
         <BellOff className="w-5 h-5 mt-0.5 flex-shrink-0" />
         <div className="space-y-1">
-          <p className="text-sm font-medium">Notifications blocked</p>
+          <p className="text-sm font-medium">{t("blocked")}</p>
           <p className="text-xs opacity-80">
-            You&apos;ve blocked notifications for this app. To enable them, update your browser settings.
+            {t("blockedDescription")}
           </p>
         </div>
       </div>
@@ -74,12 +76,12 @@ export function NotificationSettings() {
           )}
           <div className="text-left">
             <p className={cn("text-sm font-medium", isSubscribed ? "text-primary" : "text-foreground")}>
-              {isSubscribed ? "Notifications enabled" : "Enable notifications"}
+              {isSubscribed ? t("enabled") : t("enable")}
             </p>
             <p className="text-xs text-muted-foreground">
               {isSubscribed
-                ? "You'll receive alerts for RSVPs and reminders"
-                : "Get notified about events and reminders"}
+                ? t("enabledDescription")
+                : t("disabledDescription")}
             </p>
           </div>
         </div>
@@ -100,7 +102,7 @@ export function NotificationSettings() {
 
       {isSubscribed && (
         <p className="text-xs text-muted-foreground px-1">
-          Notifications will appear on your lock screen and notification center with sound and vibration (where supported).
+          {t("detailedInfo")}
         </p>
       )}
     </div>

@@ -3,6 +3,7 @@
 import { useState, useTransition, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Check, Loader2, AlertCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +21,7 @@ const BIO_MAX_LENGTH = 160;
 
 export function ProfileEditForm({ profile }: ProfileEditFormProps) {
   const router = useRouter();
+  const t = useTranslations("profile");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -49,17 +51,17 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
 
     // Client-side validation first
     if (username.length < 3) {
-      setUsernameError("Username must be at least 3 characters");
+      setUsernameError(t("usernameMinLength"));
       setUsernameAvailable(null);
       return;
     }
     if (username.length > 20) {
-      setUsernameError("Username must be 20 characters or less");
+      setUsernameError(t("usernameMaxLength"));
       setUsernameAvailable(null);
       return;
     }
     if (!/^[a-z0-9_]+$/.test(username)) {
-      setUsernameError("Only lowercase letters, numbers, and underscores");
+      setUsernameError(t("usernameFormat"));
       setUsernameAvailable(null);
       return;
     }
@@ -79,7 +81,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
       setUsernameChecking(false);
       setUsernameAvailable(!existing);
       if (existing) {
-        setUsernameError("Username is already taken");
+        setUsernameError(t("usernameTaken"));
       }
     }, 500);
 
@@ -166,12 +168,12 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle>Edit Profile</CardTitle>
+          <CardTitle>{t("editProfile")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8">
           {/* Avatar */}
           <div className="space-y-2">
-            <Label>Profile photo</Label>
+            <Label>{t("profilePhoto")}</Label>
             <AvatarUpload
               userId={profile.id}
               currentAvatarUrl={avatarUrl}
@@ -182,7 +184,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
 
           {/* Username */}
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">{t("username")}</Label>
             <div className="relative">
               <div className="flex items-center">
                 <span className="text-muted-foreground mr-1">@</span>
@@ -191,7 +193,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
                   name="username"
                   value={username}
                   onChange={handleUsernameChange}
-                  placeholder="yourname"
+                  placeholder={t("usernamePlaceholder")}
                   className={cn(
                     "pr-10",
                     usernameError && "border-destructive focus-visible:ring-destructive"
@@ -218,16 +220,16 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
             {!usernameError &&
               usernameAvailable === true &&
               username !== profile.username && (
-                <p className="text-sm text-green-600">Username is available!</p>
+                <p className="text-sm text-green-600">{t("usernameAvailable")}</p>
               )}
             <p className="text-xs text-muted-foreground">
-              3-20 characters. Letters, numbers, and underscores only.
+              {t("usernameHelp")}
             </p>
           </div>
 
           {/* Display Name */}
           <div className="space-y-2">
-            <Label htmlFor="display_name">Display name</Label>
+            <Label htmlFor="display_name">{t("displayName")}</Label>
             <Input
               id="display_name"
               name="display_name"
@@ -236,18 +238,18 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
                 setDisplayName(e.target.value);
                 setSuccess(false);
               }}
-              placeholder="Your Name"
+              placeholder={t("displayNamePlaceholder")}
               maxLength={50}
             />
             <p className="text-xs text-muted-foreground">
-              How your name appears on events and your profile
+              {t("displayNameHelp")}
             </p>
           </div>
 
           {/* Bio */}
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="bio">Bio</Label>
+              <Label htmlFor="bio">{t("bio")}</Label>
               <span
                 className={cn(
                   "text-xs",
@@ -266,12 +268,12 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               name="bio"
               value={bio}
               onChange={handleBioChange}
-              placeholder="Tell people a bit about yourself..."
+              placeholder={t("bioPlaceholder")}
               rows={3}
               className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none"
             />
             <p className="text-xs text-muted-foreground">
-              A short bio shown on your public profile
+              {t("bioHelp")}
             </p>
           </div>
 
@@ -287,7 +289,7 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           {success && (
             <div className="flex items-center gap-2 text-green-600 text-sm">
               <Check className="w-4 h-4" />
-              Profile updated successfully!
+              {t("profileUpdated")}
             </div>
           )}
 
@@ -297,16 +299,16 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
               {isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
+                  {t("saving")}
                 </>
               ) : (
-                "Save changes"
+                t("saveChanges")
               )}
             </Button>
 
             {hasChanges && !isPending && (
               <p className="text-sm text-muted-foreground">
-                You have unsaved changes
+                {t("unsavedChanges")}
               </p>
             )}
           </div>

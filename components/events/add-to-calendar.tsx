@@ -1,6 +1,7 @@
 "use client";
 
 import { CalendarPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -143,6 +144,7 @@ function downloadICS(props: AddToCalendarProps) {
 }
 
 export function AddToCalendar(props: AddToCalendarProps) {
+  const t = useTranslations("calendar");
   const googleUrl = generateGoogleCalendarUrl(props);
 
   return (
@@ -150,17 +152,17 @@ export function AddToCalendar(props: AddToCalendarProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="w-full">
           <CalendarPlus className="w-4 h-4 mr-2" />
-          Add to calendar
+          {t("addToCalendar")}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="center" className="w-48">
         <DropdownMenuItem asChild>
           <a href={googleUrl} target="_blank" rel="noopener noreferrer">
-            Google Calendar
+            {t("googleCalendar")}
           </a>
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => downloadICS(props)}>
-          Apple / Outlook (.ics)
+          {t("appleOutlook")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

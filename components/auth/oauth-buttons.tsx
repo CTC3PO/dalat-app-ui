@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 
 export function GoogleButton() {
+  const t = useTranslations("auth");
   const [isLoading, setIsLoading] = useState(false);
 
   async function signInWithGoogle() {
@@ -29,11 +31,11 @@ export function GoogleButton() {
       disabled={isLoading}
     >
       {isLoading ? (
-        "Connecting..."
+        t("connecting")
       ) : (
         <>
           <GoogleIcon className="w-5 h-5 mr-2" />
-          Continue with Google
+          {t("continueWithGoogle")}
         </>
       )}
     </Button>

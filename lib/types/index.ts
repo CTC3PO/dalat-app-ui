@@ -1,5 +1,38 @@
 export type Locale = 'en' | 'fr' | 'vi';
-export type UserRole = 'user' | 'admin' | 'contributor';
+
+// Extended role hierarchy
+export type UserRole =
+  | 'user'
+  | 'admin'
+  | 'moderator'
+  | 'organizer_verified'
+  | 'organizer_pending'
+  | 'contributor';
+
+// Role hierarchy levels (higher = more permissions)
+export const ROLE_HIERARCHY: Record<UserRole, number> = {
+  admin: 100,
+  moderator: 80,
+  organizer_verified: 60,
+  organizer_pending: 50,
+  contributor: 40,
+  user: 10,
+};
+
+// Check if a user role has at least the required level
+export function hasRoleLevel(userRole: UserRole, requiredRole: UserRole): boolean {
+  return ROLE_HIERARCHY[userRole] >= ROLE_HIERARCHY[requiredRole];
+}
+
+// Organizer types
+export type OrganizerType =
+  | 'ward'           // Phường
+  | 'city'           // Thành phố
+  | 'venue'          // Venue/location
+  | 'cultural_org'   // Cultural organization
+  | 'committee'      // Festival committee
+  | 'business'       // Business
+  | 'other';
 
 export interface Profile {
   id: string;
@@ -22,6 +55,10 @@ export interface Organizer {
   website_url: string | null;
   facebook_url: string | null;
   instagram_url: string | null;
+  zalo_url: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  organizer_type: OrganizerType;
   is_verified: boolean;
   priority_score: number;
   owner_id: string | null;
@@ -116,4 +153,174 @@ export interface ExtractionLog {
   // Joined data
   profiles?: Profile;
   organizers?: Organizer;
+}
+
+// ============================================
+// Verification Request Types
+// ============================================
+
+export type VerificationStatus = 'pending' | 'approved' | 'rejected' | 'more_info_needed';
+
+export interface VerificationRequest {
+  id: string;
+  user_id: string;
+  organizer_name: string;
+  organizer_type: OrganizerType;
+  organizer_description: string | null;
+  proof_links: string[];
+  proof_message: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  status: VerificationStatus;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  admin_notes: string | null;
+  rejection_reason: string | null;
+  organizer_id: string | null;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  profiles?: Profile;
+  reviewer?: Profile;
+  organizers?: Organizer;
+}
+
+// ============================================
+// Festival Types
+// ============================================
+
+export type FestivalStatus = 'draft' | 'published' | 'cancelled' | 'completed';
+
+export interface Festival {
+  id: string;
+  slug: string;
+  title: string;
+  subtitle: string | null;
+  description: string | null;
+  start_date: string;
+  end_date: string;
+  cover_image_url: string | null;
+  logo_url: string | null;
+  location_city: string;
+  location_description: string | null;
+  sources: string[];
+  website_url: string | null;
+  facebook_url: string | null;
+  hashtags: string[];
+  status: FestivalStatus;
+  is_featured: boolean;
+  created_by: string;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  profiles?: Profile;
+  festival_organizers?: FestivalOrganizer[];
+  festival_events?: FestivalEvent[];
+}
+
+export type FestivalOrganizerRole = 'lead' | 'organizer' | 'sponsor' | 'partner' | 'supporter';
+
+export interface FestivalOrganizer {
+  festival_id: string;
+  organizer_id: string;
+  role: FestivalOrganizerRole;
+  sort_order: number;
+  // Joined data
+  organizers?: Organizer;
+}
+
+export type FestivalEventType = 'official_program' | 'community_side_event' | 'announcement_only';
+
+export interface FestivalEvent {
+  festival_id: string;
+  event_id: string;
+  event_type: FestivalEventType;
+  is_highlighted: boolean;
+  sort_order: number;
+  added_at: string;
+  added_by: string | null;
+  // Joined data
+  events?: Event;
+  festivals?: Festival;
+}
+
+export type FestivalUpdateType = 'announcement' | 'schedule_change' | 'highlight' | 'reminder';
+
+export interface FestivalUpdate {
+  id: string;
+  festival_id: string;
+  title: string;
+  body: string | null;
+  image_urls: string[];
+  source_url: string | null;
+  update_type: FestivalUpdateType;
+  is_pinned: boolean;
+  created_by: string;
+  posted_at: string;
+  created_at: string;
+  updated_at: string;
+  // Joined data
+  profiles?: Profile;
+  festivals?: Festival;
+}
+
+// ============================================
+// Analytics Types
+// ============================================
+
+export interface TimeSeriesDataPoint {
+  date: string;
+  count: number;
+}
+
+export interface RoleDistribution {
+  role: string;
+  count: number;
+  percentage: number;
+}
+
+export interface EventActivityData {
+  date: string;
+  created: number;
+  published: number;
+}
+
+export interface RsvpTrendsData {
+  date: string;
+  going: number;
+  waitlist: number;
+  interested: number;
+  cancelled: number;
+}
+
+export interface DashboardOverview {
+  users: {
+    total: number;
+    new_today: number;
+    new_this_week: number;
+  };
+  events: {
+    total: number;
+    published: number;
+    draft: number;
+  };
+  rsvps: {
+    total: number;
+    going: number;
+    interested: number;
+  };
+  organizers: {
+    total: number;
+    verified: number;
+  };
+  festivals: {
+    total: number;
+    active: number;
+  };
+  verification_queue: {
+    pending: number;
+  };
+  notifications: {
+    users_with_push: number;
+  };
 }

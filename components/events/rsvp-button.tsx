@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import type { Rsvp } from "@/lib/types";
@@ -24,6 +25,7 @@ export function RsvpButton({
   waitlistPosition,
 }: RsvpButtonProps) {
   const router = useRouter();
+  const t = useTranslations("rsvp");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -147,7 +149,7 @@ export function RsvpButton({
             variant="outline"
             className="flex-1"
           >
-            {isPending ? "..." : "Cancel RSVP"}
+            {isPending ? "..." : t("cancelRsvp")}
           </Button>
           <Button
             onClick={handleInterested}
@@ -155,11 +157,11 @@ export function RsvpButton({
             variant="ghost"
             className="flex-1"
           >
-            {isPending ? "..." : "Just interested"}
+            {isPending ? "..." : t("justInterested")}
           </Button>
         </div>
         <p className="text-sm text-green-600 text-center">
-          You&apos;re going!
+          {t("youreGoing")}
         </p>
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
       </div>
@@ -177,7 +179,7 @@ export function RsvpButton({
             variant="outline"
             className="flex-1"
           >
-            {isPending ? "..." : "Leave waitlist"}
+            {isPending ? "..." : t("leaveWaitlist")}
           </Button>
           <Button
             onClick={handleInterested}
@@ -185,15 +187,15 @@ export function RsvpButton({
             variant="ghost"
             className="flex-1"
           >
-            {isPending ? "..." : "Just interested"}
+            {isPending ? "..." : t("justInterested")}
           </Button>
         </div>
         <div className="text-center space-y-1">
           <p className="text-sm text-orange-600 font-medium">
-            You&apos;re #{waitlistPosition} on the waitlist
+            {t("waitlistPosition", { position: waitlistPosition ?? 0 })}
           </p>
           <p className="text-xs text-muted-foreground">
-            You&apos;ll automatically get a spot when one opens up
+            {t("waitlistAutoPromote")}
           </p>
         </div>
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
@@ -211,7 +213,7 @@ export function RsvpButton({
             disabled={isPending}
             className="flex-1"
           >
-            {isPending ? "..." : isFull ? "Join waitlist" : "I'm going"}
+            {isPending ? "..." : isFull ? t("joinWaitlist") : t("imGoing")}
           </Button>
           <Button
             onClick={handleCancel}
@@ -219,11 +221,11 @@ export function RsvpButton({
             variant="outline"
             className="flex-1"
           >
-            {isPending ? "..." : "Not interested"}
+            {isPending ? "..." : t("notInterested")}
           </Button>
         </div>
         <p className="text-sm text-blue-600 text-center">
-          You&apos;re interested
+          {t("youreInterested")}
         </p>
         {error && <p className="text-sm text-red-500 text-center">{error}</p>}
       </div>
@@ -239,7 +241,7 @@ export function RsvpButton({
           disabled={isPending}
           className="flex-1"
         >
-          {isPending ? "..." : isFull ? "Join waitlist" : "I'm going"}
+          {isPending ? "..." : isFull ? t("joinWaitlist") : t("imGoing")}
         </Button>
         <Button
           onClick={handleInterested}
@@ -247,7 +249,7 @@ export function RsvpButton({
           variant="outline"
           className="flex-1"
         >
-          {isPending ? "..." : "Interested"}
+          {isPending ? "..." : t("interested")}
         </Button>
       </div>
       {error && <p className="text-sm text-red-500 text-center">{error}</p>}

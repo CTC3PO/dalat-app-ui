@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Calendar, MapPin, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { EventDefaultImage } from "@/components/events/event-default-image";
 import { formatInDaLat } from "@/lib/timezone";
@@ -15,6 +16,8 @@ interface EventCardProps {
 }
 
 export function EventCard({ event, counts }: EventCardProps) {
+  const t = useTranslations("events");
+
   const spotsText = event.capacity
     ? `${counts?.going_spots ?? 0}/${event.capacity}`
     : `${counts?.going_spots ?? 0}`;
@@ -85,18 +88,18 @@ export function EventCard({ event, counts }: EventCardProps) {
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span>
-                {spotsText} going
+                {spotsText} {t("going")}
                 {isFull && (
-                  <span className="ml-1 text-orange-500">(Full)</span>
+                  <span className="ml-1 text-orange-500">({t("full")})</span>
                 )}
                 {(counts?.interested_count ?? 0) > 0 && (
                   <span className="ml-1 text-muted-foreground">
-                    &middot; {counts?.interested_count} interested
+                    &middot; {counts?.interested_count} {t("interested")}
                   </span>
                 )}
                 {(counts?.waitlist_count ?? 0) > 0 && (
                   <span className="ml-1 text-muted-foreground">
-                    &middot; {counts?.waitlist_count} waitlist
+                    &middot; {counts?.waitlist_count} {t("waitlist")}
                   </span>
                 )}
               </span>

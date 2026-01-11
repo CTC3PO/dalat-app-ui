@@ -141,7 +141,11 @@
     "bioPlaceholder": "Giới thiệu một chút về bạn...",
     "bioHelp": "Tiểu sử ngắn hiển thị trên hồ sơ công khai",
     "profileUpdated": "Cập nhật hồ sơ thành công!",
-    "unsavedChanges": "Bạn có thay đổi chưa lưu"
+    "unsavedChanges": "Bạn có thay đổi chưa lưu",
+    "uploadFailed": "Tải lên thất bại. Vui lòng thử lại.",
+    "removeFailed": "Không thể xóa ảnh",
+    "saving": "Đang lưu...",
+    "saveChanges": "Lưu thay đổi"
   },
   "settings": {
     "settings": "Cài đặt",

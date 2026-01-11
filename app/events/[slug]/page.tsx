@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, Link2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { RsvpButton } from "@/components/events/rsvp-button";
@@ -243,6 +244,8 @@ export default async function EventPage({ params, searchParams }: PageProps) {
   }
 
   const event = result.event;
+  const t = await getTranslations("events");
+  const tCommon = await getTranslations("common");
 
   const currentUserId = await getCurrentUserId();
 
@@ -277,7 +280,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
             className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Back</span>
+            <span>{tCommon("back")}</span>
           </Link>
           {isCreator && (
             <EventActions eventId={event.id} eventSlug={event.slug} />
@@ -352,7 +355,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                           rel="noopener noreferrer"
                           className="text-sm text-primary hover:underline flex items-center gap-1"
                         >
-                          View on map
+                          {t("viewOnMap")}
                           <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
@@ -365,16 +368,16 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                   <Users className="w-5 h-5 text-muted-foreground" />
                   <div>
                     <p className="font-medium">
-                      {spotsText} going
+                      {spotsText} {t("going")}
                       {(counts?.interested_count ?? 0) > 0 && (
                         <span className="text-muted-foreground font-normal">
-                          {" "}· {counts?.interested_count} interested
+                          {" "}· {counts?.interested_count} {t("interested")}
                         </span>
                       )}
                     </p>
                     {(counts?.waitlist_count ?? 0) > 0 && (
                       <p className="text-sm text-muted-foreground">
-                        {counts?.waitlist_count} on waitlist
+                        {counts?.waitlist_count} {t("onWaitlist")}
                       </p>
                     )}
                   </div>
@@ -389,7 +392,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                     className="flex items-center gap-2 text-sm text-primary hover:underline"
                   >
                     <Link2 className="w-4 h-4" />
-                    More info
+                    {t("moreInfo")}
                     <ExternalLink className="w-3 h-3" />
                   </a>
                 )}
@@ -424,7 +427,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
             <Card>
               <CardContent className="p-4">
                 <p className="text-sm text-muted-foreground mb-2">
-                  Organized by
+                  {t("organizedBy")}
                 </p>
                 <Link
                   href={`/${event.profiles?.username || event.created_by}`}
@@ -442,7 +445,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                   <span className="font-medium">
                     {event.profiles?.display_name ||
                       event.profiles?.username ||
-                      "Anonymous"}
+                      tCommon("anonymous")}
                   </span>
                 </Link>
               </CardContent>

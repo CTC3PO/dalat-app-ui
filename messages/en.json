@@ -141,7 +141,11 @@
     "bioPlaceholder": "Tell people a bit about yourself...",
     "bioHelp": "A short bio shown on your public profile",
     "profileUpdated": "Profile updated successfully!",
-    "unsavedChanges": "You have unsaved changes"
+    "unsavedChanges": "You have unsaved changes",
+    "uploadFailed": "Failed to upload image. Please try again.",
+    "removeFailed": "Failed to remove image",
+    "saving": "Saving...",
+    "saveChanges": "Save changes"
   },
   "settings": {
     "settings": "Settings",

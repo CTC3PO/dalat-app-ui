@@ -129,10 +129,10 @@ export function UserMenu({ avatarUrl, displayName, username, userId, currentLoca
         <DropdownMenuSub>
           <DropdownMenuSubTrigger>
             {mounted && <ThemeIcon className="w-4 h-4 mr-2" />}
-            Theme
+            {t("theme")}
             {mounted && (
-              <span className="ml-auto text-xs text-muted-foreground capitalize">
-                {theme}
+              <span className="ml-auto text-xs text-muted-foreground">
+                {theme === "light" ? t("themeLight") : theme === "dark" ? t("themeDark") : t("themeSystem")}
               </span>
             )}
           </DropdownMenuSubTrigger>
@@ -140,21 +140,21 @@ export function UserMenu({ avatarUrl, displayName, username, userId, currentLoca
             <DropdownMenuItem onClick={() => setTheme("light")} className="justify-between">
               <span className="flex items-center">
                 <Sun className="w-4 h-4 mr-2" />
-                Light
+                {t("themeLight")}
               </span>
               {mounted && theme === "light" && <Check className="w-4 h-4 text-primary" />}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setTheme("dark")} className="justify-between">
               <span className="flex items-center">
                 <Moon className="w-4 h-4 mr-2" />
-                Dark
+                {t("themeDark")}
               </span>
               {mounted && theme === "dark" && <Check className="w-4 h-4 text-primary" />}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => setTheme("system")} className="justify-between">
               <span className="flex items-center">
                 <Laptop className="w-4 h-4 mr-2" />
-                System
+                {t("themeSystem")}
               </span>
               {mounted && theme === "system" && <Check className="w-4 h-4 text-primary" />}
             </DropdownMenuItem>
@@ -165,7 +165,7 @@ export function UserMenu({ avatarUrl, displayName, username, userId, currentLoca
         <DropdownMenuSub>
           <DropdownMenuSubTrigger disabled={isPending}>
             <Globe className="w-4 h-4 mr-2" />
-            Language
+            {t("language")}
             <span className="ml-auto text-xs">
               {LOCALE_FLAGS[locale]}
             </span>
@@ -187,7 +187,7 @@ export function UserMenu({ avatarUrl, displayName, username, userId, currentLoca
 
         <DropdownMenuItem onClick={logout} className="text-red-500 focus:text-red-500">
           <LogOut className="w-4 h-4 mr-2" />
-          Sign out
+          {t("signOut")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

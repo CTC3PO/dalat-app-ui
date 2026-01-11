@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from "react";
 import { Camera, X, Upload, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -31,6 +32,7 @@ export function AvatarUpload({
   onAvatarChange,
   size = "lg",
 }: AvatarUploadProps) {
+  const t = useTranslations("profile");
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentAvatarUrl);
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,11 +44,11 @@ export function AvatarUpload({
     const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
 
     if (!allowedTypes.includes(file.type)) {
-      return "Please upload a JPEG, PNG, WebP, or GIF image";
+      return t("invalidFileType");
     }
 
     if (file.size > maxSize) {
-      return "Image must be less than 5MB";
+      return t("fileTooLarge");
     }
 
     return null;
@@ -102,7 +104,7 @@ export function AvatarUpload({
       onAvatarChange(publicUrl);
     } catch (err) {
       console.error("Upload error:", err);
-      setError("Failed to upload image. Please try again.");
+      setError(t("uploadFailed"));
       setPreviewUrl(currentAvatarUrl);
     } finally {
       setIsUploading(false);
@@ -161,7 +163,7 @@ export function AvatarUpload({
       onAvatarChange(null);
     } catch (err) {
       console.error("Remove error:", err);
-      setError("Failed to remove image");
+      setError(t("removeFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -187,7 +189,7 @@ export function AvatarUpload({
           {previewUrl ? (
             <img
               src={previewUrl}
-              alt="Profile photo"
+              alt={t("profilePhoto")}
               className="w-full h-full object-cover"
             />
           ) : (
@@ -225,12 +227,12 @@ export function AvatarUpload({
             {isUploading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Uploading...
+                {t("uploading")}
               </>
             ) : (
               <>
                 <Upload className="w-4 h-4" />
-                Upload photo
+                {t("uploadPhoto")}
               </>
             )}
           </Button>
@@ -245,7 +247,7 @@ export function AvatarUpload({
               className="text-muted-foreground hover:text-destructive"
             >
               <X className="w-4 h-4" />
-              Remove
+              {t("remove")}
             </Button>
           )}
         </div>
@@ -262,7 +264,7 @@ export function AvatarUpload({
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       <p className="text-xs text-muted-foreground">
-        JPEG, PNG, WebP, or GIF. Max 5MB.
+        {t("photoHelp")}
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { Button } from "./ui/button";
 import { createClient } from "@/lib/supabase/server";
 import { UserMenu } from "./user-menu";
@@ -8,13 +9,14 @@ import type { Locale } from "@/lib/types";
 
 export async function AuthButton() {
   const supabase = await createClient();
+  const t = await getTranslations("nav");
 
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
     return (
       <Button asChild size="sm" variant="outline">
-        <Link href="/auth/login">Sign in</Link>
+        <Link href="/auth/login">{t("signIn")}</Link>
       </Button>
     );
   }

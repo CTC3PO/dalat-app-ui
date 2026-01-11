@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
 import { EventCard } from "@/components/events/event-card";
@@ -63,13 +64,14 @@ async function EventsFeed() {
   const events = await getEvents();
   const eventIds = events.map((e) => e.id);
   const counts = await getEventCounts(eventIds);
+  const t = await getTranslations("home");
 
   if (events.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
-        <p className="mb-4">No upcoming events yet.</p>
+        <p className="mb-4">{t("noEvents")}</p>
         <Link href="/events/new" prefetch={false}>
-          <Button>Create the first event</Button>
+          <Button>{t("createFirst")}</Button>
         </Link>
       </div>
     );
@@ -84,7 +86,10 @@ async function EventsFeed() {
   );
 }
 
-export default function Home() {
+export default async function Home() {
+  const t = await getTranslations("home");
+  const tNav = await getTranslations("nav");
+
   return (
     <>
       {/* Mobile: Full immersive experience */}
@@ -102,7 +107,7 @@ export default function Home() {
                 className="text-white hover:bg-white/20 hover:text-white drop-shadow-lg"
               >
                 <Plus className="w-4 h-4 mr-1" />
-                Event
+                {tNav("events")}
               </Button>
             </Link>
             <Suspense>
@@ -134,7 +139,7 @@ export default function Home() {
               <Link href="/events/new" prefetch={false}>
                 <Button size="sm" variant="outline">
                   <Plus className="w-4 h-4 mr-1" />
-                  Event
+                  {tNav("events")}
                 </Button>
               </Link>
               <Suspense>
@@ -147,9 +152,9 @@ export default function Home() {
         {/* Main content */}
         <div className="flex-1 container max-w-4xl mx-auto px-4 py-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold mb-2">Upcoming Events</h1>
+            <h1 className="text-2xl font-bold mb-2">{t("title")}</h1>
             <p className="text-muted-foreground">
-              Discover what&apos;s happening in Da Lat
+              {t("subtitle")}
             </p>
           </div>
 
@@ -172,7 +177,7 @@ export default function Home() {
         {/* Footer */}
         <footer className="border-t py-6">
           <div className="container max-w-4xl mx-auto px-4 text-center text-sm text-muted-foreground">
-            <p>Made with ❤️ for Đà Lạt, Vietnam</p>
+            <p>{t("footer")}</p>
           </div>
         </footer>
       </main>

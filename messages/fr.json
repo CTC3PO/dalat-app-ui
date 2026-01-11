@@ -141,7 +141,11 @@
     "bioPlaceholder": "Parlez un peu de vous...",
     "bioHelp": "Une courte bio affichée sur votre profil public",
     "profileUpdated": "Profil mis à jour avec succès !",
-    "unsavedChanges": "Vous avez des modifications non enregistrées"
+    "unsavedChanges": "Vous avez des modifications non enregistrées",
+    "uploadFailed": "Échec du téléchargement. Veuillez réessayer.",
+    "removeFailed": "Échec de la suppression de l'image",
+    "saving": "Enregistrement...",
+    "saveChanges": "Enregistrer"
   },
   "settings": {
     "settings": "Paramètres",

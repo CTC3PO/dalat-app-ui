@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,8 @@ interface EventActionsProps {
 
 export function EventActions({ eventId, eventSlug }: EventActionsProps) {
   const router = useRouter();
+  const t = useTranslations("eventActions");
+  const tCommon = useTranslations("common");
   const [isPending, startTransition] = useTransition();
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -54,14 +57,14 @@ export function EventActions({ eventId, eventSlug }: EventActionsProps) {
   if (showConfirm) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-sm text-muted-foreground">Delete?</span>
+        <span className="text-sm text-muted-foreground">{t("deleteConfirm")}</span>
         <Button
           variant="destructive"
           size="sm"
           onClick={handleDelete}
           disabled={isPending}
         >
-          {isPending ? "Deleting..." : "Yes"}
+          {isPending ? t("deleting") : tCommon("yes")}
         </Button>
         <Button
           variant="outline"
@@ -69,7 +72,7 @@ export function EventActions({ eventId, eventSlug }: EventActionsProps) {
           onClick={() => setShowConfirm(false)}
           disabled={isPending}
         >
-          No
+          {tCommon("no")}
         </Button>
       </div>
     );
@@ -80,20 +83,20 @@ export function EventActions({ eventId, eventSlug }: EventActionsProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon">
           <MoreHorizontal className="w-5 h-5" />
-          <span className="sr-only">Event options</span>
+          <span className="sr-only">{t("eventOptions")}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={handleEdit}>
           <Pencil className="w-4 h-4 mr-2" />
-          Edit event
+          {t("editEvent")}
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={handleDelete}
           className="text-red-600 focus:text-red-600"
         >
           <Trash2 className="w-4 h-4 mr-2" />
-          Delete event
+          {t("deleteEvent")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

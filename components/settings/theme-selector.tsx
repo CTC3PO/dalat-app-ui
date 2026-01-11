@@ -3,17 +3,19 @@
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Moon, Sun, Laptop, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 const themes = [
-  { value: "light", label: "Light", icon: Sun },
-  { value: "dark", label: "Dark", icon: Moon },
-  { value: "system", label: "System", icon: Laptop },
+  { value: "light", labelKey: "themeLight", icon: Sun },
+  { value: "dark", labelKey: "themeDark", icon: Moon },
+  { value: "system", labelKey: "themeSystem", icon: Laptop },
 ] as const;
 
 export function ThemeSelector() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const t = useTranslations("userMenu");
 
   useEffect(() => {
     setMounted(true);
@@ -22,9 +24,9 @@ export function ThemeSelector() {
   if (!mounted) {
     return (
       <div className="grid grid-cols-3 gap-3">
-        {themes.map((t) => (
+        {themes.map((themeItem) => (
           <div
-            key={t.value}
+            key={themeItem.value}
             className="flex flex-col items-center gap-2 p-4 rounded-lg border border-border bg-muted/30 animate-pulse"
           >
             <div className="w-5 h-5 rounded bg-muted" />
@@ -37,13 +39,13 @@ export function ThemeSelector() {
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      {themes.map((t) => {
-        const Icon = t.icon;
-        const isSelected = theme === t.value;
+      {themes.map((themeItem) => {
+        const Icon = themeItem.icon;
+        const isSelected = theme === themeItem.value;
         return (
           <button
-            key={t.value}
-            onClick={() => setTheme(t.value)}
+            key={themeItem.value}
+            onClick={() => setTheme(themeItem.value)}
             className={cn(
               "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all duration-200",
               isSelected
@@ -58,7 +60,7 @@ export function ThemeSelector() {
               )}
             </div>
             <span className={cn("text-sm font-medium", isSelected ? "text-primary" : "text-muted-foreground")}>
-              {t.label}
+              {t(themeItem.labelKey)}
             </span>
           </button>
         );

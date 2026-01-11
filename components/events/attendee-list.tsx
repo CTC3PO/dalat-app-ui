@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import type { Rsvp, Profile } from "@/lib/types";
 
@@ -40,7 +43,7 @@ function AttendeeChip({
         />
       )}
       <span>
-        {rsvp.profiles?.display_name || rsvp.profiles?.username || "Anonymous"}
+        {rsvp.profiles?.display_name || rsvp.profiles?.username}
       </span>
       {rsvp.plus_ones > 0 && (
         <span className="text-muted-foreground">+{rsvp.plus_ones}</span>
@@ -50,13 +53,15 @@ function AttendeeChip({
 }
 
 export function AttendeeList({ attendees, waitlist, interested = [] }: AttendeeListProps) {
+  const t = useTranslations("attendees");
+
   if (attendees.length === 0 && waitlist.length === 0 && interested.length === 0) return null;
 
   return (
     <Card>
       <CardContent className="p-4">
         <h3 className="font-semibold mb-3">
-          Who&apos;s going ({attendees.length})
+          {t("whosGoing", { count: attendees.length })}
         </h3>
         <div className="flex flex-wrap gap-2">
           {attendees.map((rsvp) => (
@@ -69,7 +74,7 @@ export function AttendeeList({ attendees, waitlist, interested = [] }: AttendeeL
             <div className="flex items-center gap-3 my-4">
               <div className="h-px flex-1 bg-border" />
               <span className="text-xs text-muted-foreground">
-                Waitlist ({waitlist.length})
+                {t("waitlist", { count: waitlist.length })}
               </span>
               <div className="h-px flex-1 bg-border" />
             </div>
@@ -86,7 +91,7 @@ export function AttendeeList({ attendees, waitlist, interested = [] }: AttendeeL
             <div className="flex items-center gap-3 my-4">
               <div className="h-px flex-1 bg-border" />
               <span className="text-xs text-muted-foreground">
-                Interested ({interested.length})
+                {t("interested", { count: interested.length })}
               </span>
               <div className="h-px flex-1 bg-border" />
             </div>

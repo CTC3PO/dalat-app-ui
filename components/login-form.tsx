@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import {
   Card,
@@ -16,6 +17,8 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentPropsWithoutRef<"div">) {
+  const t = useTranslations("auth");
+
   return (
     <div className={cn("flex flex-col gap-4", className)} {...props}>
       <Link
@@ -23,13 +26,13 @@ export function LoginForm({
         className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors w-fit"
       >
         <ArrowLeft className="w-4 h-4" />
-        Back to events
+        {t("backToEvents")}
       </Link>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Welcome to dalat.app</CardTitle>
+          <CardTitle className="text-2xl">{t("welcomeTitle")}</CardTitle>
           <CardDescription>
-            Sign in to discover events in Da Lat
+            {t("signInDescription")}
           </CardDescription>
         </CardHeader>
         <CardContent>
