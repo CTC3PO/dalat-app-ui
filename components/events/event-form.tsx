@@ -127,6 +127,21 @@ export function EventForm({ userId, event }: EventFormProps) {
     <form onSubmit={handleSubmit}>
       <Card>
         <CardContent className="p-6 space-y-6">
+          {/* Event image/video - TOP of form */}
+          {isEditing ? (
+            <EventMediaUpload
+              eventId={event.id}
+              currentMediaUrl={imageUrl}
+              onMediaChange={setImageUrl}
+            />
+          ) : (
+            <div className="aspect-[2/1] rounded-lg border-2 border-dashed border-muted-foreground/25 flex items-center justify-center bg-muted/30">
+              <p className="text-sm text-muted-foreground text-center px-4">
+                Add a flyer after creating the event
+              </p>
+            </div>
+          )}
+
           {/* Title */}
           <div className="space-y-2">
             <Label htmlFor="title">Event title *</Label>
@@ -151,22 +166,6 @@ export function EventForm({ userId, event }: EventFormProps) {
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             />
           </div>
-
-          {/* Event image/video */}
-          {isEditing ? (
-            <div className="space-y-2">
-              <Label>Event flyer or video</Label>
-              <EventMediaUpload
-                eventId={event.id}
-                currentMediaUrl={imageUrl}
-                onMediaChange={setImageUrl}
-              />
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground py-2">
-              You can add a flyer image or video after creating the event.
-            </p>
-          )}
 
           {/* Date and time */}
           <div className="grid gap-4 sm:grid-cols-2">
