@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { PlaceAutocomplete } from "@/components/events/place-autocomplete";
 import { EventMediaUpload } from "@/components/events/event-media-upload";
 import { toUTCFromDaLat, getDateTimeInDaLat } from "@/lib/timezone";
+import { canEditSlug } from "@/lib/config";
 import type { Event } from "@/lib/types";
 
 interface EventFormProps {
@@ -17,15 +18,34 @@ interface EventFormProps {
   event?: Event;
 }
 
-function generateSlug(title: string): string {
-  const base = title
+/**
+ * Sanitize a string into a valid slug format
+ */
+function sanitizeSlug(input: string): string {
+  return input
     .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 40);
+    .replace(/[^a-z0-9-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-");
+}
+
+/**
+ * Generate a slug from title with random suffix (for fallback/auto-generation)
+ */
+function generateSlug(title: string): string {
+  const base = sanitizeSlug(title).slice(0, 40);
   const suffix = Math.random().toString(36).slice(2, 6);
   return `${base}-${suffix}`;
 }
+
+/**
+ * Generate a suggested slug from title (without random suffix)
+ */
+function suggestSlug(title: string): string {
+  return sanitizeSlug(title).slice(0, 50);
+}
+
+type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
 export function EventForm({ userId, event }: EventFormProps) {
   const router = useRouter();
@@ -36,6 +56,68 @@ export function EventForm({ userId, event }: EventFormProps) {
   );
 
   const isEditing = !!event;
+  const slugEditable = canEditSlug(isEditing);
+
+  // Slug state
+  const [slug, setSlug] = useState(event?.slug ?? "");
+  const [slugStatus, setSlugStatus] = useState<SlugStatus>("idle");
+  const [slugTouched, setSlugTouched] = useState(false);
+
+  // Check slug availability with debounce
+  useEffect(() => {
+    if (!slug || !slugTouched) {
+      setSlugStatus("idle");
+      return;
+    }
+
+    // Basic validation
+    if (slug.length < 1 || !/^[a-z0-9-]+$/.test(slug)) {
+      setSlugStatus("invalid");
+      return;
+    }
+
+    // Skip check if slug hasn't changed from original
+    if (isEditing && slug === event?.slug) {
+      setSlugStatus("available");
+      return;
+    }
+
+    setSlugStatus("checking");
+
+    const timer = setTimeout(async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from("events")
+        .select("id")
+        .eq("slug", slug)
+        .maybeSingle();
+
+      if (data) {
+        setSlugStatus("taken");
+      } else {
+        setSlugStatus("available");
+      }
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [slug, slugTouched, isEditing, event?.slug]);
+
+  // Auto-suggest slug from title when creating (if user hasn't manually edited)
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!isEditing && !slugTouched && slugEditable) {
+        const suggested = suggestSlug(e.target.value);
+        setSlug(suggested);
+      }
+    },
+    [isEditing, slugTouched, slugEditable]
+  );
+
+  const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const sanitized = sanitizeSlug(e.target.value);
+    setSlug(sanitized);
+    setSlugTouched(true);
+  };
 
   // Parse existing event date/time in Da Lat timezone
   const defaults = event ? getDateTimeInDaLat(event.starts_at) : { date: "", time: "" };
@@ -60,6 +142,16 @@ export function EventForm({ userId, event }: EventFormProps) {
       return;
     }
 
+    // Validate slug if editable
+    if (slugEditable && slugStatus === "taken") {
+      setError("This URL is already taken. Please choose a different one.");
+      return;
+    }
+    if (slugEditable && slugStatus === "invalid") {
+      setError("Please enter a valid URL (lowercase letters, numbers, and hyphens only)");
+      return;
+    }
+
     // Convert Da Lat time to UTC for storage
     const startsAt = toUTCFromDaLat(date, time);
     const capacity = capacityStr ? parseInt(capacityStr, 10) : null;
@@ -69,19 +161,26 @@ export function EventForm({ userId, event }: EventFormProps) {
     startTransition(async () => {
       if (isEditing) {
         // Update existing event
+        const updateData: Record<string, unknown> = {
+          title,
+          description: description || null,
+          image_url: imageUrl,
+          starts_at: startsAt,
+          location_name: locationName || null,
+          address: address || null,
+          google_maps_url: googleMapsUrl || null,
+          external_chat_url: externalChatUrl || null,
+          capacity,
+        };
+
+        // Include slug if editable and changed
+        if (slugEditable && slug && slug !== event.slug) {
+          updateData.slug = slug;
+        }
+
         const { error: updateError } = await supabase
           .from("events")
-          .update({
-            title,
-            description: description || null,
-            image_url: imageUrl,
-            starts_at: startsAt,
-            location_name: locationName || null,
-            address: address || null,
-            google_maps_url: googleMapsUrl || null,
-            external_chat_url: externalChatUrl || null,
-            capacity,
-          })
+          .update(updateData)
           .eq("id", event.id);
 
         if (updateError) {
@@ -89,16 +188,21 @@ export function EventForm({ userId, event }: EventFormProps) {
           return;
         }
 
-        router.push(`/events/${event.slug}`);
+        // Navigate to new slug if changed, otherwise original
+        const finalSlug = slugEditable && slug ? slug : event.slug;
+        router.push(`/events/${finalSlug}`);
         router.refresh();
       } else {
         // Create new event
-        const slug = generateSlug(title);
+        // Use custom slug if provided and valid, otherwise auto-generate
+        const finalSlug = slugEditable && slug && slugStatus === "available"
+          ? slug
+          : generateSlug(title);
 
         const { data, error: insertError } = await supabase
           .from("events")
           .insert({
-            slug,
+            slug: finalSlug,
             title,
             description: description || null,
             starts_at: startsAt,
@@ -150,9 +254,48 @@ export function EventForm({ userId, event }: EventFormProps) {
               name="title"
               placeholder="Coffee & Code"
               defaultValue={event?.title ?? ""}
+              onChange={handleTitleChange}
               required
             />
           </div>
+
+          {/* Custom URL Slug */}
+          {slugEditable && (
+            <div className="space-y-2">
+              <Label htmlFor="slug">Event URL</Label>
+              <div className="flex items-center gap-0">
+                <span className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-l-md border border-r-0 border-input">
+                  dalat.app/events/
+                </span>
+                <Input
+                  id="slug"
+                  value={slug}
+                  onChange={handleSlugChange}
+                  placeholder="my-event"
+                  className="rounded-l-none"
+                />
+              </div>
+              {slugTouched && (
+                <p className={`text-xs ${
+                  slugStatus === "available" ? "text-green-600" :
+                  slugStatus === "taken" ? "text-red-500" :
+                  slugStatus === "invalid" ? "text-red-500" :
+                  slugStatus === "checking" ? "text-muted-foreground" :
+                  "text-muted-foreground"
+                }`}>
+                  {slugStatus === "checking" && "Checking availability..."}
+                  {slugStatus === "available" && "✓ This URL is available"}
+                  {slugStatus === "taken" && "✗ This URL is already taken"}
+                  {slugStatus === "invalid" && "Only lowercase letters, numbers, and hyphens allowed"}
+                </p>
+              )}
+              {isEditing && (
+                <p className="text-xs text-amber-600">
+                  ⚠ Changing the URL will break any previously shared links
+                </p>
+              )}
+            </div>
+          )}
 
           {/* Description */}
           <div className="space-y-2">
