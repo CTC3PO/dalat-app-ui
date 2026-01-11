@@ -1,13 +1,27 @@
+import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { type EmailOtpType } from "@supabase/supabase-js";
-import { redirect } from "next/navigation";
 import { type NextRequest } from "next/server";
+import { routing } from "@/lib/i18n/routing";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
-  const next = searchParams.get("next") ?? "/";
+  const url = new URL(request.url);
+  const token_hash = url.searchParams.get("token_hash");
+  const type = url.searchParams.get("type") as EmailOtpType | null;
+  const next = url.searchParams.get("next") ?? "/";
+
+  // Helper to create locale-prefixed redirect with optional cookie
+  const createRedirect = (path: string, locale: string, setCookie = false) => {
+    const localePath = path.startsWith(`/${locale}`) ? path : `/${locale}${path.startsWith('/') ? path : `/${path}`}`;
+    const response = NextResponse.redirect(new URL(localePath, url.origin));
+    if (setCookie) {
+      response.cookies.set('NEXT_LOCALE', locale, {
+        maxAge: 60 * 60 * 24 * 365,
+        path: '/',
+      });
+    }
+    return response;
+  };
 
   if (token_hash && type) {
     const supabase = await createClient();
@@ -16,8 +30,8 @@ export async function GET(request: NextRequest) {
       type,
       token_hash,
     });
+
     if (!error) {
-      // Check if user needs onboarding (no username)
       const {
         data: { user },
       } = await supabase.auth.getUser();
@@ -25,20 +39,24 @@ export async function GET(request: NextRequest) {
       if (user) {
         const { data: profile } = await supabase
           .from("profiles")
-          .select("username")
+          .select("username, locale")
           .eq("id", user.id)
           .single();
 
-        if (!profile?.username) {
-          redirect("/onboarding");
-        }
-      }
+        const locale = profile?.locale && routing.locales.includes(profile.locale as typeof routing.locales[number])
+          ? profile.locale
+          : routing.defaultLocale;
 
-      redirect(next);
-    } else {
-      redirect(`/auth/error?error=${error?.message}`);
+        if (!profile?.username) {
+          return createRedirect('/onboarding', locale, true);
+        }
+
+        return createRedirect(next, locale, true);
+      }
     }
+
+    return createRedirect(`/auth/error?error=${encodeURIComponent(error?.message || 'Unknown error')}`, routing.defaultLocale);
   }
 
-  redirect(`/auth/error?error=No token hash or type`);
+  return createRedirect('/auth/error?error=No token hash or type', routing.defaultLocale);
 }

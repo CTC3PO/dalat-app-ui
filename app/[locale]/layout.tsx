@@ -1,0 +1,68 @@
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { ThemeProvider } from "next-themes";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import { BadgeClearer } from "@/components/badge-clearer";
+import { NotificationPrompt } from "@/components/notification-prompt";
+import { SwUpdateHandler } from "@/components/sw-update-handler";
+import { routing, type Locale } from "@/lib/i18n/routing";
+
+const siteUrl = "https://dalat.app";
+
+interface Props {
+  children: React.ReactNode;
+  params: Promise<{ locale: string }>;
+}
+
+// Generate static params for all locales
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+// Generate metadata with hreflang for SEO
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+
+  return {
+    alternates: {
+      canonical: `${siteUrl}/${locale}`,
+      languages: {
+        'en': `${siteUrl}/en`,
+        'fr': `${siteUrl}/fr`,
+        'vi': `${siteUrl}/vi`,
+        'x-default': `${siteUrl}/en`,
+      },
+    },
+  };
+}
+
+export default async function LocaleLayout({ children, params }: Props) {
+  const { locale } = await params;
+
+  // Validate locale
+  if (!routing.locales.includes(locale as Locale)) {
+    notFound();
+  }
+
+  // Enable static rendering
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
+
+  return (
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <BadgeClearer />
+        <NotificationPrompt />
+        <SwUpdateHandler />
+        {children}
+      </ThemeProvider>
+    </NextIntlClientProvider>
+  );
+}

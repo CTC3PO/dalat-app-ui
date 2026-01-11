@@ -1,11 +1,5 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
-import { BadgeClearer } from "@/components/badge-clearer";
-import { NotificationPrompt } from "@/components/notification-prompt";
-import { SwUpdateHandler } from "@/components/sw-update-handler";
 import "./globals.css";
 
 const siteUrl = "https://dalat.app";
@@ -29,30 +23,15 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html suppressHydrationWarning>
       <body className={`${geistSans.className} antialiased`}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <BadgeClearer />
-            <NotificationPrompt />
-            <SwUpdateHandler />
-            {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
+        {children}
       </body>
     </html>
   );

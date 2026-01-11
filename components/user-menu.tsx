@@ -3,9 +3,9 @@
 import { useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState, useTransition } from "react";
-import Link from "next/link";
+import { Link } from "@/lib/i18n/routing";
 import { useTranslations } from "next-intl";
-import { LogOut, Moon, Sun, Laptop, User, Globe, Settings, ExternalLink, Check } from "lucide-react";
+import { LogOut, Moon, Sun, Laptop, User, Globe, Settings, ExternalLink, Check, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import {
   DropdownMenu,
@@ -18,7 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LOCALE_NAMES, LOCALE_FLAGS, SUPPORTED_LOCALES } from "@/lib/locale";
-import type { Locale } from "@/lib/types";
+import type { Locale, UserRole } from "@/lib/types";
 
 interface UserMenuProps {
   avatarUrl: string | null;
@@ -26,9 +26,13 @@ interface UserMenuProps {
   username: string | null;
   userId: string;
   currentLocale: Locale;
+  role: UserRole;
 }
 
-export function UserMenu({ avatarUrl, displayName, username, userId, currentLocale }: UserMenuProps) {
+const ADMIN_ROLES: UserRole[] = ['admin', 'moderator', 'organizer_verified', 'contributor'];
+
+export function UserMenu({ avatarUrl, displayName, username, userId, currentLocale, role }: UserMenuProps) {
+  const hasAdminAccess = ADMIN_ROLES.includes(role);
   const router = useRouter();
   const { theme, setTheme } = useTheme();
   const t = useTranslations("userMenu");
@@ -122,6 +126,18 @@ export function UserMenu({ avatarUrl, displayName, username, userId, currentLoca
             {t("settings")}
           </Link>
         </DropdownMenuItem>
+
+        {hasAdminAccess && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link href="/admin" className="cursor-pointer">
+                <Shield className="w-4 h-4 mr-2" />
+                {t("admin")}
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuSeparator />
 

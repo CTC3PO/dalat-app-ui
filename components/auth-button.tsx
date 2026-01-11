@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/lib/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import { Button } from "./ui/button";
 import { createClient } from "@/lib/supabase/server";
@@ -21,10 +21,10 @@ export async function AuthButton() {
     );
   }
 
-  // Fetch profile for avatar and locale
+  // Fetch profile for avatar, locale, and role
   const { data: profile } = await supabase
     .from("profiles")
-    .select("avatar_url, display_name, username, locale")
+    .select("avatar_url, display_name, username, locale, role")
     .eq("id", user.id)
     .single();
 
@@ -40,6 +40,7 @@ export async function AuthButton() {
         username={profile?.username || null}
         userId={user.id}
         currentLocale={(profile?.locale as Locale) || 'en'}
+        role={profile?.role || 'user'}
       />
     </div>
   );

@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Check, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { LOCALE_NAMES, LOCALE_FLAGS, SUPPORTED_LOCALES } from "@/lib/locale";
+import { useRouter, usePathname } from "@/lib/i18n/routing";
 import { cn } from "@/lib/utils";
 import type { Locale } from "@/lib/types";
 
@@ -15,6 +15,7 @@ interface LanguageSelectorProps {
 
 export function LanguageSelector({ userId, currentLocale }: LanguageSelectorProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [locale, setLocale] = useState<Locale>(currentLocale);
   const [isPending, startTransition] = useTransition();
 
@@ -24,11 +25,17 @@ export function LanguageSelector({ userId, currentLocale }: LanguageSelectorProp
     setLocale(newLocale);
     const supabase = createClient();
     startTransition(async () => {
+      // Update profile in database
       await supabase
         .from("profiles")
         .update({ locale: newLocale })
         .eq("id", userId);
-      router.refresh();
+
+      // Set cookie for middleware
+      document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
+
+      // Navigate to same page in new locale
+      router.replace(pathname, { locale: newLocale });
     });
   };
 

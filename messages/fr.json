@@ -170,6 +170,7 @@
   "userMenu": {
     "editProfile": "Modifier le profil",
     "settings": "Paramètres",
+    "admin": "Admin",
     "theme": "Thème",
     "themeLight": "Clair",
     "themeDark": "Sombre",

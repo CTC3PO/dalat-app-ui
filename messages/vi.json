@@ -170,6 +170,7 @@
   "userMenu": {
     "editProfile": "Chỉnh sửa hồ sơ",
     "settings": "Cài đặt",
+    "admin": "Quản trị",
     "theme": "Giao diện",
     "themeLight": "Sáng",
     "themeDark": "Tối",

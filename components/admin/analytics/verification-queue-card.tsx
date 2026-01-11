@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/lib/i18n/routing";
 import { ShieldCheck, Clock, XCircle, HelpCircle, ArrowRight } from "lucide-react";
 import type { VerificationQueueStats } from "@/lib/admin/analytics";
 
