@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Calendar, MapPin, Users, Expand } from "lucide-react";
 import { ImageLightbox } from "@/components/ui/image-lightbox";
 import { EventDefaultImage } from "@/components/events/event-default-image";
+import { ImmersiveImage } from "@/components/events/immersive-image";
 import { formatInDaLat } from "@/lib/timezone";
 import { isVideoUrl } from "@/lib/media-utils";
 import type { Event, EventCounts } from "@/lib/types";
@@ -49,17 +50,12 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
                 autoPlay
               />
             ) : (
-              <>
-                <img
-                  src={event.image_url!}
-                  alt={event.title}
-                  className="absolute inset-0 w-full h-full object-contain"
-                />
+              <ImmersiveImage src={event.image_url!} alt={event.title}>
                 {/* Expand icon - top right, below floating header */}
-                <div className="absolute top-16 right-4 bg-black/50 rounded-full p-2.5">
+                <div className="absolute top-16 right-4 bg-black/50 rounded-full p-2.5 z-20">
                   <Expand className="w-5 h-5 text-white" />
                 </div>
-              </>
+              </ImmersiveImage>
             )
           ) : (
             /* Default image when no event image is provided */
