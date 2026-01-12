@@ -66,6 +66,22 @@ async function getEventCounts(eventIds: string[]) {
   return counts;
 }
 
+async function getLifecycleCounts() {
+  const supabase = await createClient();
+
+  // Get count of happening events (just need to know if > 0)
+  const { data: happeningEvents } = await supabase.rpc("get_events_by_lifecycle", {
+    p_lifecycle: "happening",
+    p_limit: 1,
+  });
+
+  return {
+    upcoming: 0, // Not needed for hiding logic
+    happening: happeningEvents?.length ?? 0,
+    past: 0, // Not needed for hiding logic
+  };
+}
+
 async function EventsFeed({ lifecycle }: { lifecycle: EventLifecycle }) {
   const events = await getEventsByLifecycle(lifecycle);
   const eventIds = events.map((e) => e.id);
@@ -101,10 +117,21 @@ async function EventsFeed({ lifecycle }: { lifecycle: EventLifecycle }) {
   );
 }
 
-function DesktopTabs({ activeTab }: { activeTab: EventLifecycle }) {
+function DesktopTabs({
+  activeTab,
+  lifecycleCounts
+}: {
+  activeTab: EventLifecycle;
+  lifecycleCounts: { upcoming: number; happening: number; past: number };
+}) {
   return (
     <Suspense fallback={<div className="h-10 bg-muted rounded-lg animate-pulse" />}>
-      <EventFeedTabs activeTab={activeTab} useUrlNavigation />
+      <EventFeedTabs
+        activeTab={activeTab}
+        useUrlNavigation
+        counts={lifecycleCounts}
+        hideEmptyTabs
+      />
     </Suspense>
   );
 }
@@ -112,8 +139,11 @@ function DesktopTabs({ activeTab }: { activeTab: EventLifecycle }) {
 export default async function Home({ searchParams }: PageProps) {
   const params = await searchParams;
   const activeTab = parseLifecycle(params.tab);
-  const t = await getTranslations("home");
-  const tNav = await getTranslations("nav");
+  const [t, tNav, lifecycleCounts] = await Promise.all([
+    getTranslations("home"),
+    getTranslations("nav"),
+    getLifecycleCounts(),
+  ]);
 
   return (
     <>
@@ -148,7 +178,7 @@ export default async function Home({ searchParams }: PageProps) {
             </div>
           }
         >
-          <EventFeedImmersive lifecycle={activeTab} />
+          <EventFeedImmersive lifecycle={activeTab} lifecycleCounts={lifecycleCounts} />
         </Suspense>
       </div>
 
@@ -183,7 +213,7 @@ export default async function Home({ searchParams }: PageProps) {
 
           {/* Tabs */}
           <div className="mb-6">
-            <DesktopTabs activeTab={activeTab} />
+            <DesktopTabs activeTab={activeTab} lifecycleCounts={lifecycleCounts} />
           </div>
 
           <Suspense

@@ -7,6 +7,7 @@ import type { Event, EventCounts } from "@/lib/types";
 
 interface EventFeedImmersiveProps {
   lifecycle?: EventLifecycle;
+  lifecycleCounts?: { upcoming: number; happening: number; past: number };
 }
 
 async function getEventsByLifecycle(lifecycle: EventLifecycle) {
@@ -58,15 +59,30 @@ async function getEventCounts(eventIds: string[]) {
   return counts;
 }
 
-function FloatingTabs({ activeTab }: { activeTab: EventLifecycle }) {
+function FloatingTabs({
+  activeTab,
+  lifecycleCounts
+}: {
+  activeTab: EventLifecycle;
+  lifecycleCounts?: { upcoming: number; happening: number; past: number };
+}) {
   return (
     <Suspense fallback={null}>
-      <EventFeedTabs activeTab={activeTab} variant="floating" useUrlNavigation />
+      <EventFeedTabs
+        activeTab={activeTab}
+        variant="floating"
+        useUrlNavigation
+        counts={lifecycleCounts}
+        hideEmptyTabs={!!lifecycleCounts}
+      />
     </Suspense>
   );
 }
 
-export async function EventFeedImmersive({ lifecycle = "upcoming" }: EventFeedImmersiveProps) {
+export async function EventFeedImmersive({
+  lifecycle = "upcoming",
+  lifecycleCounts
+}: EventFeedImmersiveProps) {
   const events = await getEventsByLifecycle(lifecycle);
   const eventIds = events.map((e) => e.id);
   const counts = await getEventCounts(eventIds);
@@ -84,7 +100,7 @@ export async function EventFeedImmersive({ lifecycle = "upcoming" }: EventFeedIm
       <div className="h-[100dvh] flex flex-col bg-black text-white">
         {/* Floating tabs */}
         <div className="absolute top-14 left-0 right-0 z-40 px-3">
-          <FloatingTabs activeTab={lifecycle} />
+          <FloatingTabs activeTab={lifecycle} lifecycleCounts={lifecycleCounts} />
         </div>
 
         <div className="flex-1 flex items-center justify-center">
@@ -105,7 +121,7 @@ export async function EventFeedImmersive({ lifecycle = "upcoming" }: EventFeedIm
     <div className="h-[100dvh] relative">
       {/* Floating tabs below the header */}
       <div className="absolute top-14 left-0 right-0 z-40 px-3">
-        <FloatingTabs activeTab={lifecycle} />
+        <FloatingTabs activeTab={lifecycle} lifecycleCounts={lifecycleCounts} />
       </div>
 
       {/* Scrollable event cards */}

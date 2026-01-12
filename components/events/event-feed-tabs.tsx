@@ -13,6 +13,7 @@ interface EventFeedTabsProps {
   variant?: "default" | "floating";
   labels?: { upcoming: string; happening: string; past: string };
   useUrlNavigation?: boolean;
+  hideEmptyTabs?: boolean;
 }
 
 const tabs: { id: EventLifecycle; icon: typeof Calendar; defaultLabel: string }[] = [
@@ -28,10 +29,17 @@ export function EventFeedTabs({
   variant = "default",
   labels,
   useUrlNavigation = false,
+  hideEmptyTabs = false,
 }: EventFeedTabsProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isFloating = variant === "floating";
+
+  // Filter out tabs with no events when hideEmptyTabs is enabled
+  // Only hide "happening" tab when empty - always show upcoming and past
+  const visibleTabs = hideEmptyTabs
+    ? tabs.filter((tab) => tab.id !== "happening" || (counts?.happening ?? 0) > 0)
+    : tabs;
 
   const handleTabChange = (tab: EventLifecycle) => {
     if (useUrlNavigation) {
@@ -50,13 +58,14 @@ export function EventFeedTabs({
   return (
     <div
       className={cn(
-        "grid w-full grid-cols-3 gap-1 rounded-lg p-1",
+        "grid w-full gap-1 rounded-lg p-1",
+        visibleTabs.length === 2 ? "grid-cols-2" : "grid-cols-3",
         isFloating
           ? "bg-black/40 backdrop-blur-md"
           : "bg-muted"
       )}
     >
-      {tabs.map((tab) => {
+      {visibleTabs.map((tab) => {
         const Icon = tab.icon;
         const isActive = activeTab === tab.id;
         const count = counts?.[tab.id];
