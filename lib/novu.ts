@@ -488,3 +488,141 @@ export async function scheduleEventReminders(
 
   return results;
 }
+
+// ============================================
+// Tribe Notifications
+// ============================================
+
+const tribeTranslations = {
+  joinRequest: {
+    en: (name: string, tribe: string) => `${name} wants to join "${tribe}"`,
+    fr: (name: string, tribe: string) => `${name} souhaite rejoindre "${tribe}"`,
+    vi: (name: string, tribe: string) => `${name} muốn tham gia "${tribe}"`,
+  },
+  requestApproved: {
+    en: (tribe: string) => `Welcome to "${tribe}"! Your request was approved.`,
+    fr: (tribe: string) => `Bienvenue dans "${tribe}" ! Votre demande a été approuvée.`,
+    vi: (tribe: string) => `Chào mừng bạn đến "${tribe}"! Yêu cầu của bạn đã được chấp nhận.`,
+  },
+  requestRejected: {
+    en: (tribe: string) => `Your request to join "${tribe}" was not approved.`,
+    fr: (tribe: string) => `Votre demande pour rejoindre "${tribe}" n'a pas été approuvée.`,
+    vi: (tribe: string) => `Yêu cầu tham gia "${tribe}" của bạn không được chấp nhận.`,
+  },
+  newEvent: {
+    en: (event: string, tribe: string) => `New event "${event}" in ${tribe}`,
+    fr: (event: string, tribe: string) => `Nouvel événement "${event}" dans ${tribe}`,
+    vi: (event: string, tribe: string) => `Sự kiện mới "${event}" trong ${tribe}`,
+  },
+  buttons: {
+    reviewRequests: { en: 'Review requests', fr: 'Voir les demandes', vi: 'Xem yêu cầu' },
+    viewTribe: { en: 'View tribe', fr: 'Voir la tribu', vi: 'Xem tribe' },
+    viewEvent: { en: 'View event', fr: 'Voir l\'événement', vi: 'Xem sự kiện' },
+  },
+};
+
+export async function notifyTribeJoinRequest(
+  adminIds: string[],
+  requesterName: string,
+  tribeName: string,
+  tribeSlug: string
+) {
+  const tribeUrl = `${process.env.NEXT_PUBLIC_APP_URL}/tribes/${tribeSlug}?tab=requests`;
+
+  await Promise.all(adminIds.map(async (adminId) => {
+    await Promise.all([
+      getNovu().trigger('tribe-join-request', {
+        to: { subscriberId: adminId },
+        payload: {
+          subject: tribeTranslations.joinRequest.en(requesterName, tribeName),
+          requesterName,
+          tribeName,
+          tribeSlug,
+          actionUrl: tribeUrl,
+          primaryActionLabel: tribeTranslations.buttons.reviewRequests.en,
+          primaryActionUrl: tribeUrl,
+        },
+      }),
+      sendPushToUser(adminId, {
+        title: tribeTranslations.joinRequest.en(requesterName, tribeName),
+        body: tribeTranslations.buttons.reviewRequests.en,
+        url: tribeUrl,
+        tag: `tribe-request-${tribeSlug}`,
+      }),
+    ]);
+  }));
+}
+
+export async function notifyTribeRequestApproved(
+  userId: string,
+  tribeName: string,
+  tribeSlug: string
+) {
+  const tribeUrl = `${process.env.NEXT_PUBLIC_APP_URL}/tribes/${tribeSlug}`;
+
+  await Promise.all([
+    getNovu().trigger('tribe-request-approved', {
+      to: { subscriberId: userId },
+      payload: {
+        subject: tribeTranslations.requestApproved.en(tribeName),
+        tribeName,
+        tribeSlug,
+        actionUrl: tribeUrl,
+        primaryActionLabel: tribeTranslations.buttons.viewTribe.en,
+        primaryActionUrl: tribeUrl,
+      },
+    }),
+    sendPushToUser(userId, {
+      title: tribeTranslations.requestApproved.en(tribeName),
+      body: tribeTranslations.buttons.viewTribe.en,
+      url: tribeUrl,
+      tag: `tribe-approved-${tribeSlug}`,
+    }),
+  ]);
+}
+
+export async function notifyTribeRequestRejected(
+  userId: string,
+  tribeName: string
+) {
+  // Only in-app notification for rejections (no push)
+  await getNovu().trigger('tribe-request-rejected', {
+    to: { subscriberId: userId },
+    payload: {
+      subject: tribeTranslations.requestRejected.en(tribeName),
+      tribeName,
+    },
+  });
+}
+
+export async function notifyTribeNewEvent(
+  memberIds: string[],
+  eventTitle: string,
+  eventSlug: string,
+  tribeName: string
+) {
+  const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
+
+  await Promise.all(memberIds.map(async (memberId) => {
+    await Promise.all([
+      getNovu().trigger('tribe-new-event', {
+        to: { subscriberId: memberId },
+        payload: {
+          subject: tribeTranslations.newEvent.en(eventTitle, tribeName),
+          eventTitle,
+          eventSlug,
+          tribeName,
+          actionUrl: eventUrl,
+          primaryActionLabel: tribeTranslations.buttons.viewEvent.en,
+          primaryActionUrl: eventUrl,
+        },
+      }),
+      sendPushToUser(memberId, {
+        title: tribeTranslations.newEvent.en(eventTitle, tribeName),
+        body: tribeTranslations.buttons.viewEvent.en,
+        url: eventUrl,
+        tag: `tribe-event-${eventSlug}`,
+      }),
+    ]);
+  }));
+}

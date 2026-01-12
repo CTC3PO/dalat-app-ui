@@ -68,15 +68,64 @@ export interface Organizer {
   profiles?: Profile;
 }
 
+// ============================================
+// Tribe Types (V2 - Enhanced Membership System)
+// ============================================
+
+export type TribeAccessType = 'public' | 'request' | 'invite_only' | 'secret';
+export type TribeMemberRole = 'member' | 'admin' | 'leader';
+export type TribeMemberStatus = 'active' | 'banned';
+export type TribeRequestStatus = 'pending' | 'approved' | 'rejected' | 'cancelled';
+export type TribeEventVisibility = 'public' | 'members_only';
+
 export interface Tribe {
   id: string;
   slug: string;
   name: string;
   description: string | null;
   cover_image_url: string | null;
+  access_type: TribeAccessType;
+  invite_code: string | null;
+  invite_code_expires_at: string | null;
+  is_listed: boolean;
+  settings: Record<string, unknown>;
   created_by: string;
   created_at: string;
   updated_at: string;
+  // Joined data
+  profiles?: Profile;
+  member_count?: number;
+  is_member?: boolean;
+  user_role?: TribeMemberRole;
+  user_status?: TribeMemberStatus;
+}
+
+export interface TribeMember {
+  id: string;
+  tribe_id: string;
+  user_id: string;
+  role: TribeMemberRole;
+  status: TribeMemberStatus;
+  invited_by: string | null;
+  joined_at: string;
+  show_on_profile: boolean;
+  // Joined data
+  profiles?: Profile;
+  tribes?: Tribe;
+}
+
+export interface TribeRequest {
+  id: string;
+  tribe_id: string;
+  user_id: string;
+  message: string | null;
+  status: TribeRequestStatus;
+  reviewed_by: string | null;
+  created_at: string;
+  reviewed_at: string | null;
+  // Joined data
+  profiles?: Profile;
+  tribes?: Tribe;
 }
 
 export interface Event {
@@ -84,6 +133,7 @@ export interface Event {
   slug: string;
   previous_slugs: string[];
   tribe_id: string | null;
+  tribe_visibility: TribeEventVisibility;
   organizer_id: string | null;
   title: string;
   description: string | null;
@@ -386,6 +436,25 @@ export interface MomentCounts {
   event_id: string;
   published_count: number;
   pending_count: number;
+}
+
+// Extended moment type with event data for the content-first feed
+export interface MomentWithEvent {
+  id: string;
+  event_id: string;
+  user_id: string;
+  content_type: MomentContentType;
+  media_url: string | null;
+  text_content: string | null;
+  created_at: string;
+  username: string | null;
+  display_name: string | null;
+  avatar_url: string | null;
+  event_slug: string;
+  event_title: string;
+  event_image_url: string | null;
+  event_starts_at: string;
+  event_location_name: string | null;
 }
 
 export interface MomentLikeStatus {
