@@ -1,9 +1,17 @@
 'use client';
 
-import { Inbox } from '@novu/nextjs';
+import dynamic from 'next/dynamic';
 import { inboxDarkTheme } from '@novu/react/themes';
 import { useTheme } from 'next-themes';
-import { useEffect, useState } from 'react';
+
+// Dynamically import Inbox with SSR disabled to prevent hydration mismatch
+const Inbox = dynamic(
+  () => import('@novu/nextjs').then((mod) => mod.Inbox),
+  {
+    ssr: false,
+    loading: () => <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+  }
+);
 
 interface NotificationInboxProps {
   subscriberId: string;
@@ -12,24 +20,6 @@ interface NotificationInboxProps {
 
 export function NotificationInbox({ subscriberId, subscriberHash }: NotificationInboxProps) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    // Debug: log what we're using
-    console.log('[Novu] Inbox mounting with:', {
-      applicationIdentifier: process.env.NEXT_PUBLIC_NOVU_APPLICATION_IDENTIFIER,
-      subscriberId,
-      subscriberHash: subscriberHash ? `${subscriberHash.substring(0, 8)}...` : 'missing',
-    });
-  }, [subscriberId, subscriberHash]);
-
-  if (!mounted) {
-    return (
-      <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
-    );
-  }
-
   const isDark = resolvedTheme === 'dark';
 
   return (
