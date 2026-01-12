@@ -1,7 +1,7 @@
 import { notFound, redirect } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Camera } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { MomentForm } from "@/components/moments";
@@ -125,6 +125,9 @@ export default async function NewMomentPage({ params }: PageProps) {
     redirect(`/events/${slug}/moments`);
   }
 
+  // Check if user is event creator (photographer)
+  const isPhotographer = event.created_by === user.id;
+
   const t = await getTranslations("moments");
   const tCommon = await getTranslations("common");
 
@@ -156,6 +159,19 @@ export default async function NewMomentPage({ params }: PageProps) {
           eventSlug={slug}
           userId={user.id}
         />
+
+        {/* Pro Upload Link - Only for photographers */}
+        {isPhotographer && (
+          <div className="mt-6 pt-6 border-t">
+            <Link
+              href={`/events/${slug}/moments/pro-upload`}
+              className="flex items-center justify-center gap-2 p-4 rounded-lg border border-dashed border-muted-foreground/30 hover:border-primary hover:bg-primary/5 text-muted-foreground hover:text-primary transition-all group"
+            >
+              <Camera className="w-5 h-5" />
+              <span className="text-sm font-medium">{t("proUpload.proUploadLink")}</span>
+            </Link>
+          </div>
+        )}
       </div>
     </main>
   );
