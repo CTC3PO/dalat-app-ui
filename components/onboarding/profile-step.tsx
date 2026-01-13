@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
-import { detectBrowserLocale, SUPPORTED_LOCALES } from "@/lib/locale";
+import { detectBrowserLocale } from "@/lib/locale";
 import type { Locale } from "@/lib/types";
 
 interface ProfileStepProps {
@@ -42,15 +42,11 @@ export function ProfileStep({
   const [usernameChecking, setUsernameChecking] = useState(false);
   const [usernameAvailable, setUsernameAvailable] = useState<boolean | null>(null);
 
-  // Locale detection
+  // Locale detection - detectBrowserLocale returns one of The Global Twelve
   const [detectedLocale, setDetectedLocale] = useState<Locale>("en");
 
   useEffect(() => {
-    const browserLocale = detectBrowserLocale();
-    const uiLocale = SUPPORTED_LOCALES.includes(browserLocale as Locale)
-      ? (browserLocale as Locale)
-      : "en";
-    setDetectedLocale(uiLocale);
+    setDetectedLocale(detectBrowserLocale());
   }, []);
 
   // Debounced username availability check

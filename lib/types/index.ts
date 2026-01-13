@@ -1,10 +1,13 @@
-// UI locales (for static translations in messages/*.json)
-export type Locale = 'en' | 'fr' | 'vi';
+// The Global Twelve - unified locale system for UI and content
+export type Locale = 'en' | 'vi' | 'ko' | 'zh' | 'ru' | 'fr' | 'ja' | 'ms' | 'th' | 'de' | 'es' | 'id';
 
-// Content locales - The Global Twelve (for user-generated content translation)
-export type ContentLocale = 'en' | 'vi' | 'ko' | 'zh' | 'ru' | 'fr' | 'ja' | 'ms' | 'th' | 'de' | 'es' | 'id';
+// ContentLocale is now an alias for backwards compatibility
+export type ContentLocale = Locale;
 
-export const CONTENT_LOCALES: ContentLocale[] = ['en', 'vi', 'ko', 'zh', 'ru', 'fr', 'ja', 'ms', 'th', 'de', 'es', 'id'];
+export const LOCALES: Locale[] = ['en', 'vi', 'ko', 'zh', 'ru', 'fr', 'ja', 'ms', 'th', 'de', 'es', 'id'];
+
+// Backwards compatibility alias
+export const CONTENT_LOCALES: ContentLocale[] = LOCALES;
 
 export const LOCALE_FLAGS: Record<ContentLocale, string> = {
   en: '🇬🇧', vi: '🇻🇳', ko: '🇰🇷', zh: '🇨🇳',

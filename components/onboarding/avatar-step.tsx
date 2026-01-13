@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Upload, Sparkles, Loader2, Camera, User } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
@@ -29,8 +29,31 @@ export function AvatarStep({
   const [selectedDefault, setSelectedDefault] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStage, setGenerationStage] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Multi-stage loading messages for AI generation
+  const generationStages = [
+    t("avatarStep.generating"),           // "Generating..."
+    t("avatarStep.creatingArtwork"),      // "Creating artwork..."
+    t("avatarStep.almostThere"),          // "Almost there..."
+  ];
+
+  // Progress through stages during generation
+  useEffect(() => {
+    if (!isGenerating) {
+      setGenerationStage(0);
+      return;
+    }
+
+    const timers = [
+      setTimeout(() => setGenerationStage(1), 3000),  // After 3s
+      setTimeout(() => setGenerationStage(2), 8000),  // After 8s
+    ];
+
+    return () => timers.forEach(clearTimeout);
+  }, [isGenerating]);
 
   const validateFile = (file: File): string | null => {
     const maxSize = 5 * 1024 * 1024;
@@ -264,7 +287,7 @@ export function AvatarStep({
             </div>
           )}
           <span className="text-sm font-medium">
-            {isGenerating ? t("avatarStep.generating") : t("avatarStep.aiMagic")}
+            {isGenerating ? generationStages[generationStage] : t("avatarStep.aiMagic")}
           </span>
         </button>
       </div>

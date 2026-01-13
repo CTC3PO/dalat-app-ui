@@ -1,40 +1,25 @@
-import type { Locale, ContentLocale } from '@/lib/types';
-import { CONTENT_LOCALES, LOCALE_FLAGS as CONTENT_LOCALE_FLAGS, LOCALE_NAMES as CONTENT_LOCALE_NAMES } from '@/lib/types';
+import type { Locale } from '@/lib/types';
+import { LOCALES, LOCALE_FLAGS as TYPE_LOCALE_FLAGS, LOCALE_NAMES as TYPE_LOCALE_NAMES } from '@/lib/types';
 
-// UI locales with full translation files
-export const SUPPORTED_LOCALES: Locale[] = ['en', 'fr', 'vi'];
+// The Global Twelve - all supported locales
+export const SUPPORTED_LOCALES: Locale[] = LOCALES;
 
-// Content locales - The Global Twelve
-export const SUPPORTED_CONTENT_LOCALES: ContentLocale[] = CONTENT_LOCALES;
+// Re-export for convenience
+export const LOCALE_NAMES = TYPE_LOCALE_NAMES;
+export const LOCALE_FLAGS = TYPE_LOCALE_FLAGS;
 
-export const LOCALE_NAMES: Record<Locale, string> = {
-  en: 'English',
-  fr: 'Français',
-  vi: 'Tiếng Việt',
-};
-
-export const LOCALE_FLAGS: Record<Locale, string> = {
-  en: '🇬🇧',
-  fr: '🇫🇷',
-  vi: '🇻🇳',
-};
-
-// Re-export content locale maps for convenience
-export const CONTENT_LOCALE_NAMES_MAP = CONTENT_LOCALE_NAMES;
-export const CONTENT_LOCALE_FLAGS_MAP = CONTENT_LOCALE_FLAGS;
-
-export function detectBrowserLocale(): ContentLocale {
+export function detectBrowserLocale(): Locale {
   if (typeof navigator === 'undefined') return 'en';
 
   const browserLang = navigator.language.split('-')[0].toLowerCase();
 
-  // Check if browser language matches any content locale
-  if (SUPPORTED_CONTENT_LOCALES.includes(browserLang as ContentLocale)) {
-    return browserLang as ContentLocale;
+  // Check if browser language matches any supported locale
+  if (SUPPORTED_LOCALES.includes(browserLang as Locale)) {
+    return browserLang as Locale;
   }
 
   // Map some common language codes to our supported locales
-  const langMap: Record<string, ContentLocale> = {
+  const langMap: Record<string, Locale> = {
     'zh-cn': 'zh',
     'zh-tw': 'zh',
     'zh-hk': 'zh',
@@ -52,8 +37,4 @@ export function detectBrowserLocale(): ContentLocale {
 
 export function isValidLocale(locale: string): locale is Locale {
   return SUPPORTED_LOCALES.includes(locale as Locale);
-}
-
-export function isValidContentLocale(locale: string): locale is ContentLocale {
-  return SUPPORTED_CONTENT_LOCALES.includes(locale as ContentLocale);
 }

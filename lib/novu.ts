@@ -3,6 +3,17 @@ import { createHmac } from 'crypto';
 import type { Locale } from '@/lib/types';
 import { sendPushToUser } from '@/lib/web-push';
 
+// Notification translations currently support 3 locales
+// Other locales fall back to English
+type NotificationLocale = 'en' | 'fr' | 'vi';
+const NOTIFICATION_LOCALES: NotificationLocale[] = ['en', 'fr', 'vi'];
+
+function getNotificationLocale(locale: Locale): NotificationLocale {
+  return NOTIFICATION_LOCALES.includes(locale as NotificationLocale)
+    ? (locale as NotificationLocale)
+    : 'en';
+}
+
 // Lazy-initialized Novu client to avoid failing at module load time
 // when only generateSubscriberHash is needed
 let novuClient: Novu | null = null;
@@ -90,6 +101,7 @@ export async function notifyRsvpConfirmation(
   eventSlug: string,
   eventDescription: string | null
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   // Send both Novu inbox and web push in parallel
@@ -97,15 +109,15 @@ export async function notifyRsvpConfirmation(
     getNovu().trigger('rsvp', {
       to: { subscriberId },
       payload: {
-        subject: translations.rsvpConfirmation[locale](eventTitle),
-        body: translations.rsvpConfirmationBody[locale](eventDescription),
-        primaryActionLabel: translations.buttons.viewEvent[locale],
+        subject: translations.rsvpConfirmation[notifLocale](eventTitle),
+        body: translations.rsvpConfirmationBody[notifLocale](eventDescription),
+        primaryActionLabel: translations.buttons.viewEvent[notifLocale],
         primaryActionUrl: eventUrl,
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.rsvpConfirmation[locale](eventTitle),
-      body: translations.rsvpConfirmationBody[locale](eventDescription),
+      title: translations.rsvpConfirmation[notifLocale](eventTitle),
+      body: translations.rsvpConfirmationBody[notifLocale](eventDescription),
       url: eventUrl,
       tag: `rsvp-${eventSlug}`,
     }),
@@ -119,23 +131,24 @@ export async function notifyConfirmAttendance24h(
   eventTime: string,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const baseUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('24h-re-confirmation', {
       to: { subscriberId },
       payload: {
-        subject: translations.confirmAttendance24h[locale](eventTitle, eventTime),
-        primaryActionLabel: translations.buttons.yes[locale],
+        subject: translations.confirmAttendance24h[notifLocale](eventTitle, eventTime),
+        primaryActionLabel: translations.buttons.yes[notifLocale],
         primaryActionUrl: `${baseUrl}?confirm=yes`,
-        secondaryActionLabel: translations.buttons.changePlans[locale],
+        secondaryActionLabel: translations.buttons.changePlans[notifLocale],
         secondaryActionUrl: `${baseUrl}?cancel=true`,
-        emailPrompt: translations.email.clickToConfirm[locale],
+        emailPrompt: translations.email.clickToConfirm[notifLocale],
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.confirmAttendance24h[locale](eventTitle, eventTime),
-      body: translations.email.clickToConfirm[locale],
+      title: translations.confirmAttendance24h[notifLocale](eventTitle, eventTime),
+      body: translations.email.clickToConfirm[notifLocale],
       url: `${baseUrl}?confirm=yes`,
       tag: `24h-${eventSlug}`,
       requireInteraction: true,
@@ -151,25 +164,26 @@ export async function notifyFinalReminder2h(
   googleMapsUrl: string | null,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('2h-reminder', {
       to: { subscriberId },
       payload: {
-        subject: translations.finalReminder2h[locale](eventTitle, locationName),
+        subject: translations.finalReminder2h[notifLocale](eventTitle, locationName),
         primaryActionLabel: googleMapsUrl
-          ? translations.buttons.getDirections[locale]
-          : translations.buttons.viewEvent[locale],
+          ? translations.buttons.getDirections[notifLocale]
+          : translations.buttons.viewEvent[notifLocale],
         primaryActionUrl: googleMapsUrl || eventUrl,
-        secondaryActionLabel: translations.buttons.changePlans[locale],
+        secondaryActionLabel: translations.buttons.changePlans[notifLocale],
         secondaryActionUrl: eventUrl,
-        emailBody: translations.email.seeYouThere[locale],
+        emailBody: translations.email.seeYouThere[notifLocale],
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.finalReminder2h[locale](eventTitle, locationName),
-      body: translations.email.seeYouThere[locale],
+      title: translations.finalReminder2h[notifLocale](eventTitle, locationName),
+      body: translations.email.seeYouThere[notifLocale],
       url: googleMapsUrl || eventUrl,
       tag: `2h-${eventSlug}`,
       requireInteraction: true,
@@ -183,20 +197,21 @@ export async function notifyWaitlistPromotion(
   eventTitle: string,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('waitlist-promotion', {
       to: { subscriberId },
       payload: {
-        message: translations.waitlistPromotion[locale](eventTitle),
-        buttonText: translations.buttons.viewEvent[locale],
+        message: translations.waitlistPromotion[notifLocale](eventTitle),
+        buttonText: translations.buttons.viewEvent[notifLocale],
         eventUrl,
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.waitlistPromotion[locale](eventTitle),
-      body: translations.buttons.viewEvent[locale],
+      title: translations.waitlistPromotion[notifLocale](eventTitle),
+      body: translations.buttons.viewEvent[notifLocale],
       url: eventUrl,
       tag: `waitlist-${eventSlug}`,
       requireInteraction: true,
@@ -211,20 +226,21 @@ export async function notifyEventReminder(
   eventTime: string,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('event-reminder', {
       to: { subscriberId },
       payload: {
-        message: translations.eventReminder[locale](eventTitle, eventTime),
-        buttonText: translations.buttons.viewEvent[locale],
+        message: translations.eventReminder[notifLocale](eventTitle, eventTime),
+        buttonText: translations.buttons.viewEvent[notifLocale],
         eventUrl,
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.eventReminder[locale](eventTitle, eventTime),
-      body: translations.buttons.viewEvent[locale],
+      title: translations.eventReminder[notifLocale](eventTitle, eventTime),
+      body: translations.buttons.viewEvent[notifLocale],
       url: eventUrl,
       tag: `reminder-${eventSlug}`,
     }),
@@ -237,22 +253,23 @@ export async function notifyConfirmAttendance(
   eventTitle: string,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const baseUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('confirm-attendance', {
       to: { subscriberId },
       payload: {
-        message: translations.confirmAttendance[locale](eventTitle),
-        yesButtonText: translations.buttons.yes[locale],
-        noButtonText: translations.buttons.no[locale],
+        message: translations.confirmAttendance[notifLocale](eventTitle),
+        yesButtonText: translations.buttons.yes[notifLocale],
+        noButtonText: translations.buttons.no[notifLocale],
         confirmUrl: `${baseUrl}?confirm=yes`,
         cancelUrl: `${baseUrl}?confirm=no`,
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.confirmAttendance[locale](eventTitle),
-      body: translations.buttons.yes[locale],
+      title: translations.confirmAttendance[notifLocale](eventTitle),
+      body: translations.buttons.yes[notifLocale],
       url: `${baseUrl}?confirm=yes`,
       tag: `confirm-${eventSlug}`,
       requireInteraction: true,
@@ -267,20 +284,21 @@ export async function notifyWaitlistPositionUpdate(
   position: number,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('waitlist-position-update', {
       to: { subscriberId },
       payload: {
-        message: translations.waitlistPosition[locale](eventTitle, position),
-        buttonText: translations.buttons.viewEvent[locale],
+        message: translations.waitlistPosition[notifLocale](eventTitle, position),
+        buttonText: translations.buttons.viewEvent[notifLocale],
         eventUrl,
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.waitlistPosition[locale](eventTitle, position),
-      body: translations.buttons.viewEvent[locale],
+      title: translations.waitlistPosition[notifLocale](eventTitle, position),
+      body: translations.buttons.viewEvent[notifLocale],
       url: eventUrl,
       tag: `waitlist-pos-${eventSlug}`,
     }),
@@ -294,20 +312,21 @@ export async function notifyOrganizerNewRsvp(
   attendeeName: string,
   eventSlug: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventUrl = `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`;
 
   await Promise.all([
     getNovu().trigger('new-rsvp-organizer', {
       to: { subscriberId },
       payload: {
-        message: translations.newRsvp[locale](eventTitle, attendeeName),
-        buttonText: translations.buttons.viewEvent[locale],
+        message: translations.newRsvp[notifLocale](eventTitle, attendeeName),
+        buttonText: translations.buttons.viewEvent[notifLocale],
         eventUrl,
       },
     }),
     sendPushToUser(subscriberId, {
-      title: translations.newRsvp[locale](eventTitle, attendeeName),
-      body: translations.buttons.viewEvent[locale],
+      title: translations.newRsvp[notifLocale](eventTitle, attendeeName),
+      body: translations.buttons.viewEvent[notifLocale],
       url: eventUrl,
       tag: `new-rsvp-${eventSlug}`,
     }),
@@ -340,17 +359,18 @@ export async function notifyEventInvitation(
   inviterName: string,
   token: string
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const inviteUrl = `${process.env.NEXT_PUBLIC_APP_URL}/invite/${token}`;
 
   // Format event date/time for display
   const eventDate = new Date(startsAt);
-  const formattedDate = eventDate.toLocaleDateString(locale === 'vi' ? 'vi-VN' : locale === 'fr' ? 'fr-FR' : 'en-US', {
+  const formattedDate = eventDate.toLocaleDateString(notifLocale === 'vi' ? 'vi-VN' : notifLocale === 'fr' ? 'fr-FR' : 'en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
     timeZone: 'Asia/Ho_Chi_Minh',
   });
-  const formattedTime = eventDate.toLocaleTimeString(locale === 'vi' ? 'vi-VN' : locale === 'fr' ? 'fr-FR' : 'en-US', {
+  const formattedTime = eventDate.toLocaleTimeString(notifLocale === 'vi' ? 'vi-VN' : notifLocale === 'fr' ? 'fr-FR' : 'en-US', {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
@@ -388,7 +408,7 @@ export async function notifyEventInvitation(
       firstName: inviteeName || undefined,
     },
     payload: {
-      subject: inviteTranslations.subject[locale](inviterName, eventTitle),
+      subject: inviteTranslations.subject[notifLocale](inviterName, eventTitle),
       eventTitle,
       eventDescription: eventDescription || '',
       eventDate: formattedDate,
@@ -402,11 +422,11 @@ export async function notifyEventInvitation(
       notGoingUrl: `${inviteUrl}?rsvp=cancelled`,
       calendarUrl: `${inviteUrl}/calendar.ics`,
       eventUrl: `${process.env.NEXT_PUBLIC_APP_URL}/events/${eventSlug}`,
-      goingLabel: inviteTranslations.buttons.going[locale],
-      maybeLabel: inviteTranslations.buttons.maybe[locale],
-      notGoingLabel: inviteTranslations.buttons.notGoing[locale],
-      viewDetailsLabel: inviteTranslations.buttons.viewDetails[locale],
-      addToCalendarLabel: inviteTranslations.buttons.addToCalendar[locale],
+      goingLabel: inviteTranslations.buttons.going[notifLocale],
+      maybeLabel: inviteTranslations.buttons.maybe[notifLocale],
+      notGoingLabel: inviteTranslations.buttons.notGoing[notifLocale],
+      viewDetailsLabel: inviteTranslations.buttons.viewDetails[notifLocale],
+      addToCalendarLabel: inviteTranslations.buttons.addToCalendar[notifLocale],
     },
   });
 }
@@ -423,6 +443,7 @@ export async function scheduleEventReminders(
   locationName?: string | null,
   googleMapsUrl?: string | null
 ) {
+  const notifLocale = getNotificationLocale(locale);
   const eventStart = new Date(startsAt);
   const now = new Date();
 
@@ -450,12 +471,12 @@ export async function scheduleEventReminders(
         eventTitle,
         eventSlug,
         eventTime,
-        subject: translations.confirmAttendance24h[locale](eventTitle, eventTime),
-        primaryActionLabel: translations.buttons.yes[locale],
+        subject: translations.confirmAttendance24h[notifLocale](eventTitle, eventTime),
+        primaryActionLabel: translations.buttons.yes[notifLocale],
         primaryActionUrl: `${baseUrl}?confirm=yes`,
-        secondaryActionLabel: translations.buttons.changePlans[locale],
+        secondaryActionLabel: translations.buttons.changePlans[notifLocale],
         secondaryActionUrl: `${baseUrl}?confirm=no`,
-        emailPrompt: translations.email.clickToConfirm[locale],
+        emailPrompt: translations.email.clickToConfirm[notifLocale],
         delayTill: time24hBefore.toISOString(),
       },
     });
@@ -472,14 +493,14 @@ export async function scheduleEventReminders(
         eventSlug,
         locationName: locationName || 'the venue',
         googleMapsUrl: googleMapsUrl || undefined,
-        subject: translations.finalReminder2h[locale](eventTitle, locationName || 'the venue'),
+        subject: translations.finalReminder2h[notifLocale](eventTitle, locationName || 'the venue'),
         primaryActionLabel: googleMapsUrl
-          ? translations.buttons.getDirections[locale]
-          : translations.buttons.viewEvent[locale],
+          ? translations.buttons.getDirections[notifLocale]
+          : translations.buttons.viewEvent[notifLocale],
         primaryActionUrl: googleMapsUrl || baseUrl,
-        secondaryActionLabel: translations.buttons.changePlans[locale],
+        secondaryActionLabel: translations.buttons.changePlans[notifLocale],
         secondaryActionUrl: baseUrl,
-        emailBody: translations.email.seeYouThere[locale],
+        emailBody: translations.email.seeYouThere[notifLocale],
         delayTill: time2hBefore.toISOString(),
       },
     });
