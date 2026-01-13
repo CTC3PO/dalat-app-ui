@@ -520,7 +520,7 @@ export function EventForm({
                   {slugStatus === "invalid" && "Only lowercase letters, numbers, and hyphens allowed"}
                 </p>
               )}
-              {isEditing && (
+              {isEditing && slug !== event?.slug && (
                 <p className="text-xs text-amber-600">
                   ⚠ Changing the URL will break any previously shared links
                 </p>
