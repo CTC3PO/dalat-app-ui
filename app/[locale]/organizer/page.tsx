@@ -5,7 +5,6 @@ import {
   Calendar,
   PartyPopper,
   Users,
-  Sparkles,
   Plus,
   ArrowRight,
 } from "lucide-react";
@@ -167,13 +166,6 @@ export default async function OrganizerDashboard() {
           >
             <PartyPopper className="h-4 w-4" />
             {t("createFestival")}
-          </Link>
-          <Link
-            href="/organizer/extract"
-            className="inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
-          >
-            <Sparkles className="h-4 w-4" />
-            {t("extractFromPoster")}
           </Link>
         </div>
       </div>

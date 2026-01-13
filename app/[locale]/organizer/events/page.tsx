@@ -198,23 +198,15 @@ export default async function OrganizerEventsPage() {
           <Calendar className="h-16 w-16 mx-auto mb-4 text-muted-foreground/50" />
           <h3 className="text-xl font-semibold mb-2">{t("noEventsYet")}</h3>
           <p className="text-muted-foreground mb-6">
-            Create your first event or use AI extraction
+            {t("createFirstEvent")}
           </p>
-          <div className="flex gap-3 justify-center">
-            <Link
-              href="/events/new"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
-            >
-              <Plus className="h-5 w-5" />
-              {t("createEvent")}
-            </Link>
-            <Link
-              href="/organizer/extract"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors font-medium"
-            >
-              {t("extractFromPoster")}
-            </Link>
-          </div>
+          <Link
+            href="/events/new"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-md bg-primary text-primary-foreground hover:bg-primary/90 transition-colors font-medium"
+          >
+            <Plus className="h-5 w-5" />
+            {t("createEvent")}
+          </Link>
         </div>
       )}
     </div>

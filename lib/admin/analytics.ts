@@ -144,36 +144,6 @@ export async function getVerificationQueueStats(): Promise<VerificationQueueStat
 }
 
 // ============================================
-// Extraction Analytics
-// ============================================
-
-export interface ExtractionStats {
-  total_extractions: number;
-  total_extracted: number;
-  total_published: number;
-  total_skipped: number;
-  success_rate: number;
-  by_status: Array<{ status: string; count: number }>;
-}
-
-export async function getExtractionStats(): Promise<ExtractionStats | null> {
-  try {
-    const supabase = await createClient();
-    const { data, error } = await supabase.rpc("get_extraction_stats");
-
-    if (error) {
-      console.error("Error fetching extraction stats:", error);
-      return null;
-    }
-
-    return data?.[0] ?? null;
-  } catch (e) {
-    console.error("Exception fetching extraction stats:", e);
-    return null;
-  }
-}
-
-// ============================================
 // Festival Analytics
 // ============================================
 
@@ -266,7 +236,6 @@ export interface FullDashboardData {
   eventActivity: EventActivityData[];
   rsvpTrends: RsvpTrendsData[];
   verificationQueue: VerificationQueueStats | null;
-  extractionStats: ExtractionStats | null;
   festivalStats: FestivalStats | null;
   sessionStats: SessionStats | null;
 }
@@ -281,7 +250,6 @@ export async function getFullDashboardData(): Promise<FullDashboardData> {
       eventActivity,
       rsvpTrends,
       verificationQueue,
-      extractionStats,
       festivalStats,
       sessionStats,
     ] = await Promise.all([
@@ -291,7 +259,6 @@ export async function getFullDashboardData(): Promise<FullDashboardData> {
       getEventActivity(30),
       getRsvpTrends(30),
       getVerificationQueueStats(),
-      getExtractionStats(),
       getFestivalStats(),
       getSessionStats(),
     ]);
@@ -303,7 +270,6 @@ export async function getFullDashboardData(): Promise<FullDashboardData> {
       eventActivity,
       rsvpTrends,
       verificationQueue,
-      extractionStats,
       festivalStats,
       sessionStats,
     };
@@ -317,7 +283,6 @@ export async function getFullDashboardData(): Promise<FullDashboardData> {
       eventActivity: [],
       rsvpTrends: [],
       verificationQueue: null,
-      extractionStats: null,
       festivalStats: null,
       sessionStats: null,
     };

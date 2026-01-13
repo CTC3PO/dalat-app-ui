@@ -3,7 +3,6 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/lib/i18n/routing";
 import {
   Building2,
-  Sparkles,
   Home,
   PartyPopper,
   Calendar,
@@ -83,8 +82,7 @@ export default async function OrganizerLayout({
     { href: "/organizer", label: t("dashboard"), icon: LayoutDashboard },
     { href: "/organizer/festivals", label: t("festivals"), icon: PartyPopper },
     { href: "/organizer/events", label: t("events"), icon: Calendar },
-    { href: "/organizer/extract", label: t("aiExtract"), icon: Sparkles },
-  ];
+      ];
 
   return (
     <div className="min-h-screen flex flex-col">

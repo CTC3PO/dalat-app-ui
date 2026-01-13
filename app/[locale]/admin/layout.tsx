@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 import {
   Shield,
   Building2,
-  Sparkles,
   Home,
   PartyPopper,
   ShieldCheck,
@@ -84,12 +83,6 @@ export default async function AdminLayout({
       label: t("navFestivals"),
       icon: PartyPopper,
       show: isAdmin, // Only admins see festivals in admin panel
-    },
-    {
-      href: "/admin/extract",
-      label: t("navAiExtract"),
-      icon: Sparkles,
-      show: true,
     },
     {
       href: "/admin/verifications",

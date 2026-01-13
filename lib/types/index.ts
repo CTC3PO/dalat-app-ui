@@ -181,36 +181,6 @@ export interface EventCounts {
   interested_count: number;
 }
 
-// AI Extraction types
-export interface ExtractedEventData {
-  title: string;
-  description: string | null;
-  starts_at: string;  // ISO string
-  ends_at: string | null;
-  location_name: string | null;
-  address: string | null;
-  confidence: number;  // 0-1, how confident AI is about extraction
-  // Deduplication results (filled in after checking)
-  duplicate_of?: string;  // Event ID if duplicate found
-  duplicate_confidence?: number;
-}
-
-export interface ExtractionLog {
-  id: string;
-  user_id: string;
-  image_url: string;
-  organizer_id: string | null;
-  extracted_count: number;
-  published_count: number;
-  skipped_count: number;
-  raw_response: ExtractedEventData[] | null;
-  status: 'pending' | 'reviewed' | 'completed';
-  created_at: string;
-  // Joined data
-  profiles?: Profile;
-  organizers?: Organizer;
-}
-
 // ============================================
 // Verification Request Types
 // ============================================

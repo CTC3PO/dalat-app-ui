@@ -2,7 +2,6 @@ import { Link } from "@/lib/i18n/routing";
 import { getTranslations } from "next-intl/server";
 import {
   Building2,
-  Sparkles,
   Calendar,
   Users,
   Bell,
@@ -148,25 +147,7 @@ export default async function AdminDashboard() {
             </div>
           </div>
         </div>
-        <div className="rounded-lg border bg-card p-6">
-          <div className="flex items-center gap-4">
-            <div className="rounded-lg bg-primary/10 p-3">
-              <Sparkles className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">
-                {t("aiExtract")}
-              </p>
-              <p className="text-2xl font-bold">
-                {dashboardData.extractionStats?.total_extractions ?? 0}
-              </p>
-              <p className="text-xs text-muted-foreground">
-                {dashboardData.extractionStats?.success_rate ?? 0}% {t("successRate")}
-              </p>
-            </div>
-          </div>
         </div>
-      </div>
 
       {/* Quick Actions */}
       <div className="rounded-lg border bg-card p-6">
@@ -178,13 +159,6 @@ export default async function AdminDashboard() {
           >
             <Building2 className="h-4 w-4" />
             {t("addOrganizer")}
-          </Link>
-          <Link
-            href="/admin/extract"
-            className="inline-flex items-center gap-2 rounded-md bg-secondary px-4 py-2 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary/80"
-          >
-            <Sparkles className="h-4 w-4" />
-            {t("extractFromPoster")}
           </Link>
           <Link
             href="/admin/festivals/new"
