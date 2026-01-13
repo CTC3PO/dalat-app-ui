@@ -82,8 +82,9 @@ Aspect ratio: 2:1 landscape orientation.`;
       }
     }
 
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { error: "Failed to generate flyer image" },
+      { error: `Failed to generate flyer image: ${errorMessage}` },
       { status: 500 }
     );
   }

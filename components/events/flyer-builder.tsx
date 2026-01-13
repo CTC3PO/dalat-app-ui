@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { validateMediaFile, ALLOWED_MEDIA_TYPES } from "@/lib/media-utils";
 
-type ImageSource = "upload" | "url" | "generate";
+type ImageSource = "upload" | "url";
 
 interface FlyerBuilderProps {
   title: string;
@@ -232,7 +232,6 @@ export function FlyerBuilder({
             <p className="text-sm text-muted-foreground">
               {source === "upload" && "Click or drop an image"}
               {source === "url" && "Enter a URL below"}
-              {source === "generate" && "Generate from your event title"}
             </p>
           </div>
         )}
@@ -274,7 +273,7 @@ export function FlyerBuilder({
         )}
       </div>
 
-      {/* Source mode selector */}
+      {/* Source mode selector - Upload/URL only */}
       <div className="flex gap-2">
         <Button
           type="button"
@@ -295,16 +294,6 @@ export function FlyerBuilder({
         >
           <LinkIcon className="w-4 h-4 mr-2" />
           URL
-        </Button>
-        <Button
-          type="button"
-          variant={source === "generate" ? "default" : "outline"}
-          size="sm"
-          onClick={() => setSource("generate")}
-          className="flex-1"
-        >
-          <Sparkles className="w-4 h-4 mr-2" />
-          Generate
         </Button>
       </div>
 
@@ -356,37 +345,43 @@ export function FlyerBuilder({
             </p>
           </div>
         )}
-
-        {source === "generate" && (
-          <div className="space-y-2">
-            <Button
-              type="button"
-              variant="default"
-              size="sm"
-              onClick={handleGenerate}
-              disabled={isGenerating || !title.trim()}
-              className="w-full"
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Generating...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Generate flyer from title
-                </>
-              )}
-            </Button>
-            <p className="text-xs text-muted-foreground text-center">
-              {title.trim()
-                ? "AI will create an event poster inspired by your title"
-                : "Enter an event title above to generate"}
-            </p>
-          </div>
-        )}
       </div>
+
+      {/* AI Generate - separate action with visual distinction */}
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-muted-foreground/20" />
+        </div>
+        <div className="relative flex justify-center text-xs">
+          <span className="bg-background px-2 text-muted-foreground">or</span>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={handleGenerate}
+        disabled={isGenerating || !title.trim()}
+        className="w-full border-dashed"
+      >
+        {isGenerating ? (
+          <>
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            Generating...
+          </>
+        ) : (
+          <>
+            <Sparkles className="w-4 h-4 mr-2" />
+            Generate with AI
+          </>
+        )}
+      </Button>
+      {!title.trim() && (
+        <p className="text-xs text-muted-foreground text-center">
+          Enter an event title to enable AI generation
+        </p>
+      )}
 
       {/* Error display */}
       {error && <p className="text-sm text-destructive text-center">{error}</p>}
