@@ -110,13 +110,15 @@ export function EventForm({
       externalChatUrl: "",
       capacity: copyFromEvent.capacity,
       sponsors: draftFromCopy,
+      // Copy the flyer - same festival usually has same branding
+      imageUrl: copyFromEvent.image_url,
     };
   }, [copyFromEvent, copyFromSponsors]);
 
   const copyDefaults = getCopyDefaults();
 
   const [imageUrl, setImageUrl] = useState<string | null>(
-    event?.image_url ?? null
+    event?.image_url ?? copyDefaults?.imageUrl ?? null
   );
 
   const isEditing = !!event;
