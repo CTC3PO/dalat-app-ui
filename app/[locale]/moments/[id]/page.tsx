@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { isVideoUrl } from "@/lib/media-utils";
 import { formatInDaLat } from "@/lib/timezone";
+import { DeleteMomentButton } from "@/components/moments/delete-moment-button";
 import type { Moment, Event, Profile } from "@/lib/types";
 
 interface PageProps {
@@ -152,11 +153,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function MomentPage({ params }: PageProps) {
   const { id } = await params;
+  const supabase = await createClient();
   const moment = await getMoment(id);
 
   if (!moment) {
     notFound();
   }
+
+  // Get current user and check permissions
+  const { data: { user } } = await supabase.auth.getUser();
+  const isOwner = user?.id === moment.user_id;
+  const isEventCreator = user?.id === moment.events.created_by;
+
+  // Check if user is admin or moderator
+  let isAdminOrMod = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    isAdminOrMod = profile?.role === "admin" || profile?.role === "moderator";
+  }
+
+  const canModerate = isEventCreator || isAdminOrMod;
 
   const t = await getTranslations("moments");
   const tCommon = await getTranslations("common");
@@ -278,7 +298,7 @@ export default async function MomentPage({ params }: PageProps) {
                 <div className="w-10 h-10 rounded-full bg-primary/20" />
               )}
             </Link>
-            <div>
+            <div className="flex-1">
               <Link
                 href={`/${profile?.username || moment.user_id}`}
                 className="font-medium hover:underline"
@@ -287,6 +307,13 @@ export default async function MomentPage({ params }: PageProps) {
               </Link>
               <p className="text-sm text-muted-foreground">{timeAgo}</p>
             </div>
+            {/* Delete button for owner/moderators */}
+            <DeleteMomentButton
+              momentId={moment.id}
+              eventSlug={event.slug}
+              isOwner={isOwner}
+              canModerate={canModerate}
+            />
           </div>
 
           {/* Caption / Text */}
