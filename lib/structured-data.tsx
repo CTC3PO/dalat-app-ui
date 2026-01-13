@@ -122,7 +122,8 @@ export function generateEventSchema(
       ? {
           "@type": "Person",
           name: event.profiles.display_name || event.profiles.username || "Event Organizer",
-          url: `${SITE_URL}/${locale}/${event.profiles.username}`,
+          // Use username if available, otherwise fall back to user ID for URL
+          url: `${SITE_URL}/${locale}/${event.profiles.username || event.profiles.id}`,
         }
       : undefined,
 
@@ -301,7 +302,9 @@ export function generatePersonSchema(
   locale: string,
   eventCount?: number
 ) {
-  const profileUrl = `${SITE_URL}/${locale}/${profile.username}`;
+  // Use username if available, otherwise fall back to user ID for URL
+  const profileIdentifier = profile.username || profile.id;
+  const profileUrl = `${SITE_URL}/${locale}/${profileIdentifier}`;
 
   const schema: Record<string, unknown> = {
     "@context": "https://schema.org",

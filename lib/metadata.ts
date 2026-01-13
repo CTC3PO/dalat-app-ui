@@ -143,6 +143,7 @@ export function generateLocalizedMetadata({
  */
 export function generateProfileMetadata(
   profile: {
+    id: string;
     username: string | null;
     display_name: string | null;
     bio: string | null;
@@ -158,9 +159,12 @@ export function generateProfileMetadata(
     ? `${name} has organized ${eventCount} events in Da Lat, Vietnam`
     : `${name}'s profile on dalat.app - Event discovery in Da Lat, Vietnam`;
 
+  // Use username if available, otherwise fall back to user ID for URL
+  const profileIdentifier = profile.username || profile.id;
+
   return generateLocalizedMetadata({
     locale,
-    path: `/${profile.username}`,
+    path: `/${profileIdentifier}`,
     title: name,
     description,
     image: profile.avatar_url || undefined,

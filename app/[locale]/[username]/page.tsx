@@ -155,11 +155,13 @@ export default async function ProfilePage({ params }: PageProps) {
   const pastEvents = events.filter((e) => new Date(e.starts_at) <= new Date());
 
   // Generate structured data for SEO and AEO
+  // Use username if available, otherwise fall back to user ID for URLs
+  const profileIdentifier = profile.username || profile.id;
   const personSchema = generatePersonSchema(profile, locale, events.length);
   const breadcrumbSchema = generateBreadcrumbSchema(
     [
       { name: "Home", url: "/" },
-      { name: profile.display_name || profile.username || "Profile", url: `/${profile.username}` },
+      { name: profile.display_name || profile.username || "Profile", url: `/${profileIdentifier}` },
     ],
     locale
   );
