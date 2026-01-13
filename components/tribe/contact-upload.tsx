@@ -70,9 +70,9 @@ function parseCSV(text: string): ContactRow[] {
         notes: notes.trim() || undefined,
         isValid,
         error: !trimmedEmail
-          ? "Missing email"
+          ? "missingEmail"
           : !isValid
-            ? "Invalid email format"
+            ? "invalidEmailFormat"
             : undefined,
       };
     })
@@ -94,7 +94,7 @@ export function ContactUpload({ onUpload, disabled }: ContactUploadProps) {
     setError(null);
 
     if (!file.name.endsWith(".csv") && file.type !== "text/csv") {
-      setError("Please upload a CSV file");
+      setError(t("errors.pleaseUploadCsv"));
       return;
     }
 
@@ -103,15 +103,15 @@ export function ContactUpload({ onUpload, disabled }: ContactUploadProps) {
       const parsed = parseCSV(text);
 
       if (parsed.length === 0) {
-        setError("No valid rows found in CSV");
+        setError(t("errors.noValidRows"));
         return;
       }
 
       setContacts(parsed);
     } catch {
-      setError("Failed to read CSV file");
+      setError(t("errors.failedToRead"));
     }
-  }, []);
+  }, [t]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
@@ -135,7 +135,7 @@ export function ContactUpload({ onUpload, disabled }: ContactUploadProps) {
       await onUpload(contacts.filter((c) => c.isValid));
       setContacts([]);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      setError(err instanceof Error ? err.message : t("errors.uploadFailed"));
     } finally {
       setIsUploading(false);
     }
@@ -229,11 +229,11 @@ export function ContactUpload({ onUpload, disabled }: ContactUploadProps) {
           <div className="flex items-center justify-between">
             <div className="text-sm">
               <span className="text-green-600 dark:text-green-400">
-                {validCount} valid
+                {validCount} {t("valid")}
               </span>
               {invalidCount > 0 && (
                 <span className="text-red-600 dark:text-red-400 ml-2">
-                  {invalidCount} invalid
+                  {invalidCount} {t("invalid")}
                 </span>
               )}
             </div>
@@ -276,7 +276,7 @@ export function ContactUpload({ onUpload, disabled }: ContactUploadProps) {
                         {contact.email}
                         {contact.error && (
                           <span className="text-red-600 ml-1">
-                            ({contact.error})
+                            ({t(`errors.${contact.error}`)})
                           </span>
                         )}
                       </td>

@@ -1,0 +1,233 @@
+import { createClient } from '@/lib/supabase/server';
+import type {
+  ContentLocale,
+  ContentTranslation,
+  TranslationContentType,
+  TranslationFieldName,
+  Event,
+  Moment,
+} from '@/lib/types';
+import { CONTENT_LOCALES } from '@/lib/types';
+
+// Fallback chain: requested locale -> English -> original
+const FALLBACK_LOCALE: ContentLocale = 'en';
+
+/**
+ * Fetch translations for a piece of content
+ */
+export async function getTranslations(
+  contentType: TranslationContentType,
+  contentId: string,
+  targetLocale: ContentLocale
+): Promise<Map<TranslationFieldName, string>> {
+  const supabase = await createClient();
+
+  const { data: translations } = await supabase
+    .from('content_translations')
+    .select('field_name, translated_text')
+    .eq('content_type', contentType)
+    .eq('content_id', contentId)
+    .eq('target_locale', targetLocale);
+
+  const result = new Map<TranslationFieldName, string>();
+
+  if (translations) {
+    for (const t of translations) {
+      result.set(t.field_name as TranslationFieldName, t.translated_text);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Fetch translations with fallback chain
+ */
+export async function getTranslationsWithFallback(
+  contentType: TranslationContentType,
+  contentId: string,
+  targetLocale: ContentLocale,
+  fallbackFields: Record<TranslationFieldName, string | null>
+): Promise<Record<string, string | null>> {
+  // Try requested locale first
+  const translations = await getTranslations(contentType, contentId, targetLocale);
+
+  const result: Record<string, string | null> = {};
+
+  for (const [fieldName, originalValue] of Object.entries(fallbackFields)) {
+    // Use translation if available
+    const translated = translations.get(fieldName as TranslationFieldName);
+    if (translated) {
+      result[fieldName] = translated;
+      continue;
+    }
+
+    // Try English fallback if not the requested locale
+    if (targetLocale !== FALLBACK_LOCALE) {
+      const englishTranslations = await getTranslations(contentType, contentId, FALLBACK_LOCALE);
+      const englishTranslation = englishTranslations.get(fieldName as TranslationFieldName);
+      if (englishTranslation) {
+        result[fieldName] = englishTranslation;
+        continue;
+      }
+    }
+
+    // Fall back to original value
+    result[fieldName] = originalValue;
+  }
+
+  return result;
+}
+
+/**
+ * Event with translations
+ */
+export interface TranslatedEvent extends Event {
+  translated_title: string;
+  translated_description: string | null;
+  is_translated: boolean;
+}
+
+/**
+ * Fetch an event with its translations for a specific locale
+ */
+export async function getEventWithTranslations(
+  slug: string,
+  targetLocale: ContentLocale
+): Promise<TranslatedEvent | null> {
+  const supabase = await createClient();
+
+  // Fetch the event
+  const { data: event, error } = await supabase
+    .from('events')
+    .select(`
+      *,
+      profiles:created_by (*),
+      organizers:organizer_id (*),
+      tribes:tribe_id (*)
+    `)
+    .eq('slug', slug)
+    .single();
+
+  if (error || !event) {
+    return null;
+  }
+
+  // Fetch translations for this event
+  const translations = await getTranslationsWithFallback(
+    'event',
+    event.id,
+    targetLocale,
+    {
+      title: event.title,
+      description: event.description,
+      text_content: null,
+      bio: null,
+    }
+  );
+
+  // Determine if we're showing a translation
+  const sourceLocale = (event as Event & { source_locale?: string }).source_locale || 'en';
+  const isTranslated = targetLocale !== sourceLocale;
+
+  return {
+    ...event,
+    translated_title: translations.title || event.title,
+    translated_description: translations.description,
+    is_translated: isTranslated && (translations.title !== event.title || translations.description !== event.description),
+  } as TranslatedEvent;
+}
+
+/**
+ * Moment with translations
+ */
+export interface TranslatedMoment extends Moment {
+  translated_text_content: string | null;
+  is_translated: boolean;
+}
+
+/**
+ * Fetch a moment with its translations for a specific locale
+ */
+export async function getMomentWithTranslations(
+  momentId: string,
+  targetLocale: ContentLocale
+): Promise<TranslatedMoment | null> {
+  const supabase = await createClient();
+
+  const { data: moment, error } = await supabase
+    .from('moments')
+    .select(`
+      *,
+      profiles:user_id (*)
+    `)
+    .eq('id', momentId)
+    .single();
+
+  if (error || !moment) {
+    return null;
+  }
+
+  // Only fetch translations if there's text content
+  if (!moment.text_content) {
+    return {
+      ...moment,
+      translated_text_content: null,
+      is_translated: false,
+    } as TranslatedMoment;
+  }
+
+  const translations = await getTranslationsWithFallback(
+    'moment',
+    moment.id,
+    targetLocale,
+    {
+      title: null,
+      description: null,
+      text_content: moment.text_content,
+      bio: null,
+    }
+  );
+
+  const sourceLocale = (moment as Moment & { source_locale?: string }).source_locale || 'en';
+  const isTranslated = targetLocale !== sourceLocale;
+
+  return {
+    ...moment,
+    translated_text_content: translations.text_content,
+    is_translated: isTranslated && translations.text_content !== moment.text_content,
+  } as TranslatedMoment;
+}
+
+/**
+ * Trigger translation for content (fire-and-forget)
+ * This is called after content creation to translate in the background
+ */
+export async function triggerTranslation(
+  contentType: TranslationContentType,
+  contentId: string,
+  fields: { field_name: TranslationFieldName; text: string }[]
+): Promise<void> {
+  // Fire and forget - don't await
+  fetch('/api/translate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      content_type: contentType,
+      content_id: contentId,
+      fields,
+      detect_language: true,
+    }),
+  }).catch((error) => {
+    console.error('Translation trigger failed:', error);
+  });
+}
+
+/**
+ * Check if a locale is valid
+ */
+export function isValidContentLocale(locale: string): locale is ContentLocale {
+  return CONTENT_LOCALES.includes(locale as ContentLocale);
+}

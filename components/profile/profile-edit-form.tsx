@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvatarUpload } from "./avatar-upload";
 import { cn } from "@/lib/utils";
+import { triggerTranslation } from "@/lib/translations-client";
 import type { Profile } from "@/lib/types";
 
 interface ProfileEditFormProps {
@@ -154,6 +155,14 @@ export function ProfileEditForm({ profile }: ProfileEditFormProps) {
           setError(updateError.message);
         }
         return;
+      }
+
+      // Trigger translation for bio if it changed (fire-and-forget)
+      const newBio = bio.trim();
+      if (newBio && newBio !== (profile.bio || "")) {
+        triggerTranslation("profile", profile.id, [
+          { field_name: "bio", text: newBio },
+        ]);
       }
 
       setSuccess(true);

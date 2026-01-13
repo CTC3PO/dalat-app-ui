@@ -6,6 +6,7 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { BadgeClearer } from "@/components/badge-clearer";
 import { NotificationPrompt } from "@/components/notification-prompt";
 import { SwUpdateHandler } from "@/components/sw-update-handler";
+import { GlobalFooter } from "@/components/global-footer";
 import { routing, type Locale } from "@/lib/i18n/routing";
 
 const siteUrl = "https://dalat.app";
@@ -20,7 +21,7 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
-// Generate metadata with hreflang for SEO
+// Generate metadata with hreflang for all 12 locales (SEO)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
 
@@ -28,9 +29,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     alternates: {
       canonical: `${siteUrl}/${locale}`,
       languages: {
+        // The Global Twelve
         'en': `${siteUrl}/en`,
-        'fr': `${siteUrl}/fr`,
         'vi': `${siteUrl}/vi`,
+        'ko': `${siteUrl}/ko`,
+        'zh': `${siteUrl}/zh`,
+        'ru': `${siteUrl}/ru`,
+        'fr': `${siteUrl}/fr`,
+        'ja': `${siteUrl}/ja`,
+        'ms': `${siteUrl}/ms`,
+        'th': `${siteUrl}/th`,
+        'de': `${siteUrl}/de`,
+        'es': `${siteUrl}/es`,
+        'id': `${siteUrl}/id`,
         'x-default': `${siteUrl}/en`,
       },
     },
@@ -58,10 +69,13 @@ export default async function LocaleLayout({ children, params }: Props) {
         enableSystem
         disableTransitionOnChange
       >
-        <BadgeClearer />
-        <NotificationPrompt />
-        <SwUpdateHandler />
-        {children}
+        <div className="min-h-screen flex flex-col">
+          <BadgeClearer />
+          <NotificationPrompt />
+          <SwUpdateHandler />
+          <main className="flex-1">{children}</main>
+          <GlobalFooter />
+        </div>
       </ThemeProvider>
     </NextIntlClientProvider>
   );

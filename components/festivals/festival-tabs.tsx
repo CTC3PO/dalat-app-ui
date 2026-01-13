@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MessageSquare, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,13 +22,14 @@ export function FestivalTabs({
   communityEvents,
   updates,
 }: FestivalTabsProps) {
+  const t = useTranslations("festival");
   const [activeTab, setActiveTab] = useState<Tab>("program");
   const totalEvents = officialEvents.length + communityEvents.length;
 
   const tabs = [
-    { id: "program" as Tab, label: "Program", icon: Calendar },
-    { id: "updates" as Tab, label: "Updates", icon: MessageSquare },
-    { id: "about" as Tab, label: "About", icon: Info },
+    { id: "program" as Tab, label: t("tabs.program"), icon: Calendar },
+    { id: "updates" as Tab, label: t("tabs.updates"), icon: MessageSquare },
+    { id: "about" as Tab, label: t("tabs.about"), icon: Info },
   ];
 
   return (
@@ -58,14 +60,14 @@ export function FestivalTabs({
         {totalEvents === 0 ? (
           <Card>
             <CardContent className="p-8 text-center text-muted-foreground">
-              No events announced yet. Check back soon!
+              {t("noEventsYet")}
             </CardContent>
           </Card>
         ) : (
           <>
             {officialEvents.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Official Program</h3>
+                <h3 className="text-lg font-semibold">{t("officialProgram")}</h3>
                 <div className="space-y-3">
                   {officialEvents.map((fe) => (
                     <Card key={fe.event_id}>
@@ -85,7 +87,7 @@ export function FestivalTabs({
 
             {communityEvents.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold">Community Side Events</h3>
+                <h3 className="text-lg font-semibold">{t("communitySideEvents")}</h3>
                 <div className="space-y-3">
                   {communityEvents.map((fe) => (
                     <Card key={fe.event_id}>
@@ -112,7 +114,7 @@ export function FestivalTabs({
           {updates.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center text-muted-foreground">
-                No updates yet. Stay tuned!
+                {t("noUpdatesYet")}
               </CardContent>
             </Card>
           ) : (
@@ -144,7 +146,7 @@ export function FestivalTabs({
               )}
               {!festival.description && (
                 <p className="text-muted-foreground text-center">
-                  More details coming soon.
+                  {t("moreDetailsSoon")}
                 </p>
               )}
             </CardContent>

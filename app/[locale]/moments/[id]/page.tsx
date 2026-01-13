@@ -3,13 +3,15 @@ import { Link } from "@/lib/i18n/routing";
 import type { Metadata } from "next";
 import { ArrowLeft, ChevronLeft, ChevronRight, Calendar, MapPin } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
 import { isVideoUrl } from "@/lib/media-utils";
 import { formatInDaLat } from "@/lib/timezone";
 import { DeleteMomentButton } from "@/components/moments/delete-moment-button";
-import type { Moment, Event, Profile } from "@/lib/types";
+import { TranslatedFrom } from "@/components/ui/translation-badge";
+import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
+import type { Moment, Event, Profile, ContentLocale } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -106,6 +108,53 @@ async function getAdjacentMoments(
   return { prevId, nextId };
 }
 
+interface MomentTranslations {
+  textContent: string | null;
+  originalTextContent: string | null;
+  isTranslated: boolean;
+  sourceLocale: ContentLocale | null;
+}
+
+async function getMomentTranslations(
+  momentId: string,
+  originalTextContent: string | null,
+  sourceLocale: string | null,
+  locale: string
+): Promise<MomentTranslations> {
+  if (!originalTextContent || !isValidContentLocale(locale)) {
+    return {
+      textContent: originalTextContent,
+      originalTextContent,
+      isTranslated: false,
+      sourceLocale: null,
+    };
+  }
+
+  const translations = await getTranslationsWithFallback(
+    'moment',
+    momentId,
+    locale as ContentLocale,
+    {
+      title: null,
+      description: null,
+      text_content: originalTextContent,
+      bio: null,
+    }
+  );
+
+  const translatedText = translations.text_content || originalTextContent;
+  const validSourceLocale = sourceLocale && isValidContentLocale(sourceLocale)
+    ? sourceLocale as ContentLocale
+    : null;
+
+  return {
+    textContent: translatedText,
+    originalTextContent,
+    isTranslated: translatedText !== originalTextContent,
+    sourceLocale: validSourceLocale,
+  };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
   const moment = await getMoment(id);
@@ -178,14 +227,25 @@ export default async function MomentPage({ params }: PageProps) {
 
   const canModerate = isEventCreator || isAdminOrMod;
 
-  const t = await getTranslations("moments");
-  const tCommon = await getTranslations("common");
-  const tEvents = await getTranslations("events");
+  const [t, tCommon, tEvents, locale] = await Promise.all([
+    getTranslations("moments"),
+    getTranslations("common"),
+    getTranslations("events"),
+    getLocale(),
+  ]);
 
   const event = moment.events;
   const profile = moment.profiles;
   const isVideo = isVideoUrl(moment.media_url);
   const timeAgo = formatDistanceToNow(new Date(moment.created_at), { addSuffix: true });
+
+  // Get translations for text content
+  const momentTranslations = await getMomentTranslations(
+    moment.id,
+    moment.text_content,
+    moment.source_locale,
+    locale
+  );
 
   // Get adjacent moments for navigation
   const { prevId, nextId } = await getAdjacentMoments(
@@ -317,8 +377,16 @@ export default async function MomentPage({ params }: PageProps) {
           </div>
 
           {/* Caption / Text */}
-          {moment.text_content && (
-            <p className="text-lg whitespace-pre-wrap">{moment.text_content}</p>
+          {momentTranslations.textContent && (
+            <div className="space-y-2">
+              <p className="text-lg whitespace-pre-wrap">{momentTranslations.textContent}</p>
+              {momentTranslations.isTranslated && momentTranslations.sourceLocale && (
+                <TranslatedFrom
+                  sourceLocale={momentTranslations.sourceLocale}
+                  originalText={momentTranslations.textContent !== momentTranslations.originalTextContent ? momentTranslations.originalTextContent ?? undefined : undefined}
+                />
+              )}
+            </div>
           )}
 
           {/* Event card */}

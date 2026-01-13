@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Link as LinkIcon,
   Sparkles,
@@ -38,6 +39,7 @@ export function FlyerBuilder({
   imageUrl,
   onImageChange,
 }: FlyerBuilderProps) {
+  const t = useTranslations("flyerBuilder");
   const [showUrlInput, setShowUrlInput] = useState(false);
   const [showPromptEditor, setShowPromptEditor] = useState(false);
   const [prompt, setPrompt] = useState("");
@@ -77,7 +79,7 @@ export function FlyerBuilder({
         return;
       }
       if (!file.type.startsWith("image/")) {
-        setError("Images only");
+        setError(t("imagesOnly"));
         return;
       }
       revokeExistingBlobUrl();
@@ -133,12 +135,12 @@ export function FlyerBuilder({
         setUrlInput("");
       };
       img.onerror = () => {
-        setError("Invalid image");
+        setError(t("invalidImage"));
         setIsLoadingUrl(false);
       };
       img.src = urlInput.trim();
     } catch {
-      setError("Invalid URL");
+      setError(t("invalidUrl"));
       setIsLoadingUrl(false);
     }
   };
@@ -154,7 +156,7 @@ export function FlyerBuilder({
   // Actually generate the image with the current prompt
   const handleGenerate = async () => {
     if (!prompt.trim()) {
-      setError("Prompt is empty");
+      setError(t("promptEmpty"));
       return;
     }
     setError(null);
@@ -169,7 +171,7 @@ export function FlyerBuilder({
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Generation failed");
+        throw new Error(data.error || t("generationFailed"));
       }
 
       const data = await response.json();
@@ -178,7 +180,7 @@ export function FlyerBuilder({
       onImageChange(data.imageUrl);
       setShowPromptEditor(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Generation failed");
+      setError(err instanceof Error ? err.message : t("generationFailed"));
     } finally {
       setIsGenerating(false);
     }
@@ -226,7 +228,7 @@ export function FlyerBuilder({
           <Input
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
-            placeholder="Event title"
+            placeholder={t("eventTitlePlaceholder")}
             className={cn(
               "text-lg font-semibold",
               hasImage
@@ -266,7 +268,7 @@ export function FlyerBuilder({
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Describe the image you want to generate..."
+              placeholder={t("promptPlaceholder")}
               rows={6}
               className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               autoFocus
@@ -283,7 +285,7 @@ export function FlyerBuilder({
                 }}
                 disabled={isGenerating}
               >
-                Cancel
+                {t("cancel")}
               </Button>
               <div className="flex-1" />
               <Button
@@ -295,12 +297,12 @@ export function FlyerBuilder({
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
+                    {t("generating")}
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Generate
+                    {t("generate")}
                   </>
                 )}
               </Button>

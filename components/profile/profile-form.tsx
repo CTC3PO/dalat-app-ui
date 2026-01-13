@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { detectBrowserLocale } from "@/lib/locale";
-import type { Locale } from "@/lib/types";
+import { detectBrowserLocale, SUPPORTED_LOCALES } from "@/lib/locale";
+import type { Locale, ContentLocale } from "@/lib/types";
 
 interface ProfileFormProps {
   userId: string;
@@ -25,10 +25,16 @@ export function ProfileForm({
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [usernameError, setUsernameError] = useState<string | null>(null);
+  // Detect browser locale and map to supported UI locale
   const [detectedLocale, setDetectedLocale] = useState<Locale>('en');
 
   useEffect(() => {
-    setDetectedLocale(detectBrowserLocale());
+    const browserLocale = detectBrowserLocale();
+    // Map content locale to UI locale (only en, fr, vi are UI locales)
+    const uiLocale = SUPPORTED_LOCALES.includes(browserLocale as Locale)
+      ? (browserLocale as Locale)
+      : 'en';
+    setDetectedLocale(uiLocale);
   }, []);
 
   function validateUsername(value: string): boolean {

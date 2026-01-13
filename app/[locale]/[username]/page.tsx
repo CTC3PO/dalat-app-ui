@@ -2,9 +2,12 @@ import { notFound } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { format } from "date-fns";
+import { getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent } from "@/components/ui/card";
-import type { Profile, Event } from "@/lib/types";
+import { TranslatedFrom } from "@/components/ui/translation-badge";
+import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
+import type { Profile, Event, ContentLocale } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{ username: string }>;
@@ -55,6 +58,53 @@ async function isCurrentUser(profileId: string): Promise<boolean> {
   return user?.id === profileId;
 }
 
+interface BioTranslations {
+  bio: string | null;
+  originalBio: string | null;
+  isTranslated: boolean;
+  sourceLocale: ContentLocale | null;
+}
+
+async function getBioTranslations(
+  profileId: string,
+  originalBio: string | null,
+  sourceLocale: string | null,
+  locale: string
+): Promise<BioTranslations> {
+  if (!originalBio || !isValidContentLocale(locale)) {
+    return {
+      bio: originalBio,
+      originalBio,
+      isTranslated: false,
+      sourceLocale: null,
+    };
+  }
+
+  const translations = await getTranslationsWithFallback(
+    'profile',
+    profileId,
+    locale as ContentLocale,
+    {
+      title: null,
+      description: null,
+      text_content: null,
+      bio: originalBio,
+    }
+  );
+
+  const translatedBio = translations.bio || originalBio;
+  const validSourceLocale = sourceLocale && isValidContentLocale(sourceLocale)
+    ? sourceLocale as ContentLocale
+    : null;
+
+  return {
+    bio: translatedBio,
+    originalBio,
+    isTranslated: translatedBio !== originalBio,
+    sourceLocale: validSourceLocale,
+  };
+}
+
 export default async function ProfilePage({ params }: PageProps) {
   const { username: rawUsername } = await params;
   // Strip @ prefix if present (supports both /@username and /username)
@@ -67,9 +117,12 @@ export default async function ProfilePage({ params }: PageProps) {
     notFound();
   }
 
-  const [events, isOwner] = await Promise.all([
+  const locale = await getLocale();
+
+  const [events, isOwner, bioTranslations] = await Promise.all([
     getUserEvents(profile.id),
     isCurrentUser(profile.id),
+    getBioTranslations(profile.id, profile.bio, profile.bio_source_locale, locale),
   ]);
 
   const upcomingEvents = events.filter(
@@ -111,7 +164,17 @@ export default async function ProfilePage({ params }: PageProps) {
             {profile.username && (
               <p className="text-muted-foreground">@{profile.username}</p>
             )}
-            {profile.bio && <p className="mt-2">{profile.bio}</p>}
+            {bioTranslations.bio && (
+              <div className="mt-2 space-y-1">
+                <p>{bioTranslations.bio}</p>
+                {bioTranslations.isTranslated && bioTranslations.sourceLocale && (
+                  <TranslatedFrom
+                    sourceLocale={bioTranslations.sourceLocale}
+                    originalText={bioTranslations.bio !== bioTranslations.originalBio ? bioTranslations.originalBio ?? undefined : undefined}
+                  />
+                )}
+              </div>
+            )}
             {isOwner && (
               <Link
                 href="/settings/profile"

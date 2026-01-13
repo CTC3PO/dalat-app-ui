@@ -3,8 +3,11 @@ import { Link } from "@/lib/i18n/routing";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, Link2 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
+import type { ContentLocale } from "@/lib/types";
+import { TranslatedFrom } from "@/components/ui/translation-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { RsvpButton } from "@/components/events/rsvp-button";
 import { EventActions } from "@/components/events/event-actions";
@@ -305,6 +308,62 @@ async function canUserPostMoment(eventId: string, userId: string | null, creator
   }
 }
 
+interface EventTranslations {
+  title: string;
+  description: string | null;
+  originalTitle: string;
+  originalDescription: string | null;
+  isTranslated: boolean;
+  sourceLocale: ContentLocale | null;
+}
+
+async function getEventTranslations(
+  eventId: string,
+  originalTitle: string,
+  originalDescription: string | null,
+  sourceLocale: string | null,
+  locale: string
+): Promise<EventTranslations> {
+  // Validate locale
+  if (!isValidContentLocale(locale)) {
+    return {
+      title: originalTitle,
+      description: originalDescription,
+      originalTitle,
+      originalDescription,
+      isTranslated: false,
+      sourceLocale: null,
+    };
+  }
+
+  const translations = await getTranslationsWithFallback(
+    'event',
+    eventId,
+    locale as ContentLocale,
+    {
+      title: originalTitle,
+      description: originalDescription,
+      text_content: null,
+      bio: null,
+    }
+  );
+
+  const translatedTitle = translations.title || originalTitle;
+  const translatedDescription = translations.description ?? originalDescription;
+  const validSourceLocale = sourceLocale && isValidContentLocale(sourceLocale)
+    ? sourceLocale as ContentLocale
+    : null;
+
+  return {
+    title: translatedTitle,
+    description: translatedDescription,
+    originalTitle,
+    originalDescription,
+    isTranslated: translatedTitle !== originalTitle || translatedDescription !== originalDescription,
+    sourceLocale: validSourceLocale,
+  };
+}
+
 export default async function EventPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const result = await getEvent(slug);
@@ -329,12 +388,15 @@ export default async function EventPage({ params, searchParams }: PageProps) {
   }
 
   const event = result.event;
-  const t = await getTranslations("events");
-  const tCommon = await getTranslations("common");
+  const [t, tCommon, locale] = await Promise.all([
+    getTranslations("events"),
+    getTranslations("common"),
+    getLocale(),
+  ]);
 
   const currentUserId = await getCurrentUserId();
 
-  const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents, momentsPreview, momentCounts, canPostMoment, sponsors] = await Promise.all([
+  const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents, momentsPreview, momentCounts, canPostMoment, sponsors, eventTranslations] = await Promise.all([
     getEventCounts(event.id),
     getCurrentUserRsvp(event.id),
     getAttendees(event.id),
@@ -346,6 +408,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
     getMomentCounts(event.id),
     canUserPostMoment(event.id, currentUserId, event.created_by),
     getEventSponsors(event.id),
+    getEventTranslations(event.id, event.title, event.description, event.source_locale, locale),
   ]);
 
   const isLoggedIn = !!currentUserId;
@@ -402,10 +465,18 @@ export default async function EventPage({ params, searchParams }: PageProps) {
 
             {/* Title and description */}
             <div>
-              <h1 className="text-3xl font-bold mb-4">{event.title}</h1>
-              {event.description && (
+              <h1 className="text-3xl font-bold mb-2">{eventTranslations.title}</h1>
+              {/* Show translation indicator with original */}
+              {eventTranslations.isTranslated && eventTranslations.sourceLocale && (
+                <TranslatedFrom
+                  sourceLocale={eventTranslations.sourceLocale}
+                  originalText={eventTranslations.title !== eventTranslations.originalTitle ? eventTranslations.originalTitle : undefined}
+                  className="mb-4"
+                />
+              )}
+              {eventTranslations.description && (
                 <div className="text-muted-foreground whitespace-pre-wrap">
-                  <Linkify text={event.description} />
+                  <Linkify text={eventTranslations.description} />
                 </div>
               )}
             </div>
@@ -572,6 +643,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
           </div>
         </div>
       </div>
+
     </main>
   );
 }

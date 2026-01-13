@@ -29,12 +29,6 @@ interface RecurrencePickerProps {
   className?: string;
 }
 
-const END_TYPE_OPTIONS = [
-  { value: "never", label: "Never" },
-  { value: "count", label: "After..." },
-  { value: "date", label: "On date..." },
-];
-
 export function RecurrencePicker({
   selectedDate,
   value,
@@ -44,6 +38,12 @@ export function RecurrencePicker({
   const t = useTranslations("recurrence");
   const [showCustom, setShowCustom] = useState(false);
   const [presets, setPresets] = useState<RecurrencePreset[]>([]);
+
+  const END_TYPE_OPTIONS = [
+    { value: "never", label: t("never") },
+    { value: "count", label: t("after") },
+    { value: "date", label: t("onDate") },
+  ];
 
   // Generate presets based on selected date
   useEffect(() => {
@@ -116,21 +116,21 @@ export function RecurrencePicker({
       <div className="space-y-2">
         <Label className="flex items-center gap-2">
           <Repeat className="w-4 h-4" />
-          Repeat
+          {t("repeat")}
         </Label>
 
         <Select value={getCurrentPresetId()} onValueChange={handlePresetSelect}>
           <SelectTrigger>
-            <SelectValue placeholder="Does not repeat" />
+            <SelectValue placeholder={t("doesNotRepeat")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Does not repeat</SelectItem>
+            <SelectItem value="none">{t("doesNotRepeat")}</SelectItem>
             {presets.map((preset) => (
               <SelectItem key={preset.id} value={preset.id}>
                 {preset.label}
               </SelectItem>
             ))}
-            <SelectItem value="custom">Custom...</SelectItem>
+            <SelectItem value="custom">{t("custom")}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -140,7 +140,7 @@ export function RecurrencePicker({
         <div className="space-y-4 p-4 bg-muted/50 rounded-lg">
           {/* Frequency and Interval */}
           <div className="flex items-center gap-2">
-            <span className="text-sm">Every</span>
+            <span className="text-sm">{t("every")}</span>
             <Input
               type="number"
               min="1"
@@ -162,13 +162,13 @@ export function RecurrencePicker({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="DAILY">
-                  {value.interval === 1 ? "day" : "days"}
+                  {value.interval === 1 ? t("frequency.day") : t("frequency.days")}
                 </SelectItem>
                 <SelectItem value="WEEKLY">
-                  {value.interval === 1 ? "week" : "weeks"}
+                  {value.interval === 1 ? t("frequency.week") : t("frequency.weeks")}
                 </SelectItem>
                 <SelectItem value="MONTHLY">
-                  {value.interval === 1 ? "month" : "months"}
+                  {value.interval === 1 ? t("frequency.month") : t("frequency.months")}
                 </SelectItem>
               </SelectContent>
             </Select>
@@ -177,7 +177,7 @@ export function RecurrencePicker({
           {/* Day Selection for Weekly */}
           {value.frequency === "WEEKLY" && (
             <div className="space-y-2">
-              <Label className="text-sm text-muted-foreground">On</Label>
+              <Label className="text-sm text-muted-foreground">{t("on")}</Label>
               <div className="flex flex-wrap gap-1">
                 {["SU", "MO", "TU", "WE", "TH", "FR", "SA"].map((day) => {
                   const isSelected = value.weekDays.includes(day);
@@ -214,7 +214,7 @@ export function RecurrencePicker({
 
           {/* End Condition */}
           <div className="space-y-2">
-            <Label className="text-sm text-muted-foreground">Ends</Label>
+            <Label className="text-sm text-muted-foreground">{t("ends")}</Label>
             <div className="flex items-center gap-2">
               <Select
                 value={value.endType}
@@ -247,7 +247,7 @@ export function RecurrencePicker({
                     className="w-20"
                     placeholder="10"
                   />
-                  <span className="text-sm text-muted-foreground">occurrences</span>
+                  <span className="text-sm text-muted-foreground">{t("occurrences")}</span>
                 </div>
               )}
 
@@ -280,7 +280,7 @@ export function RecurrencePicker({
             className="w-full"
           >
             <ChevronUp className="w-4 h-4 mr-2" />
-            Hide options
+            {t("hideOptions")}
           </Button>
         </div>
       )}
@@ -295,7 +295,7 @@ export function RecurrencePicker({
           className="text-muted-foreground"
         >
           <ChevronDown className="w-4 h-4 mr-2" />
-          Customize recurrence
+          {t("customizeRecurrence")}
         </Button>
       )}
     </div>

@@ -53,7 +53,41 @@
     "signInDescription": "Connectez-vous pour découvrir les événements à Da Lat",
     "continueWithGoogle": "Continuer avec Google",
     "connecting": "Connexion...",
-    "backToEvents": "Retour aux événements"
+    "backToEvents": "Retour aux événements",
+    "orContinueWith": "ou continuer avec",
+    "email": "Email",
+    "emailPlaceholder": "vous@exemple.com",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "Entrez votre mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "confirmPasswordPlaceholder": "Ressaisissez votre mot de passe",
+    "signIn": "Se connecter",
+    "createAccount": "Créer un compte",
+    "loading": "Chargement...",
+    "forgotPassword": "Mot de passe oublié ?",
+    "alreadyHaveAccount": "Vous avez déjà un compte ?",
+    "dontHaveAccount": "Vous n'avez pas de compte ?",
+    "emailPasswordRequired": "Email et mot de passe requis",
+    "passwordsDoNotMatch": "Les mots de passe ne correspondent pas",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+    "emailAlreadyRegistered": "Cet email est déjà enregistré. Essayez de vous connecter.",
+    "invalidCredentials": "Email ou mot de passe invalide",
+    "checkEmailForConfirmation": "Vérifiez votre email pour le lien de confirmation",
+    "somethingWentWrong": "Une erreur s'est produite. Veuillez réessayer.",
+    "resetPassword": "Réinitialiser le mot de passe",
+    "resetPasswordDescription": "Entrez votre email pour recevoir un lien de réinitialisation",
+    "sendResetLink": "Envoyer le lien",
+    "checkEmailForReset": "Vérifiez votre email pour le lien de réinitialisation",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Entrez votre nouveau mot de passe",
+    "setNewPassword": "Définir le nouveau mot de passe",
+    "passwordResetSuccess": "Mot de passe réinitialisé ! Vous pouvez maintenant vous connecter.",
+    "accountCreatedCheckEmail": "Compte créé ! Vérifiez votre email pour confirmer.",
+    "signInOrCreateHint": "Nouveau ? Nous créerons votre compte automatiquement.",
+    "emailRequired": "Veuillez entrer votre email",
+    "or": "ou",
+    "sendMagicLink": "Envoyez-moi un lien magique",
+    "magicLinkSent": "Lien magique envoyé ! Vérifiez votre email."
   },
   "errors": {
     "somethingWentWrong": "Désolé, une erreur s'est produite.",
@@ -135,7 +169,13 @@
     "addFlyerLater": "Ajouter une affiche après la création de l'événement",
     "creating": "Création...",
     "saving": "Enregistrement...",
-    "saveChanges": "Enregistrer les modifications"
+    "saveChanges": "Enregistrer les modifications",
+    "url": "URL",
+    "info": "Info",
+    "externalLinkNotCopied": "Lien externe non copié (chaque événement a généralement son propre lien)",
+    "limitAttendees": "Limiter les participants",
+    "creatingSeries": "Création de la série...",
+    "createRecurringEvent": "Créer un événement récurrent"
   },
   "eventActions": {
     "eventOptions": "Options de l'événement",
@@ -288,6 +328,7 @@
     "editProfile": "Modifier le profil",
     "settings": "Paramètres",
     "admin": "Admin",
+    "organizerPortal": "Organisateur",
     "theme": "Thème",
     "themeLight": "Clair",
     "themeDark": "Sombre",
@@ -411,7 +452,17 @@
     "festivalName": "Nom du festival",
     "festivalSlug": "nom-du-festival",
     "optionalTagline": "Slogan optionnel",
-    "saveChanges": "Enregistrer les modifications"
+    "saveChanges": "Enregistrer les modifications",
+    "tabs": {
+      "program": "Programme",
+      "updates": "Actualités",
+      "about": "À propos"
+    },
+    "noEventsYet": "Aucun événement annoncé. Revenez bientôt !",
+    "officialProgram": "Programme officiel",
+    "communitySideEvents": "Événements communautaires",
+    "noUpdatesYet": "Pas encore d'actualités. Restez à l'écoute !",
+    "moreDetailsSoon": "Plus de détails bientôt."
   },
   "analytics": {
     "created": "Créés",
@@ -631,6 +682,55 @@
     "share": "Partager",
     "shareSuccess": "Lien copié !"
   },
+  "translations": {
+    "autoTranslatedFrom": "Traduit automatiquement de {language}",
+    "reviewedFrom": "Traduit de {language} (vérifié)",
+    "translatedFrom": "Traduit de",
+    "showOriginal": "Afficher l'original",
+    "hideOriginal": "Masquer l'original",
+    "mayContainErrors": "La traduction automatique peut contenir des erreurs"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "dragDropCsv": "Glissez-déposez un fichier CSV",
+    "dropHere": "Déposez le CSV ici",
+    "csvFormat": "Format : email, nom, téléphone, notes",
+    "selectFile": "Sélectionner CSV",
+    "email": "Email",
+    "name": "Nom",
+    "phone": "Téléphone",
+    "notes": "Notes",
+    "clear": "Effacer",
+    "andMore": "...et {count} de plus",
+    "uploading": "Téléchargement...",
+    "uploadContacts": "Télécharger {count} contacts",
+    "noContacts": "Pas encore de contacts",
+    "addContacts": "Téléchargez un CSV pour ajouter des contacts",
+    "deleteContact": "Supprimer",
+    "deleteConfirm": "Supprimer ce contact ?",
+    "inviteToEvent": "Inviter à un événement",
+    "selectEvent": "Sélectionner un événement",
+    "sendInvites": "Envoyer les invitations",
+    "sending": "Envoi...",
+    "invitesSent": "Invitations envoyées !",
+    "invitesFailed": "Échec de l'envoi de certaines invitations",
+    "alreadyInvited": "Déjà invité",
+    "status": {
+      "active": "Actif",
+      "unsubscribed": "Désabonné",
+      "bounced": "Rejeté"
+    },
+    "valid": "valide(s)",
+    "invalid": "invalide(s)",
+    "errors": {
+      "missingEmail": "Email manquant",
+      "invalidEmailFormat": "Format d'email invalide",
+      "pleaseUploadCsv": "Veuillez télécharger un fichier CSV",
+      "noValidRows": "Aucune ligne valide trouvée dans le CSV",
+      "failedToRead": "Échec de lecture du fichier CSV",
+      "uploadFailed": "Échec du téléchargement"
+    }
+  },
   "organizerPortal": {
     "title": "Portail Organisateur",
     "dashboard": "Tableau de bord",
@@ -654,5 +754,17 @@
     "createFestival": "Créer un festival",
     "viewAllEvents": "Voir tous les événements",
     "viewAllFestivals": "Voir tous les festivals"
+  },
+  "flyerBuilder": {
+    "imagesOnly": "Images uniquement",
+    "invalidImage": "Image invalide",
+    "invalidUrl": "URL invalide",
+    "promptEmpty": "Le texte est vide",
+    "generationFailed": "Échec de la génération",
+    "eventTitlePlaceholder": "Titre de l'événement",
+    "promptPlaceholder": "Décrivez l'image que vous souhaitez générer...",
+    "cancel": "Annuler",
+    "generating": "Génération...",
+    "generate": "Générer"
   }
 }

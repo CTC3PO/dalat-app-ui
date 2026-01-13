@@ -12,6 +12,7 @@ import {
   ALL_ALLOWED_TYPES,
 } from "@/lib/media-utils";
 import { triggerHaptic } from "@/lib/haptics";
+import { triggerTranslation } from "@/lib/translations-client";
 
 interface MomentFormProps {
   eventId: string;
@@ -141,7 +142,7 @@ export function MomentForm({ eventId, eventSlug, userId, onSuccess }: MomentForm
 
       const contentType = mode === "text" ? "text" : (previewIsVideo ? "video" : "photo");
 
-      const { error: postError } = await supabase.rpc("create_moment", {
+      const { data, error: postError } = await supabase.rpc("create_moment", {
         p_event_id: eventId,
         p_content_type: contentType,
         p_media_url: mode === "media" ? mediaUrl : null,
@@ -155,6 +156,14 @@ export function MomentForm({ eventId, eventSlug, userId, onSuccess }: MomentForm
           throw postError;
         }
         return;
+      }
+
+      // Trigger translation for text content (fire-and-forget)
+      const textContent = caption.trim();
+      if (data?.moment_id && textContent) {
+        triggerTranslation("moment", data.moment_id, [
+          { field_name: "text_content", text: textContent },
+        ]);
       }
 
       triggerHaptic("medium");

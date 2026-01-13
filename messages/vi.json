@@ -53,7 +53,41 @@
     "signInDescription": "Đăng nhập để khám phá các sự kiện tại Đà Lạt",
     "continueWithGoogle": "Tiếp tục với Google",
     "connecting": "Đang kết nối...",
-    "backToEvents": "Quay lại sự kiện"
+    "backToEvents": "Quay lại sự kiện",
+    "orContinueWith": "hoặc tiếp tục với",
+    "email": "Email",
+    "emailPlaceholder": "ban@example.com",
+    "password": "Mật khẩu",
+    "passwordPlaceholder": "Nhập mật khẩu của bạn",
+    "confirmPassword": "Xác nhận mật khẩu",
+    "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
+    "signIn": "Đăng nhập",
+    "createAccount": "Tạo tài khoản",
+    "loading": "Đang tải...",
+    "forgotPassword": "Quên mật khẩu?",
+    "alreadyHaveAccount": "Đã có tài khoản?",
+    "dontHaveAccount": "Chưa có tài khoản?",
+    "emailPasswordRequired": "Email và mật khẩu là bắt buộc",
+    "passwordsDoNotMatch": "Mật khẩu không khớp",
+    "passwordTooShort": "Mật khẩu phải có ít nhất 8 ký tự",
+    "emailAlreadyRegistered": "Email này đã được đăng ký. Hãy thử đăng nhập.",
+    "invalidCredentials": "Email hoặc mật khẩu không hợp lệ",
+    "checkEmailForConfirmation": "Kiểm tra email để xác nhận",
+    "somethingWentWrong": "Đã xảy ra lỗi. Vui lòng thử lại.",
+    "resetPassword": "Đặt lại mật khẩu",
+    "resetPasswordDescription": "Nhập email để nhận liên kết đặt lại mật khẩu",
+    "sendResetLink": "Gửi liên kết",
+    "checkEmailForReset": "Kiểm tra email để đặt lại mật khẩu",
+    "newPassword": "Mật khẩu mới",
+    "newPasswordPlaceholder": "Nhập mật khẩu mới",
+    "setNewPassword": "Đặt mật khẩu mới",
+    "passwordResetSuccess": "Đặt lại mật khẩu thành công! Bạn có thể đăng nhập ngay.",
+    "accountCreatedCheckEmail": "Đã tạo tài khoản! Kiểm tra email để xác nhận.",
+    "signInOrCreateHint": "Mới đến? Chúng tôi sẽ tự động tạo tài khoản cho bạn.",
+    "emailRequired": "Vui lòng nhập email của bạn",
+    "or": "hoặc",
+    "sendMagicLink": "Gửi liên kết đăng nhập",
+    "magicLinkSent": "Đã gửi liên kết! Kiểm tra email của bạn."
   },
   "errors": {
     "somethingWentWrong": "Xin lỗi, đã xảy ra lỗi.",
@@ -135,7 +169,13 @@
     "addFlyerLater": "Thêm poster sau khi tạo sự kiện",
     "creating": "Đang tạo...",
     "saving": "Đang lưu...",
-    "saveChanges": "Lưu thay đổi"
+    "saveChanges": "Lưu thay đổi",
+    "url": "URL",
+    "info": "Thông tin",
+    "externalLinkNotCopied": "Liên kết ngoài không được sao chép (mỗi sự kiện thường có liên kết riêng)",
+    "limitAttendees": "Giới hạn người tham dự",
+    "creatingSeries": "Đang tạo chuỗi...",
+    "createRecurringEvent": "Tạo sự kiện định kỳ"
   },
   "eventActions": {
     "eventOptions": "Tùy chọn sự kiện",
@@ -288,6 +328,7 @@
     "editProfile": "Chỉnh sửa hồ sơ",
     "settings": "Cài đặt",
     "admin": "Quản trị",
+    "organizerPortal": "Người tổ chức",
     "theme": "Giao diện",
     "themeLight": "Sáng",
     "themeDark": "Tối",
@@ -411,7 +452,17 @@
     "festivalName": "Tên lễ hội",
     "festivalSlug": "ten-le-hoi",
     "optionalTagline": "Khẩu hiệu tùy chọn",
-    "saveChanges": "Lưu thay đổi"
+    "saveChanges": "Lưu thay đổi",
+    "tabs": {
+      "program": "Chương trình",
+      "updates": "Cập nhật",
+      "about": "Giới thiệu"
+    },
+    "noEventsYet": "Chưa có sự kiện nào. Hãy quay lại sau!",
+    "officialProgram": "Chương trình chính thức",
+    "communitySideEvents": "Sự kiện cộng đồng",
+    "noUpdatesYet": "Chưa có cập nhật. Hãy theo dõi!",
+    "moreDetailsSoon": "Thêm chi tiết sẽ sớm có."
   },
   "analytics": {
     "created": "Đã tạo",
@@ -631,6 +682,55 @@
     "share": "Chia sẻ",
     "shareSuccess": "Đã sao chép liên kết!"
   },
+  "translations": {
+    "autoTranslatedFrom": "Dịch tự động từ {language}",
+    "reviewedFrom": "Dịch từ {language} (đã xác nhận)",
+    "translatedFrom": "Dịch từ",
+    "showOriginal": "Hiện bản gốc",
+    "hideOriginal": "Ẩn bản gốc",
+    "mayContainErrors": "Bản dịch tự động có thể chứa lỗi"
+  },
+  "contacts": {
+    "title": "Danh bạ",
+    "dragDropCsv": "Kéo thả file CSV",
+    "dropHere": "Thả CSV vào đây",
+    "csvFormat": "Định dạng: email, tên, điện thoại, ghi chú",
+    "selectFile": "Chọn CSV",
+    "email": "Email",
+    "name": "Tên",
+    "phone": "Điện thoại",
+    "notes": "Ghi chú",
+    "clear": "Xóa",
+    "andMore": "...và {count} liên hệ khác",
+    "uploading": "Đang tải lên...",
+    "uploadContacts": "Tải lên {count} liên hệ",
+    "noContacts": "Chưa có liên hệ nào",
+    "addContacts": "Tải lên CSV để thêm liên hệ",
+    "deleteContact": "Xóa",
+    "deleteConfirm": "Xóa liên hệ này?",
+    "inviteToEvent": "Mời đến sự kiện",
+    "selectEvent": "Chọn sự kiện",
+    "sendInvites": "Gửi lời mời",
+    "sending": "Đang gửi...",
+    "invitesSent": "Đã gửi lời mời!",
+    "invitesFailed": "Gửi một số lời mời thất bại",
+    "alreadyInvited": "Đã mời",
+    "status": {
+      "active": "Hoạt động",
+      "unsubscribed": "Hủy đăng ký",
+      "bounced": "Bị trả lại"
+    },
+    "valid": "hợp lệ",
+    "invalid": "không hợp lệ",
+    "errors": {
+      "missingEmail": "Thiếu email",
+      "invalidEmailFormat": "Định dạng email không hợp lệ",
+      "pleaseUploadCsv": "Vui lòng tải lên file CSV",
+      "noValidRows": "Không tìm thấy dòng hợp lệ trong CSV",
+      "failedToRead": "Không thể đọc file CSV",
+      "uploadFailed": "Tải lên thất bại"
+    }
+  },
   "organizerPortal": {
     "title": "Cổng Người Tổ Chức",
     "dashboard": "Bảng điều khiển",
@@ -654,5 +754,17 @@
     "createFestival": "Tạo lễ hội",
     "viewAllEvents": "Xem tất cả sự kiện",
     "viewAllFestivals": "Xem tất cả lễ hội"
+  },
+  "flyerBuilder": {
+    "imagesOnly": "Chỉ hình ảnh",
+    "invalidImage": "Hình ảnh không hợp lệ",
+    "invalidUrl": "URL không hợp lệ",
+    "promptEmpty": "Mô tả trống",
+    "generationFailed": "Tạo thất bại",
+    "eventTitlePlaceholder": "Tên sự kiện",
+    "promptPlaceholder": "Mô tả hình ảnh bạn muốn tạo...",
+    "cancel": "Hủy",
+    "generating": "Đang tạo...",
+    "generate": "Tạo"
   }
 }

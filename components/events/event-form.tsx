@@ -2,6 +2,7 @@
 
 import { useState, useTransition, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,38 @@ import { AIEnhanceTextarea } from "@/components/ui/ai-enhance-textarea";
 import { toUTCFromDaLat, getDateTimeInDaLat } from "@/lib/timezone";
 import { canEditSlug } from "@/lib/config";
 import { getDefaultRecurrenceData, buildRRule } from "@/lib/recurrence";
-import type { Event, RecurrenceFormData, Sponsor, EventSponsor } from "@/lib/types";
+import type { Event, RecurrenceFormData, Sponsor, EventSponsor, TranslationFieldName } from "@/lib/types";
+
+/**
+ * Trigger translation for an event (fire-and-forget)
+ */
+async function triggerEventTranslation(
+  eventId: string,
+  title: string,
+  description: string | null
+) {
+  const fields: { field_name: TranslationFieldName; text: string }[] = [
+    { field_name: 'title', text: title },
+  ];
+
+  if (description?.trim()) {
+    fields.push({ field_name: 'description', text: description });
+  }
+
+  // Fire and forget - don't block the user
+  fetch('/api/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      content_type: 'event',
+      content_id: eventId,
+      fields,
+      detect_language: true,
+    }),
+  }).catch((error) => {
+    console.error('Translation trigger failed:', error);
+  });
+}
 
 interface EventFormProps {
   userId: string;
@@ -71,6 +103,8 @@ export function EventForm({
   copyFromSponsors = [],
 }: EventFormProps) {
   const router = useRouter();
+  const t = useTranslations("eventForm");
+  const tErrors = useTranslations("errors");
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -301,17 +335,17 @@ export function EventForm({
     const capacityStr = formData.get("capacity") as string;
 
     if (!title.trim() || !date || !time) {
-      setError("Title, date, and time are required");
+      setError(tErrors("titleDateTimeRequired"));
       return;
     }
 
     // Validate slug if editable
     if (slugEditable && slugStatus === "taken") {
-      setError("This URL is already taken. Please choose a different one.");
+      setError(t("urlTaken"));
       return;
     }
     if (slugEditable && slugStatus === "invalid") {
-      setError("Please enter a valid URL (lowercase letters, numbers, and hyphens only)");
+      setError(t("urlInvalid"));
       return;
     }
 
@@ -407,6 +441,11 @@ export function EventForm({
             await createSponsorsForEvent(seriesData.first_event_id, draftSponsors);
           }
 
+          // Trigger translation for the first event (fire-and-forget)
+          if (seriesData.first_event_id) {
+            triggerEventTranslation(seriesData.first_event_id, title.trim(), description || null);
+          }
+
           router.push(`/series/${seriesData.slug}`);
         } else {
           // Single event - direct insert
@@ -452,6 +491,9 @@ export function EventForm({
             await createSponsorsForEvent(data.id, draftSponsors);
           }
 
+          // Trigger translation in background (fire-and-forget)
+          triggerEventTranslation(data.id, title.trim(), description || null);
+
           router.push(`/events/${data.slug}`);
         }
       }
@@ -471,11 +513,11 @@ export function EventForm({
                 onMediaChange={setImageUrl}
               />
               <div className="space-y-2">
-                <Label htmlFor="title">Event title *</Label>
+                <Label htmlFor="title">{t("titleRequired")}</Label>
                 <Input
                   id="title"
                   name="title"
-                  placeholder="Coffee & Code"
+                  placeholder={t("titlePlaceholder")}
                   value={title}
                   onChange={(e) => handleTitleChange(e.target.value)}
                   required
@@ -494,17 +536,17 @@ export function EventForm({
           {/* Custom URL Slug */}
           {slugEditable && (
             <div className="space-y-2">
-              <Label htmlFor="slug">URL</Label>
+              <Label htmlFor="slug">{t("url")}</Label>
               <div className="flex items-center gap-0">
                 <span className="text-sm text-muted-foreground bg-muted px-3 py-2 rounded-l-md border border-r-0 border-input">
-                  dalat.app/events/
+                  {t("eventUrlPrefix")}
                 </span>
                 <Input
                   id="slug"
                   value={slug}
                   onChange={handleSlugChange}
                   onBlur={handleSlugBlur}
-                  placeholder="my-event"
+                  placeholder={t("urlPlaceholder")}
                   className="rounded-l-none"
                 />
               </div>
@@ -516,15 +558,15 @@ export function EventForm({
                   slugStatus === "checking" ? "text-muted-foreground" :
                   "text-muted-foreground"
                 }`}>
-                  {slugStatus === "checking" && "Checking availability..."}
-                  {slugStatus === "available" && "✓ This URL is available"}
-                  {slugStatus === "taken" && "✗ This URL is already taken"}
-                  {slugStatus === "invalid" && "Only lowercase letters, numbers, and hyphens allowed"}
+                  {slugStatus === "checking" && t("checkingAvailability")}
+                  {slugStatus === "available" && `✓ ${t("urlAvailable")}`}
+                  {slugStatus === "taken" && `✗ ${t("urlTaken")}`}
+                  {slugStatus === "invalid" && t("urlValidation")}
                 </p>
               )}
               {isEditing && slug !== event?.slug && (
                 <p className="text-xs text-amber-600">
-                  ⚠ Changing the URL will break any previously shared links
+                  ⚠ {t("urlChangeWarning")}
                 </p>
               )}
             </div>
@@ -532,7 +574,7 @@ export function EventForm({
 
           {/* Info */}
           <div className="space-y-2">
-            <Label htmlFor="description">Info</Label>
+            <Label htmlFor="description">{t("info")}</Label>
             <AIEnhanceTextarea
               id="description"
               name="description"
@@ -545,7 +587,7 @@ export function EventForm({
           {/* Date and time */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="date">Date *</Label>
+              <Label htmlFor="date">{t("dateRequired")}</Label>
               <Input
                 id="date"
                 name="date"
@@ -556,7 +598,7 @@ export function EventForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="time">Time * <span className="text-muted-foreground font-normal">(Da Lat)</span></Label>
+              <Label htmlFor="time">{t("timeRequired")}</Label>
               <Input
                 id="time"
                 name="time"
@@ -600,17 +642,17 @@ export function EventForm({
 
           {/* External link */}
           <div className="space-y-2">
-            <Label htmlFor="external_chat_url">External link</Label>
+            <Label htmlFor="external_chat_url">{t("externalLink")}</Label>
             <Input
               id="external_chat_url"
               name="external_chat_url"
               type="url"
-              placeholder="https://..."
+              placeholder={t("externalLinkPlaceholder")}
               defaultValue={event?.external_chat_url ?? ""}
             />
             {isCopying && (
               <p className="text-xs text-muted-foreground">
-                External link not copied (usually each event has its own link)
+                {t("externalLinkNotCopied")}
               </p>
             )}
           </div>
@@ -624,7 +666,7 @@ export function EventForm({
                 onCheckedChange={(checked) => setHasCapacityLimit(!!checked)}
               />
               <Label htmlFor="hasCapacityLimit" className="cursor-pointer">
-                Limit attendees
+                {t("limitAttendees")}
               </Label>
               {hasCapacityLimit && (
                 <Input
@@ -662,15 +704,15 @@ export function EventForm({
           <Button type="submit" disabled={isPending} className="w-full">
             {isPending
               ? isEditing
-                ? "Saving..."
+                ? t("saving")
                 : recurrence.isRecurring
-                  ? "Creating series..."
-                  : "Creating..."
+                  ? t("creatingSeries")
+                  : t("creating")
               : isEditing
-                ? "Save changes"
+                ? t("saveChanges")
                 : recurrence.isRecurring
-                  ? "Create recurring event"
-                  : "Create event"}
+                  ? t("createRecurringEvent")
+                  : t("createEvent")}
           </Button>
         </CardContent>
       </Card>

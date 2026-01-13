@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { routing } from '@/lib/i18n/routing';
+import { allLocales } from '@/lib/i18n/config';
 
 const baseUrl = 'https://dalat.app';
 
@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Add static pages for all locales
   for (const page of staticPages) {
-    for (const locale of routing.locales) {
+    for (const locale of allLocales) {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}${page.path}`,
         lastModified: new Date(),
@@ -46,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: page.priority,
         alternates: {
           languages: Object.fromEntries(
-            routing.locales.map(l => [l, `${baseUrl}/${l}${page.path}`])
+            allLocales.map(l => [l, `${baseUrl}/${l}${page.path}`])
           ),
         },
       });
@@ -55,7 +55,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Add events
   for (const event of events) {
-    for (const locale of routing.locales) {
+    for (const locale of allLocales) {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}/events/${event.slug}`,
         lastModified: new Date(event.updated_at),
@@ -63,7 +63,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.8,
         alternates: {
           languages: Object.fromEntries(
-            routing.locales.map(l => [l, `${baseUrl}/${l}/events/${event.slug}`])
+            allLocales.map(l => [l, `${baseUrl}/${l}/events/${event.slug}`])
           ),
         },
       });
@@ -72,7 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Add festivals
   for (const festival of festivals) {
-    for (const locale of routing.locales) {
+    for (const locale of allLocales) {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}/festivals/${festival.slug}`,
         lastModified: new Date(festival.updated_at),
@@ -80,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.7,
         alternates: {
           languages: Object.fromEntries(
-            routing.locales.map(l => [l, `${baseUrl}/${l}/festivals/${festival.slug}`])
+            allLocales.map(l => [l, `${baseUrl}/${l}/festivals/${festival.slug}`])
           ),
         },
       });
@@ -89,7 +89,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Add organizers
   for (const organizer of organizers) {
-    for (const locale of routing.locales) {
+    for (const locale of allLocales) {
       sitemapEntries.push({
         url: `${baseUrl}/${locale}/organizers/${organizer.slug}`,
         lastModified: new Date(organizer.updated_at),
@@ -97,7 +97,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         priority: 0.6,
         alternates: {
           languages: Object.fromEntries(
-            routing.locales.map(l => [l, `${baseUrl}/${l}/organizers/${organizer.slug}`])
+            allLocales.map(l => [l, `${baseUrl}/${l}/organizers/${organizer.slug}`])
           ),
         },
       });
