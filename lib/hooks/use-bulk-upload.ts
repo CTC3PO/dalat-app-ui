@@ -476,13 +476,19 @@ export function useBulkUpload(eventId: string, userId: string) {
     }, 100);
   }, [processQueue, state.status]);
 
+  // Store processQueue in a ref to avoid triggering effect on every state change
+  const processQueueRef = useRef(processQueue);
+  processQueueRef.current = processQueue;
+
   // Start processing when status changes to uploading
+  // IMPORTANT: Only depend on state.status, NOT processQueue (which changes on every file update)
   useEffect(() => {
     if (state.status === "uploading") {
       isPausedRef.current = false;
-      processQueue();
+      processQueueRef.current();
     }
-  }, [state.status, processQueue]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.status]);
 
   // Cleanup on unmount
   useEffect(() => {
