@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
+import { LocalePicker } from "@/components/locale-picker";
 import { EventCard } from "@/components/events/event-card";
 import { EventFeedImmersive } from "@/components/events/event-feed-immersive";
 import { EventFeedTabs, type EventLifecycle } from "@/components/events/event-feed-tabs";
@@ -158,7 +159,7 @@ export default async function Home({ searchParams }: PageProps) {
           <Link href="/" className="font-bold text-white text-sm drop-shadow-lg">
             dalat.app
           </Link>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             <Link href="/events/new" prefetch={false}>
               <Button
                 size="sm"
@@ -169,6 +170,7 @@ export default async function Home({ searchParams }: PageProps) {
                 {tNav("events")}
               </Button>
             </Link>
+            <LocalePicker variant="overlay" />
             <Suspense>
               <AuthButton />
             </Suspense>
@@ -201,6 +203,7 @@ export default async function Home({ searchParams }: PageProps) {
                   {tNav("events")}
                 </Button>
               </Link>
+              <LocalePicker />
               <Suspense>
                 <AuthButton />
               </Suspense>
@@ -250,13 +253,6 @@ export default async function Home({ searchParams }: PageProps) {
             <EventsFeed lifecycle={activeTab} />
           </Suspense>
         </div>
-
-        {/* Footer */}
-        <footer className="border-t py-6">
-          <div className="container max-w-4xl mx-auto px-4 text-center text-sm text-muted-foreground">
-            <p>{t("footer")}</p>
-          </div>
-        </footer>
       </main>
     </>
   );

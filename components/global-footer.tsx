@@ -1,41 +1,45 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useTranslations, useLocale } from "next-intl";
-import { Heart } from "lucide-react";
-import { FooterLanguageLinks } from "./footer-language-links";
+import { useTranslations } from "next-intl";
+import { Link } from "@/lib/i18n/routing";
+import { CONTENT_LOCALES, type ContentLocale } from "@/lib/types";
+
+const LOCALE_LABELS: Record<ContentLocale, string> = {
+  en: "English",
+  vi: "Tiếng Việt",
+  ko: "한국어",
+  zh: "中文",
+  ru: "Русский",
+  fr: "Français",
+  ja: "日本語",
+  ms: "Bahasa Melayu",
+  th: "ไทย",
+  de: "Deutsch",
+  es: "Español",
+  id: "Indonesia",
+};
 
 /**
- * Global footer with language selector.
- * Uses client-side pathname detection to work from the layout.
- * Renders 12 flag links for SEO crawlability.
+ * Minimal global footer with translated text.
+ * Language links are visually hidden but SEO-crawlable.
  */
 export function GlobalFooter() {
   const t = useTranslations("home");
-  const locale = useLocale();
   const pathname = usePathname();
 
-  // Remove locale prefix from pathname for the language links
-  // e.g., /en/events/cooking-class -> /events/cooking-class
+  // Remove locale prefix for language links
   const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(\/|$)/, "/") || "/";
 
   return (
-    <footer className="border-t py-8 mt-auto">
-      <div className="container max-w-4xl mx-auto px-4 space-y-6">
-        {/* Hero text - "Made with ❤️" prominent */}
-        <p className="text-center text-base md:text-lg text-muted-foreground flex items-center justify-center gap-1.5">
-          <span>Made with</span>
-          <Heart className="w-4 h-4 md:w-5 md:h-5 fill-red-500 text-red-500" />
-          <span>for Da Lat, Vietnam</span>
+    <footer className="border-t py-6 mt-auto">
+      <div className="container max-w-4xl mx-auto px-4 space-y-3">
+        {/* Translated footer text with heart */}
+        <p className="text-center text-sm text-muted-foreground flex items-center justify-center gap-1.5">
+          {t("footer")}
         </p>
 
-        {/* Language selector - 6+6 grid on mobile, single row on desktop */}
-        <FooterLanguageLinks
-          currentLocale={locale}
-          currentPath={pathWithoutLocale}
-        />
-
-        {/* Attribution - subtle, own line */}
+        {/* Attribution */}
         <p className="text-center">
           <a
             href="https://goldenfocus.io"
@@ -46,6 +50,20 @@ export function GlobalFooter() {
             goldenfocus.io
           </a>
         </p>
+
+        {/* SEO-only language links - visually hidden but crawlable */}
+        <nav aria-label="Language selection" className="sr-only">
+          {CONTENT_LOCALES.map((loc) => (
+            <Link
+              key={loc}
+              href={pathWithoutLocale}
+              locale={loc}
+              aria-label={LOCALE_LABELS[loc]}
+            >
+              {LOCALE_LABELS[loc]}
+            </Link>
+          ))}
+        </nav>
       </div>
     </footer>
   );
