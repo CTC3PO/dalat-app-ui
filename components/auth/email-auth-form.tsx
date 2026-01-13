@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Loader2, Mail, Eye, EyeOff } from "lucide-react";
+import { Loader2, Mail, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Link } from "@/lib/i18n/routing";
 
 export function EmailAuthForm() {
@@ -16,8 +16,11 @@ export function EmailAuthForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isMagicLinkLoading, setIsMagicLinkLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const isAnyLoading = isLoading || isMagicLinkLoading;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -83,6 +86,39 @@ export function EmailAuthForm() {
     }
   }
 
+  async function handleMagicLink() {
+    setError(null);
+    setSuccess(null);
+
+    if (!email) {
+      setError(t("emailRequired"));
+      return;
+    }
+
+    setIsMagicLinkLoading(true);
+
+    try {
+      const supabase = createClient();
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess(t("magicLinkSent"));
+      }
+    } catch {
+      setError(t("somethingWentWrong"));
+    } finally {
+      setIsMagicLinkLoading(false);
+    }
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
@@ -106,7 +142,7 @@ export function EmailAuthForm() {
           placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          disabled={isLoading}
+          disabled={isAnyLoading}
           autoComplete="email"
           className="h-12"
         />
@@ -121,7 +157,7 @@ export function EmailAuthForm() {
             placeholder={t("passwordPlaceholder")}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
+            disabled={isAnyLoading}
             autoComplete="current-password"
             className="h-12 pr-10"
           />
@@ -149,7 +185,7 @@ export function EmailAuthForm() {
         </Link>
       </div>
 
-      <Button type="submit" className="w-full h-12" disabled={isLoading}>
+      <Button type="submit" className="w-full h-12" disabled={isAnyLoading}>
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -157,6 +193,35 @@ export function EmailAuthForm() {
           </>
         ) : (
           t("signIn")
+        )}
+      </Button>
+
+      <div className="relative">
+        <div className="absolute inset-0 flex items-center">
+          <span className="w-full border-t" />
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-card px-2 text-muted-foreground">{t("or")}</span>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full h-12"
+        onClick={handleMagicLink}
+        disabled={isAnyLoading}
+      >
+        {isMagicLinkLoading ? (
+          <>
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            {t("loading")}
+          </>
+        ) : (
+          <>
+            <Sparkles className="mr-2 h-4 w-4" />
+            {t("sendMagicLink")}
+          </>
         )}
       </Button>
 

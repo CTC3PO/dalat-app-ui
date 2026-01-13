@@ -68,6 +68,7 @@
     "alreadyHaveAccount": "Already have an account?",
     "dontHaveAccount": "Don't have an account?",
     "emailPasswordRequired": "Email and password are required",
+    "emailRequired": "Please enter your email",
     "passwordsDoNotMatch": "Passwords do not match",
     "passwordTooShort": "Password must be at least 8 characters",
     "emailAlreadyRegistered": "This email is already registered. Try signing in instead.",
@@ -75,6 +76,9 @@
     "checkEmailForConfirmation": "Check your email for a confirmation link",
     "accountCreatedCheckEmail": "Account created! Check your email to confirm.",
     "signInOrCreateHint": "New here? We'll create your account automatically.",
+    "or": "or",
+    "sendMagicLink": "Send me a magic link",
+    "magicLinkSent": "Magic link sent! Check your email.",
     "somethingWentWrong": "Something went wrong. Please try again.",
     "resetPassword": "Reset password",
     "resetPasswordDescription": "Enter your email to receive a password reset link",
@@ -136,6 +140,7 @@
     "titleRequired": "Event title *",
     "titlePlaceholder": "Coffee & Code",
     "eventUrl": "Event URL",
+    "url": "URL",
     "eventUrlPrefix": "dalat.app/events/",
     "urlPlaceholder": "my-event",
     "urlAvailable": "This URL is available",
@@ -144,6 +149,7 @@
     "urlValidation": "Only lowercase letters, numbers, and hyphens allowed",
     "urlChangeWarning": "Changing the URL will break any previously shared links",
     "checkingAvailability": "Checking availability...",
+    "info": "Info",
     "description": "Description",
     "descriptionPlaceholder": "What's this event about?",
     "date": "Date",
@@ -159,13 +165,29 @@
     "externalLink": "External link",
     "externalLinkPlaceholder": "https://...",
     "externalLinkHelp": "Link to a form, chat group, website, or social media",
+    "externalLinkNotCopied": "External link not copied (usually each event has its own link)",
     "maxAttendees": "Max attendees",
     "maxAttendeesPlaceholder": "Leave empty for unlimited",
     "maxAttendeesHelp": "Once full, new RSVPs go to a waitlist",
+    "limitAttendees": "Limit attendees",
     "addFlyerLater": "Add a flyer after creating the event",
     "creating": "Creating...",
+    "creatingSeries": "Creating series...",
     "saving": "Saving...",
-    "saveChanges": "Save changes"
+    "saveChanges": "Save changes",
+    "createRecurringEvent": "Create recurring event"
+  },
+  "flyerBuilder": {
+    "imagesOnly": "Images only",
+    "invalidImage": "Invalid image",
+    "invalidUrl": "Invalid URL",
+    "promptEmpty": "Prompt is empty",
+    "generationFailed": "Generation failed",
+    "eventTitlePlaceholder": "Event title",
+    "promptPlaceholder": "Describe the image you want to generate...",
+    "cancel": "Cancel",
+    "generating": "Generating...",
+    "generate": "Generate"
   },
   "eventActions": {
     "eventOptions": "Event options",
@@ -442,7 +464,17 @@
     "festivalName": "Festival name",
     "festivalSlug": "festival-name",
     "optionalTagline": "Optional tagline",
-    "saveChanges": "Save Changes"
+    "saveChanges": "Save Changes",
+    "tabs": {
+      "program": "Program",
+      "updates": "Updates",
+      "about": "About"
+    },
+    "noEventsYet": "No events announced yet. Check back soon!",
+    "officialProgram": "Official Program",
+    "communitySideEvents": "Community Side Events",
+    "noUpdatesYet": "No updates yet. Stay tuned!",
+    "moreDetailsSoon": "More details coming soon."
   },
   "analytics": {
     "created": "Created",
@@ -687,10 +719,20 @@
     "invitesSent": "Invites sent!",
     "invitesFailed": "Failed to send some invites",
     "alreadyInvited": "Already invited",
+    "valid": "valid",
+    "invalid": "invalid",
     "status": {
       "active": "Active",
       "unsubscribed": "Unsubscribed",
       "bounced": "Bounced"
+    },
+    "errors": {
+      "missingEmail": "Missing email",
+      "invalidEmailFormat": "Invalid email format",
+      "pleaseUploadCsv": "Please upload a CSV file",
+      "noValidRows": "No valid rows found in CSV",
+      "failedToRead": "Failed to read CSV file",
+      "uploadFailed": "Upload failed"
     }
   },
   "translations": {
