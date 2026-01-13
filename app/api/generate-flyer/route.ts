@@ -22,10 +22,12 @@ export async function POST(request: Request) {
 
     const genAI = new GoogleGenerativeAI(apiKey);
 
-    // Use Gemini to generate the image
-    // Note: As of early 2025, Imagen 3 is available through the Gemini API
+    // Use Gemini 2.0 Flash with image generation capability
     const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash-exp-image-generation",
+      model: "gemini-2.0-flash-exp",
+      generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"],
+      } as never, // Type workaround - SDK types may not include responseModalities yet
     });
 
     // Use custom prompt if provided, otherwise generate default
