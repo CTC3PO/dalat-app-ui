@@ -23,6 +23,9 @@ interface EventFormProps {
   userId: string;
   event?: Event;
   initialSponsors?: (EventSponsor & { sponsors: Sponsor })[];
+  // For "Create Similar Event" feature
+  copyFromEvent?: Event;
+  copyFromSponsors?: (EventSponsor & { sponsors: Sponsor })[];
 }
 
 /**
@@ -60,10 +63,58 @@ function suggestSlug(title: string): string {
 
 type SlugStatus = "idle" | "checking" | "available" | "taken" | "invalid";
 
-export function EventForm({ userId, event, initialSponsors = [] }: EventFormProps) {
+export function EventForm({
+  userId,
+  event,
+  initialSponsors = [],
+  copyFromEvent,
+  copyFromSponsors = [],
+}: EventFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+
+  // Determine if we're copying from another event
+  const isCopying = !!copyFromEvent;
+
+  // Calculate smart defaults when copying
+  const getCopyDefaults = useCallback(() => {
+    if (!copyFromEvent) return null;
+
+    const sourceDate = new Date(copyFromEvent.starts_at);
+    // Suggest next day for the new event
+    const nextDay = new Date(sourceDate);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    // Convert source sponsors to draft format
+    const draftFromCopy: DraftSponsor[] = copyFromSponsors.map((es, index) => ({
+      id: `copy-${es.sponsor_id}-${index}`,
+      name: es.sponsors?.name || "",
+      logo_url: es.sponsors?.logo_url || "",
+      website_url: es.sponsors?.website_url || "",
+    }));
+
+    // Get time from source event in Da Lat timezone
+    const sourceDateTime = getDateTimeInDaLat(copyFromEvent.starts_at);
+
+    return {
+      title: copyFromEvent.title,
+      description: copyFromEvent.description || "",
+      // Use next day, but keep same time
+      date: nextDay.toISOString().split("T")[0],
+      time: sourceDateTime.time,
+      locationName: copyFromEvent.location_name || "",
+      address: copyFromEvent.address || "",
+      googleMapsUrl: copyFromEvent.google_maps_url || "",
+      // Clear external URL - each event typically has its own FB event
+      externalChatUrl: "",
+      capacity: copyFromEvent.capacity,
+      sponsors: draftFromCopy,
+    };
+  }, [copyFromEvent, copyFromSponsors]);
+
+  const copyDefaults = getCopyDefaults();
+
   const [imageUrl, setImageUrl] = useState<string | null>(
     event?.image_url ?? null
   );
@@ -72,7 +123,7 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
   const slugEditable = canEditSlug(isEditing);
 
   // Title state (controlled for FlyerBuilder integration)
-  const [title, setTitle] = useState(event?.title ?? "");
+  const [title, setTitle] = useState(event?.title ?? copyDefaults?.title ?? "");
 
   // Pending file for upload (only for new events with file/generated image)
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -85,14 +136,18 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
   // Recurrence state (only for new events)
   const [recurrence, setRecurrence] = useState<RecurrenceFormData>(getDefaultRecurrenceData());
   const [selectedDate, setSelectedDate] = useState<Date | null>(
-    event?.starts_at ? new Date(event.starts_at) : null
+    event?.starts_at ? new Date(event.starts_at) : copyDefaults?.date ? new Date(copyDefaults.date) : null
   );
 
-  // Draft sponsors state (for new events)
-  const [draftSponsors, setDraftSponsors] = useState<DraftSponsor[]>([]);
+  // Draft sponsors state (for new events) - initialize with copied sponsors
+  const [draftSponsors, setDraftSponsors] = useState<DraftSponsor[]>(
+    copyDefaults?.sponsors ?? []
+  );
 
   // Capacity limit toggle
-  const [hasCapacityLimit, setHasCapacityLimit] = useState(!!event?.capacity);
+  const [hasCapacityLimit, setHasCapacityLimit] = useState(
+    !!event?.capacity || !!copyDefaults?.capacity
+  );
 
   // Check slug availability with debounce
   useEffect(() => {
@@ -175,7 +230,12 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
   };
 
   // Parse existing event date/time in Da Lat timezone
-  const defaults = event ? getDateTimeInDaLat(event.starts_at) : { date: "", time: "" };
+  // For copying: use the calculated next day and same time
+  const defaults = event
+    ? getDateTimeInDaLat(event.starts_at)
+    : copyDefaults
+      ? { date: copyDefaults.date, time: copyDefaults.time }
+      : { date: "", time: "" };
 
   // Helper to upload image (file or base64) to Supabase storage
   async function uploadImage(
@@ -474,7 +534,7 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
             <AIEnhanceTextarea
               id="description"
               name="description"
-              defaultValue={event?.description ?? ""}
+              defaultValue={event?.description ?? copyDefaults?.description ?? ""}
               rows={3}
               context="an event description for a local community event in Da Lat, Vietnam"
             />
@@ -525,7 +585,14 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
                     address: event.address || "",
                     googleMapsUrl: event.google_maps_url || "",
                   }
-                : null
+                : copyDefaults?.locationName
+                  ? {
+                      placeId: "",
+                      name: copyDefaults.locationName,
+                      address: copyDefaults.address,
+                      googleMapsUrl: copyDefaults.googleMapsUrl,
+                    }
+                  : null
             }
           />
 
@@ -539,6 +606,11 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
               placeholder="https://..."
               defaultValue={event?.external_chat_url ?? ""}
             />
+            {isCopying && (
+              <p className="text-xs text-muted-foreground">
+                External link not copied (usually each event has its own link)
+              </p>
+            )}
           </div>
 
           {/* Capacity */}
@@ -558,7 +630,7 @@ export function EventForm({ userId, event, initialSponsors = [] }: EventFormProp
                   name="capacity"
                   type="number"
                   min="1"
-                  defaultValue={event?.capacity ?? ""}
+                  defaultValue={event?.capacity ?? copyDefaults?.capacity ?? ""}
                   className="w-24"
                 />
               )}

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { MoreHorizontal, Pencil, Settings, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Settings, Trash2, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
@@ -31,6 +32,10 @@ export function EventActions({ eventId, eventSlug }: EventActionsProps) {
 
   function handleSettings() {
     router.push(`/events/${eventSlug}/settings`);
+  }
+
+  function handleCreateSimilar() {
+    router.push(`/events/new?copyFrom=${eventId}`);
   }
 
   function handleDelete() {
@@ -99,6 +104,12 @@ export function EventActions({ eventId, eventSlug }: EventActionsProps) {
           <Settings className="w-4 h-4 mr-2" />
           {t("eventSettings")}
         </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleCreateSimilar}>
+          <Copy className="w-4 h-4 mr-2" />
+          {t("createSimilar")}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={handleDelete}
           className="text-red-600 focus:text-red-600"
