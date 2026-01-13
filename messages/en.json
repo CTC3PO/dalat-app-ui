@@ -46,6 +46,11 @@
       "upcoming": "Upcoming",
       "happening": "Now",
       "past": "Past"
+    },
+    "search": {
+      "placeholder": "Search events...",
+      "noResults": "No events found for \"{query}\"",
+      "clearSearch": "Clear search"
     }
   },
   "auth": {
@@ -109,6 +114,7 @@
     "waitlist": "waitlist",
     "onWaitlist": "on waitlist",
     "full": "Full",
+    "signInToSeeAttendees": "Sign in to see who's attending",
     "viewOnMap": "View on map",
     "moreInfo": "More info",
     "organizedBy": "Organized by",
@@ -317,7 +323,14 @@
     "generating": "Creating...",
     "upcomingEvents": "Upcoming Events",
     "pastEvents": "Past Events",
-    "noEventsYet": "No events yet"
+    "noEventsYet": "No events yet",
+    "claimBanner": {
+      "title": "Is this your profile?",
+      "description": "This profile was auto-created from Facebook Events and owns {count} event(s). If you are {name}, you can claim this profile to manage your events.",
+      "button": "Claim This Profile",
+      "communityImported": "Community Imported"
+    },
+    "eventsHosted": "{count} events hosted"
   },
   "settings": {
     "settings": "Settings",
@@ -465,7 +478,14 @@
     "website": "Website",
     "upcomingEvents": "Upcoming Events",
     "pastEvents": "Past Events",
-    "noEventsYet": "No events yet"
+    "noEventsYet": "No events yet",
+    "claimBanner": {
+      "title": "Is this your organization?",
+      "description": "This organizer profile has {count} event(s) but isn't claimed yet. If you represent {name}, you can claim this profile to manage it.",
+      "button": "Claim This Profile",
+      "unclaimed": "Unclaimed"
+    },
+    "eventsHosted": "{count} events"
   },
   "festival": {
     "title": "Festivals",

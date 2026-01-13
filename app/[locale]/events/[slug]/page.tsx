@@ -24,7 +24,7 @@ import { MoreFromOrganizer } from "@/components/events/more-from-organizer";
 import { Linkify } from "@/lib/linkify";
 import { MomentsPreview } from "@/components/moments";
 import { SponsorDisplay } from "@/components/events/sponsor-display";
-import type { Event, EventCounts, Rsvp, Profile, Organizer, MomentWithProfile, MomentCounts, EventSettings, Sponsor, EventSponsor } from "@/lib/types";
+import type { Event, EventCounts, Rsvp, Profile, Organizer, MomentWithProfile, MomentCounts, EventSettings, Sponsor, EventSponsor, UserRole } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -227,6 +227,17 @@ async function getCurrentUserId(): Promise<string | null> {
   return user?.id ?? null;
 }
 
+async function getCurrentUserRole(userId: string | null): Promise<UserRole | null> {
+  if (!userId) return null;
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", userId)
+    .single();
+  return (data?.role as UserRole) ?? null;
+}
+
 async function getMomentsPreview(eventId: string): Promise<MomentWithProfile[]> {
   const supabase = await createClient();
 
@@ -396,6 +407,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
   ]);
 
   const currentUserId = await getCurrentUserId();
+  const currentUserRole = await getCurrentUserRole(currentUserId);
 
   const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents, momentsPreview, momentCounts, canPostMoment, sponsors, eventTranslations] = await Promise.all([
     getEventCounts(event.id),
@@ -414,6 +426,8 @@ export default async function EventPage({ params, searchParams }: PageProps) {
 
   const isLoggedIn = !!currentUserId;
   const isCreator = currentUserId === event.created_by;
+  const isAdmin = currentUserRole === "admin";
+  const canManageEvent = isCreator || isAdmin;
 
   const spotsText = event.capacity
     ? `${counts?.going_spots ?? 0}/${event.capacity}`
@@ -449,7 +463,7 @@ export default async function EventPage({ params, searchParams }: PageProps) {
             <ArrowLeft className="w-4 h-4" />
             <span>{tCommon("back")}</span>
           </Link>
-          {isCreator && (
+          {canManageEvent && (
             <div className="flex items-center gap-2">
               <InviteModal
                 eventSlug={event.slug}
@@ -551,25 +565,34 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                   </div>
                 )}
 
-                {/* Spots */}
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-muted-foreground" />
-                  <div>
-                    <p className="font-medium">
-                      {spotsText} {t("going")}
-                      {(counts?.interested_count ?? 0) > 0 && (
-                        <span className="text-muted-foreground font-normal">
-                          {" "}· {counts?.interested_count} {t("interested")}
-                        </span>
-                      )}
-                    </p>
-                    {(counts?.waitlist_count ?? 0) > 0 && (
-                      <p className="text-sm text-muted-foreground">
-                        {counts?.waitlist_count} {t("onWaitlist")}
+                {/* Spots - only show counts to logged-in users */}
+                {isLoggedIn ? (
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-muted-foreground" />
+                    <div>
+                      <p className="font-medium">
+                        {spotsText} {t("going")}
+                        {(counts?.interested_count ?? 0) > 0 && (
+                          <span className="text-muted-foreground font-normal">
+                            {" "}· {counts?.interested_count} {t("interested")}
+                          </span>
+                        )}
                       </p>
-                    )}
+                      {(counts?.waitlist_count ?? 0) > 0 && (
+                        <p className="text-sm text-muted-foreground">
+                          {counts?.waitlist_count} {t("onWaitlist")}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-muted-foreground" />
+                    <p className="text-muted-foreground text-sm">
+                      {t("signInToSeeAttendees")}
+                    </p>
+                  </div>
+                )}
 
                 {/* External link */}
                 {event.external_chat_url && (
@@ -618,12 +641,16 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                   {t("organizedBy")}
                 </p>
                 <Link
-                  href={`/${event.profiles?.username || event.created_by}`}
+                  href={
+                    event.organizers?.slug
+                      ? `/organizers/${event.organizers.slug}`
+                      : `/${event.profiles?.username || event.created_by}`
+                  }
                   className="flex items-center gap-3 hover:bg-muted p-2 -m-2 rounded-lg transition-colors"
                 >
-                  {event.profiles?.avatar_url ? (
+                  {event.organizers?.logo_url || event.profiles?.avatar_url ? (
                     <img
-                      src={event.profiles.avatar_url}
+                      src={(event.organizers?.logo_url || event.profiles?.avatar_url) ?? undefined}
                       alt=""
                       className="w-10 h-10 rounded-full"
                     />
@@ -631,7 +658,8 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                     <div className="w-10 h-10 rounded-full bg-primary/20" />
                   )}
                   <span className="font-medium">
-                    {event.profiles?.display_name ||
+                    {event.organizers?.name ||
+                      event.profiles?.display_name ||
                       event.profiles?.username ||
                       tCommon("anonymous")}
                   </span>
