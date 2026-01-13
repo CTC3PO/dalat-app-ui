@@ -300,7 +300,9 @@
     "removeFailed": "Gagal menghapus gambar",
     "saving": "Menyimpan...",
     "saveChanges": "Simpan perubahan",
-    "continue": "Lanjutkan"
+    "continue": "Lanjutkan",
+    "generateAI": "Avatar AI",
+    "generating": "Membuat..."
   },
   "settings": {
     "settings": "Pengaturan",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "Selamat datang di dalat.app",
     "letsSetup": "Mari siapkan profil Anda",
-    "continue": "Lanjutkan"
+    "continue": "Lanjutkan",
+    "avatarStep": {
+      "subtitle": "Pilih tampilan Anda",
+      "preview": "Pratinjau avatar",
+      "useGoogle": "Gunakan foto Google",
+      "upload": "Unggah foto",
+      "uploading": "Mengunggah...",
+      "aiMagic": "Keajaiban AI",
+      "generating": "Membuat...",
+      "generationFailed": "Gagal membuat avatar. Silakan coba lagi.",
+      "orPickDefault": "Atau pilih default",
+      "continue": "Lanjutkan",
+      "skip": "Lewati"
+    },
+    "profileStep": {
+      "subtitle": "Siapkan identitas Anda",
+      "almostThere": "Hampir selesai!",
+      "setNameUsername": "Atur nama dan username",
+      "yourAvatar": "Avatar Anda",
+      "invalidUsername": "Format username tidak valid",
+      "saving": "Menyiapkan...",
+      "complete": "Selesai"
+    }
   },
   "empty": {
     "noEventsYet": "Belum ada acara",

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { ProfileForm } from "@/components/profile/profile-form";
+import { OnboardingFlow } from "@/components/onboarding/onboarding-flow";
 
 export default async function OnboardingPage() {
   const supabase = await createClient();
@@ -24,23 +24,27 @@ export default async function OnboardingPage() {
     redirect("/");
   }
 
-  // Get display name from OAuth metadata if available
+  // Get data from OAuth metadata if available
   const defaultDisplayName =
     user.user_metadata?.display_name ||
     user.user_metadata?.full_name ||
     user.user_metadata?.name ||
     "";
 
+  // Get avatar URL from OAuth provider (Google, etc.)
+  const oauthAvatarUrl =
+    user.user_metadata?.avatar_url ||
+    user.user_metadata?.picture ||
+    null;
+
   return (
-    <main className="min-h-screen flex items-center justify-center px-4">
+    <main className="min-h-screen flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold mb-2">Welcome to dalat.app</h1>
-          <p className="text-muted-foreground">
-            Let&apos;s set up your profile
-          </p>
-        </div>
-        <ProfileForm userId={user.id} defaultDisplayName={defaultDisplayName} />
+        <OnboardingFlow
+          userId={user.id}
+          defaultDisplayName={defaultDisplayName}
+          oauthAvatarUrl={oauthAvatarUrl}
+        />
       </div>
     </main>
   );

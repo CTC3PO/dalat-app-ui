@@ -300,7 +300,9 @@
     "removeFailed": "Không thể xóa ảnh",
     "saving": "Đang lưu...",
     "saveChanges": "Lưu thay đổi",
-    "continue": "Tiếp tục"
+    "continue": "Tiếp tục",
+    "generateAI": "AI Avatar",
+    "generating": "Đang tạo..."
   },
   "settings": {
     "settings": "Cài đặt",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "Chào mừng đến với dalat.app",
     "letsSetup": "Hãy thiết lập hồ sơ của bạn",
-    "continue": "Tiếp tục"
+    "continue": "Tiếp tục",
+    "avatarStep": {
+      "subtitle": "Chọn cách bạn muốn xuất hiện",
+      "preview": "Xem trước ảnh đại diện",
+      "useGoogle": "Dùng ảnh Google",
+      "upload": "Tải ảnh lên",
+      "uploading": "Đang tải...",
+      "aiMagic": "AI Sáng tạo",
+      "generating": "Đang tạo...",
+      "generationFailed": "Không thể tạo ảnh đại diện. Vui lòng thử lại.",
+      "orPickDefault": "Hoặc chọn mặc định",
+      "continue": "Tiếp tục",
+      "skip": "Bỏ qua"
+    },
+    "profileStep": {
+      "subtitle": "Thiết lập danh tính của bạn",
+      "almostThere": "Sắp xong rồi!",
+      "setNameUsername": "Đặt tên và tên người dùng",
+      "yourAvatar": "Ảnh đại diện của bạn",
+      "invalidUsername": "Định dạng tên người dùng không hợp lệ",
+      "saving": "Đang thiết lập...",
+      "complete": "Hoàn tất"
+    }
   },
   "empty": {
     "noEventsYet": "Chưa có sự kiện nào",

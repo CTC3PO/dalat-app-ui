@@ -300,7 +300,9 @@
     "removeFailed": "이미지 제거에 실패했습니다",
     "saving": "저장 중...",
     "saveChanges": "변경사항 저장",
-    "continue": "계속"
+    "continue": "계속",
+    "generateAI": "AI 아바타",
+    "generating": "생성 중..."
   },
   "settings": {
     "settings": "설정",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "dalat.app에 오신 것을 환영합니다",
     "letsSetup": "프로필을 설정해 보겠습니다",
-    "continue": "계속"
+    "continue": "계속",
+    "avatarStep": {
+      "subtitle": "표시 방법을 선택하세요",
+      "preview": "아바타 미리보기",
+      "useGoogle": "Google 사진 사용",
+      "upload": "사진 업로드",
+      "uploading": "업로드 중...",
+      "aiMagic": "AI 마법",
+      "generating": "생성 중...",
+      "generationFailed": "아바타 생성에 실패했습니다. 다시 시도해 주세요.",
+      "orPickDefault": "또는 기본값 선택",
+      "continue": "계속",
+      "skip": "건너뛰기"
+    },
+    "profileStep": {
+      "subtitle": "신원을 설정하세요",
+      "almostThere": "거의 완료!",
+      "setNameUsername": "이름과 사용자명 설정",
+      "yourAvatar": "내 아바타",
+      "invalidUsername": "잘못된 사용자명 형식",
+      "saving": "설정 중...",
+      "complete": "설정 완료"
+    }
   },
   "empty": {
     "noEventsYet": "아직 이벤트가 없습니다",

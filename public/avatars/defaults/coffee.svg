@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="coffeeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#efebe9"/>
+      <stop offset="100%" stop-color="#d7ccc8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="50" fill="url(#coffeeBg)"/>
+  <path d="M28 40 L32 75 Q32 80 37 80 L63 80 Q68 80 68 75 L72 40 Z" fill="#5d4037" opacity="0.85"/>
+  <ellipse cx="50" cy="40" rx="22" ry="8" fill="#3e2723" opacity="0.9"/>
+  <ellipse cx="50" cy="40" rx="18" ry="6" fill="#6d4c41"/>
+  <path d="M72 45 Q85 45 85 55 Q85 65 72 65" stroke="#5d4037" stroke-width="5" fill="none" opacity="0.85"/>
+  <path d="M38 25 Q40 18 44 22 Q46 15 50 20" stroke="#8d6e63" stroke-width="2" fill="none" opacity="0.5"/>
+  <path d="M50 22 Q52 15 56 19 Q58 12 62 17" stroke="#8d6e63" stroke-width="2" fill="none" opacity="0.5"/>
+</svg>

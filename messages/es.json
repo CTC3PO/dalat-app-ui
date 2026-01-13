@@ -300,7 +300,9 @@
     "removeFailed": "Error al eliminar imagen",
     "saving": "Guardando...",
     "saveChanges": "Guardar cambios",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "generateAI": "Avatar IA",
+    "generating": "Creando..."
   },
   "settings": {
     "settings": "Configuración",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "Bienvenido a dalat.app",
     "letsSetup": "Configuremos tu perfil",
-    "continue": "Continuar"
+    "continue": "Continuar",
+    "avatarStep": {
+      "subtitle": "Elige cómo quieres aparecer",
+      "preview": "Vista previa del avatar",
+      "useGoogle": "Usar foto de Google",
+      "upload": "Subir foto",
+      "uploading": "Subiendo...",
+      "aiMagic": "Magia IA",
+      "generating": "Creando...",
+      "generationFailed": "Error al generar avatar. Por favor, inténtalo de nuevo.",
+      "orPickDefault": "O elige uno predeterminado",
+      "continue": "Continuar",
+      "skip": "Omitir"
+    },
+    "profileStep": {
+      "subtitle": "Configura tu identidad",
+      "almostThere": "¡Casi listo!",
+      "setNameUsername": "Establece tu nombre y usuario",
+      "yourAvatar": "Tu avatar",
+      "invalidUsername": "Formato de usuario inválido",
+      "saving": "Configurando...",
+      "complete": "Completar"
+    }
   },
   "empty": {
     "noEventsYet": "Aún no hay eventos",

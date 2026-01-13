@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="flowerBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f3e5f5"/>
+      <stop offset="100%" stop-color="#e1bee7"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="50" fill="url(#flowerBg)"/>
+  <g transform="translate(50,45)" opacity="0.85">
+    <ellipse cx="0" cy="-18" rx="10" ry="16" fill="#9c27b0"/>
+    <ellipse cx="17" cy="-6" rx="10" ry="16" fill="#ab47bc" transform="rotate(72)"/>
+    <ellipse cx="10" cy="15" rx="10" ry="16" fill="#ba68c8" transform="rotate(144)"/>
+    <ellipse cx="-10" cy="15" rx="10" ry="16" fill="#ab47bc" transform="rotate(216)"/>
+    <ellipse cx="-17" cy="-6" rx="10" ry="16" fill="#9c27b0" transform="rotate(288)"/>
+    <circle cx="0" cy="0" r="10" fill="#ffeb3b"/>
+  </g>
+  <path d="M50 60 Q50 75 48 85" stroke="#4caf50" stroke-width="3" fill="none" opacity="0.7"/>
+</svg>

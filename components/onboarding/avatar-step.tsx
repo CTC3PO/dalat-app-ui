@@ -1,0 +1,311 @@
+"use client";
+
+import { useState, useRef, useCallback } from "react";
+import { Upload, Sparkles, Loader2, Camera, User } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { DefaultAvatars } from "./default-avatars";
+
+interface AvatarStepProps {
+  userId: string;
+  displayName?: string;
+  oauthAvatarUrl?: string | null;
+  onComplete: (avatarUrl: string | null) => void;
+  onSkip: () => void;
+}
+
+export function AvatarStep({
+  userId,
+  displayName,
+  oauthAvatarUrl,
+  onComplete,
+  onSkip,
+}: AvatarStepProps) {
+  const t = useTranslations("onboarding");
+  const tProfile = useTranslations("profile");
+  const [previewUrl, setPreviewUrl] = useState<string | null>(oauthAvatarUrl || null);
+  const [selectedDefault, setSelectedDefault] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const validateFile = (file: File): string | null => {
+    const maxSize = 5 * 1024 * 1024;
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+
+    if (!allowedTypes.includes(file.type)) {
+      return tProfile("invalidFileType");
+    }
+    if (file.size > maxSize) {
+      return tProfile("fileTooLarge");
+    }
+    return null;
+  };
+
+  const uploadToStorage = async (file: File | Blob, ext: string = "jpg"): Promise<string> => {
+    const supabase = createClient();
+    const fileName = `${userId}/${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("avatars")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        upsert: true,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: { publicUrl } } = supabase.storage
+      .from("avatars")
+      .getPublicUrl(fileName);
+
+    return publicUrl;
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setError(null);
+    const validationError = validateFile(file);
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    // Show preview immediately
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    setSelectedDefault(null);
+    setIsUploading(true);
+
+    try {
+      const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
+      const publicUrl = await uploadToStorage(file, ext);
+      setPreviewUrl(publicUrl);
+    } catch (err) {
+      console.error("Upload error:", err);
+      setError(tProfile("uploadFailed"));
+      setPreviewUrl(oauthAvatarUrl || null);
+    } finally {
+      setIsUploading(false);
+      URL.revokeObjectURL(objectUrl);
+    }
+
+    e.target.value = "";
+  };
+
+  const handleUseOAuth = async () => {
+    if (!oauthAvatarUrl) return;
+
+    setError(null);
+    setIsUploading(true);
+
+    try {
+      // Download OAuth avatar and re-upload to our storage
+      const response = await fetch(oauthAvatarUrl);
+      const blob = await response.blob();
+      const ext = blob.type.split("/")[1] || "jpg";
+      const publicUrl = await uploadToStorage(blob, ext);
+      setPreviewUrl(publicUrl);
+      setSelectedDefault(null);
+    } catch (err) {
+      console.error("OAuth avatar error:", err);
+      // Fall back to using the OAuth URL directly
+      setPreviewUrl(oauthAvatarUrl);
+      setSelectedDefault(null);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleGenerateAI = async () => {
+    setError(null);
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch("/api/generate-avatar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ displayName }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || "Failed to generate avatar");
+      }
+
+      const { imageUrl } = await response.json();
+
+      // Convert base64 to blob and upload to storage
+      const base64Data = imageUrl.split(",")[1];
+      const mimeType = imageUrl.split(";")[0].split(":")[1];
+      const byteCharacters = atob(base64Data);
+      const byteNumbers = new Array(byteCharacters.length);
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: mimeType });
+
+      const ext = mimeType.split("/")[1] || "png";
+      const publicUrl = await uploadToStorage(blob, ext);
+      setPreviewUrl(publicUrl);
+      setSelectedDefault(null);
+    } catch (err) {
+      console.error("AI generation error:", err);
+      setError(err instanceof Error ? err.message : t("avatarStep.generationFailed"));
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const handleSelectDefault = (src: string) => {
+    setSelectedDefault(src);
+    setPreviewUrl(src);
+  };
+
+  const handleContinue = () => {
+    onComplete(previewUrl);
+  };
+
+  const isLoading = isUploading || isGenerating;
+
+  return (
+    <div className="space-y-8">
+      {/* Large preview */}
+      <div className="flex justify-center">
+        <div
+          className={cn(
+            "w-32 h-32 rounded-full overflow-hidden bg-muted border-4 border-background shadow-lg",
+            "flex items-center justify-center"
+          )}
+        >
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt={t("avatarStep.preview")}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <User className="w-16 h-16 text-muted-foreground" />
+          )}
+          {isLoading && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
+              <Loader2 className="w-8 h-8 text-white animate-spin" />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Action cards */}
+      <div className="grid grid-cols-2 gap-3">
+        {oauthAvatarUrl && (
+          <button
+            type="button"
+            onClick={handleUseOAuth}
+            disabled={isLoading}
+            className={cn(
+              "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+              "hover:bg-accent hover:border-primary/50 active:scale-95",
+              "disabled:opacity-50 disabled:cursor-not-allowed",
+              previewUrl === oauthAvatarUrl ? "border-primary bg-primary/5" : "border-muted"
+            )}
+          >
+            <div className="w-10 h-10 rounded-full overflow-hidden">
+              <img src={oauthAvatarUrl} alt="Google" className="w-full h-full object-cover" />
+            </div>
+            <span className="text-sm font-medium">{t("avatarStep.useGoogle")}</span>
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={isLoading}
+          className={cn(
+            "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+            "hover:bg-accent hover:border-primary/50 active:scale-95",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            "border-muted"
+          )}
+        >
+          {isUploading ? (
+            <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Upload className="w-5 h-5 text-primary" />
+            </div>
+          )}
+          <span className="text-sm font-medium">
+            {isUploading ? t("avatarStep.uploading") : t("avatarStep.upload")}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={handleGenerateAI}
+          disabled={isLoading}
+          className={cn(
+            "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+            "hover:bg-accent hover:border-primary/50 active:scale-95",
+            "disabled:opacity-50 disabled:cursor-not-allowed",
+            oauthAvatarUrl ? "border-muted" : "col-span-2 border-muted"
+          )}
+        >
+          {isGenerating ? (
+            <Loader2 className="w-10 h-10 text-primary animate-spin" />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-white" />
+            </div>
+          )}
+          <span className="text-sm font-medium">
+            {isGenerating ? t("avatarStep.generating") : t("avatarStep.aiMagic")}
+          </span>
+        </button>
+      </div>
+
+      {/* Default avatars */}
+      <div className="space-y-3">
+        <p className="text-sm text-muted-foreground text-center">{t("avatarStep.orPickDefault")}</p>
+        <DefaultAvatars selected={selectedDefault} onSelect={handleSelectDefault} />
+      </div>
+
+      {/* Error */}
+      {error && (
+        <p className="text-sm text-destructive text-center">{error}</p>
+      )}
+
+      {/* Actions */}
+      <div className="flex flex-col gap-3">
+        <Button
+          onClick={handleContinue}
+          disabled={isLoading}
+          className="w-full"
+        >
+          {t("avatarStep.continue")}
+        </Button>
+        <Button
+          variant="ghost"
+          onClick={onSkip}
+          disabled={isLoading}
+          className="w-full text-muted-foreground"
+        >
+          {t("avatarStep.skip")}
+        </Button>
+      </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        onChange={handleFileSelect}
+        className="hidden"
+      />
+    </div>
+  );
+}

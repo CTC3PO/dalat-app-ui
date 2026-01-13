@@ -300,7 +300,9 @@
     "removeFailed": "移除图片失败",
     "saving": "保存中...",
     "saveChanges": "保存更改",
-    "continue": "继续"
+    "continue": "继续",
+    "generateAI": "AI头像",
+    "generating": "生成中..."
   },
   "settings": {
     "settings": "设置",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "欢迎来到 dalat.app",
     "letsSetup": "让我们设置您的资料",
-    "continue": "继续"
+    "continue": "继续",
+    "avatarStep": {
+      "subtitle": "选择您的外观",
+      "preview": "头像预览",
+      "useGoogle": "使用Google照片",
+      "upload": "上传照片",
+      "uploading": "上传中...",
+      "aiMagic": "AI魔法",
+      "generating": "生成中...",
+      "generationFailed": "头像生成失败，请重试。",
+      "orPickDefault": "或选择默认头像",
+      "continue": "继续",
+      "skip": "跳过"
+    },
+    "profileStep": {
+      "subtitle": "设置您的身份",
+      "almostThere": "即将完成！",
+      "setNameUsername": "设置姓名和用户名",
+      "yourAvatar": "您的头像",
+      "invalidUsername": "用户名格式无效",
+      "saving": "设置中...",
+      "complete": "完成设置"
+    }
   },
   "empty": {
     "noEventsYet": "暂无活动",

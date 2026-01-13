@@ -300,7 +300,9 @@
     "removeFailed": "ลบรูปไม่สำเร็จ",
     "saving": "กำลังบันทึก...",
     "saveChanges": "บันทึกการเปลี่ยนแปลง",
-    "continue": "ดำเนินการต่อ"
+    "continue": "ดำเนินการต่อ",
+    "generateAI": "AI อวาตาร์",
+    "generating": "กำลังสร้าง..."
   },
   "settings": {
     "settings": "การตั้งค่า",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "ยินดีต้อนรับสู่ dalat.app",
     "letsSetup": "มาตั้งค่าโปรไฟล์ของคุณกัน",
-    "continue": "ดำเนินการต่อ"
+    "continue": "ดำเนินการต่อ",
+    "avatarStep": {
+      "subtitle": "เลือกรูปลักษณ์ของคุณ",
+      "preview": "ตัวอย่างอวาตาร์",
+      "useGoogle": "ใช้รูป Google",
+      "upload": "อัปโหลดรูป",
+      "uploading": "กำลังอัปโหลด...",
+      "aiMagic": "AI มายากล",
+      "generating": "กำลังสร้าง...",
+      "generationFailed": "ไม่สามารถสร้างอวาตาร์ได้ กรุณาลองอีกครั้ง",
+      "orPickDefault": "หรือเลือกค่าเริ่มต้น",
+      "continue": "ดำเนินการต่อ",
+      "skip": "ข้าม"
+    },
+    "profileStep": {
+      "subtitle": "ตั้งค่าตัวตนของคุณ",
+      "almostThere": "เกือบเสร็จแล้ว!",
+      "setNameUsername": "ตั้งชื่อและชื่อผู้ใช้",
+      "yourAvatar": "อวาตาร์ของคุณ",
+      "invalidUsername": "รูปแบบชื่อผู้ใช้ไม่ถูกต้อง",
+      "saving": "กำลังตั้งค่า...",
+      "complete": "เสร็จสิ้น"
+    }
   },
   "empty": {
     "noEventsYet": "ยังไม่มีกิจกรรม",

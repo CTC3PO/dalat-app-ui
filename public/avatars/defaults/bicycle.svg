@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <linearGradient id="bikeBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e0f2f1"/>
+      <stop offset="100%" stop-color="#b2dfdb"/>
+    </linearGradient>
+  </defs>
+  <circle cx="50" cy="50" r="50" fill="url(#bikeBg)"/>
+  <g stroke="#00796b" stroke-width="3" fill="none" opacity="0.85">
+    <circle cx="28" cy="58" r="14"/>
+    <circle cx="72" cy="58" r="14"/>
+    <path d="M28 58 L42 35 L58 35"/>
+    <path d="M42 35 L50 58 L72 58"/>
+    <path d="M58 35 L72 58"/>
+    <circle cx="58" cy="35" r="4" fill="#00796b"/>
+    <path d="M54 35 L62 35" stroke-width="2"/>
+    <path d="M46 28 Q50 22 54 28"/>
+  </g>
+</svg>

@@ -300,7 +300,9 @@
     "removeFailed": "Не удалось удалить изображение",
     "saving": "Сохранение...",
     "saveChanges": "Сохранить изменения",
-    "continue": "Продолжить"
+    "continue": "Продолжить",
+    "generateAI": "ИИ-аватар",
+    "generating": "Создание..."
   },
   "settings": {
     "settings": "Настройки",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "Добро пожаловать в dalat.app",
     "letsSetup": "Давайте настроим ваш профиль",
-    "continue": "Продолжить"
+    "continue": "Продолжить",
+    "avatarStep": {
+      "subtitle": "Выберите, как вы хотите выглядеть",
+      "preview": "Предпросмотр аватара",
+      "useGoogle": "Использовать фото Google",
+      "upload": "Загрузить фото",
+      "uploading": "Загрузка...",
+      "aiMagic": "ИИ-магия",
+      "generating": "Создание...",
+      "generationFailed": "Не удалось создать аватар. Попробуйте ещё раз.",
+      "orPickDefault": "Или выберите стандартный",
+      "continue": "Продолжить",
+      "skip": "Пропустить"
+    },
+    "profileStep": {
+      "subtitle": "Настройте свою личность",
+      "almostThere": "Почти готово!",
+      "setNameUsername": "Укажите имя и логин",
+      "yourAvatar": "Ваш аватар",
+      "invalidUsername": "Неверный формат имени пользователя",
+      "saving": "Настройка...",
+      "complete": "Завершить"
+    }
   },
   "empty": {
     "noEventsYet": "Пока нет событий",

@@ -300,7 +300,9 @@
     "removeFailed": "画像の削除に失敗しました",
     "saving": "保存中...",
     "saveChanges": "変更を保存",
-    "continue": "続ける"
+    "continue": "続ける",
+    "generateAI": "AIアバター",
+    "generating": "作成中..."
   },
   "settings": {
     "settings": "設定",
@@ -490,7 +492,29 @@
   "onboarding": {
     "welcome": "dalat.appへようこそ",
     "letsSetup": "プロフィールを設定しましょう",
-    "continue": "続ける"
+    "continue": "続ける",
+    "avatarStep": {
+      "subtitle": "表示方法を選択",
+      "preview": "アバタープレビュー",
+      "useGoogle": "Googleの写真を使用",
+      "upload": "写真をアップロード",
+      "uploading": "アップロード中...",
+      "aiMagic": "AIマジック",
+      "generating": "作成中...",
+      "generationFailed": "アバターの生成に失敗しました。もう一度お試しください。",
+      "orPickDefault": "またはデフォルトを選択",
+      "continue": "続ける",
+      "skip": "スキップ"
+    },
+    "profileStep": {
+      "subtitle": "アイデンティティを設定",
+      "almostThere": "あと少し！",
+      "setNameUsername": "名前とユーザー名を設定",
+      "yourAvatar": "あなたのアバター",
+      "invalidUsername": "ユーザー名の形式が無効です",
+      "saving": "設定中...",
+      "complete": "設定完了"
+    }
   },
   "empty": {
     "noEventsYet": "まだイベントがありません",
