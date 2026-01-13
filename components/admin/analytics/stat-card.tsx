@@ -1,7 +1,6 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface StatCardProps {
@@ -9,10 +8,6 @@ interface StatCardProps {
   value: number | string;
   subtitle?: string;
   icon: ReactNode;
-  trend?: {
-    value: number;
-    label: string;
-  };
   className?: string;
 }
 
@@ -21,52 +16,27 @@ export function StatCard({
   value,
   subtitle,
   icon,
-  trend,
   className,
 }: StatCardProps) {
-  const TrendIcon =
-    trend && trend.value > 0
-      ? TrendingUp
-      : trend && trend.value < 0
-      ? TrendingDown
-      : Minus;
-
-  const trendColor =
-    trend && trend.value > 0
-      ? "text-green-500"
-      : trend && trend.value < 0
-      ? "text-red-500"
-      : "text-muted-foreground";
-
   return (
     <div
       className={cn(
-        "rounded-lg border bg-card p-6 transition-colors hover:border-primary/30",
+        "rounded-lg border bg-card p-5 transition-colors hover:border-primary/30",
         className
       )}
     >
-      <div className="flex items-center justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">{title}</p>
-          <p className="text-3xl font-bold tracking-tight">{value}</p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-sm text-muted-foreground truncate">{title}</p>
+          <p className="text-2xl font-semibold tracking-tight mt-1">{value}</p>
           {subtitle && (
-            <p className="text-xs text-muted-foreground">{subtitle}</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
           )}
         </div>
-        <div className="rounded-lg bg-primary/10 p-3">
+        <div className="shrink-0 rounded-lg bg-muted p-2.5">
           {icon}
         </div>
       </div>
-      {trend && (
-        <div className="mt-4 flex items-center gap-1 text-sm">
-          <TrendIcon className={cn("h-4 w-4", trendColor)} />
-          <span className={trendColor}>
-            {trend.value > 0 ? "+" : ""}
-            {trend.value}%
-          </span>
-          <span className="text-muted-foreground">{trend.label}</span>
-        </div>
-      )}
     </div>
   );
 }

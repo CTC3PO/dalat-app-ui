@@ -262,10 +262,6 @@ export function AvatarUpload({
       </div>
 
       {error && <p className="text-sm text-destructive">{error}</p>}
-
-      <p className="text-xs text-muted-foreground">
-        {t("photoHelp")}
-      </p>
     </div>
   );
 }

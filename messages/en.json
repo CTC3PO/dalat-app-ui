@@ -323,6 +323,9 @@
     "activeToday": "active today",
     "lastLogin": "Last Login",
     "vsLastWeek": "vs last week",
+    "events": "Events",
+    "rsvps": "RSVPs",
+    "pushEnabled": "Push Enabled",
     "totalRsvps": "Total RSVPs",
     "goingCount": "going",
     "pushNotifications": "Push Notifications",
@@ -648,5 +651,13 @@
     "joinedOn": "Joined {date}",
     "myTribes": "My Tribes",
     "pendingRequests": "Pending Requests"
+  },
+  "feed": {
+    "title": "Feed",
+    "empty": "No moments yet",
+    "emptyDescription": "Content from past events will appear here",
+    "viewEvent": "View Event",
+    "share": "Share",
+    "shareSuccess": "Link copied!"
   }
 }

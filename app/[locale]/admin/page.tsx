@@ -9,7 +9,6 @@ import {
   PartyPopper,
   ShieldCheck,
   LogIn,
-  Clock,
 } from "lucide-react";
 import { getFullDashboardData } from "@/lib/admin/analytics";
 import {
@@ -37,66 +36,32 @@ export default async function AdminDashboard() {
       </div>
 
       {/* Summary Stats Grid */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+      <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
         <StatCard
           title={t("totalUsers")}
           value={overview?.users?.total ?? 0}
-          subtitle={`+${overview?.users?.new_this_week ?? 0} ${t("thisWeek")}`}
-          icon={<Users className="h-6 w-6 text-primary" />}
-          trend={
-            overview?.users?.new_this_week
-              ? {
-                  value: Math.round(
-                    ((overview.users.new_this_week / Math.max(overview.users.total - overview.users.new_this_week, 1)) * 100)
-                  ),
-                  label: t("vsLastWeek"),
-                }
-              : undefined
-          }
+          subtitle={overview?.users?.new_this_week ? `+${overview.users.new_this_week} ${t("thisWeek")}` : undefined}
+          icon={<Users className="h-5 w-5" />}
         />
         <StatCard
           title={t("connections")}
           value={dashboardData.sessionStats?.total_logins ?? 0}
-          subtitle={`${dashboardData.sessionStats?.active_today ?? 0} ${t("activeToday")}`}
-          icon={<LogIn className="h-6 w-6 text-primary" />}
+          icon={<LogIn className="h-5 w-5" />}
         />
         <StatCard
-          title={t("lastLogin")}
-          value={
-            dashboardData.sessionStats?.last_login_at
-              ? new Date(dashboardData.sessionStats.last_login_at).toLocaleTimeString("en-US", {
-                  hour: "numeric",
-                  minute: "2-digit",
-                })
-              : "—"
-          }
-          subtitle={
-            dashboardData.sessionStats?.last_login_at
-              ? new Date(dashboardData.sessionStats.last_login_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })
-              : t("noData")
-          }
-          icon={<Clock className="h-6 w-6 text-primary" />}
-        />
-        <StatCard
-          title={t("publishedEvents")}
+          title={t("events")}
           value={overview?.events?.published ?? 0}
-          subtitle={`${overview?.events?.draft ?? 0} ${t("drafts")}`}
-          icon={<Calendar className="h-6 w-6 text-primary" />}
+          icon={<Calendar className="h-5 w-5" />}
         />
         <StatCard
-          title={t("totalRsvps")}
+          title={t("rsvps")}
           value={overview?.rsvps?.total ?? 0}
-          subtitle={`${overview?.rsvps?.going ?? 0} ${t("goingCount")}`}
-          icon={<PartyPopper className="h-6 w-6 text-primary" />}
+          icon={<PartyPopper className="h-5 w-5" />}
         />
         <StatCard
-          title={t("pushNotifications")}
+          title={t("pushEnabled")}
           value={overview?.notifications?.users_with_push ?? 0}
-          subtitle={t("usersWithNotifications")}
-          icon={<Bell className="h-6 w-6 text-primary" />}
+          icon={<Bell className="h-5 w-5" />}
         />
       </div>
 

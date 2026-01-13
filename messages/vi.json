@@ -323,6 +323,9 @@
     "activeToday": "hoạt động hôm nay",
     "lastLogin": "Đăng nhập lần cuối",
     "vsLastWeek": "so với tuần trước",
+    "events": "Sự kiện",
+    "rsvps": "RSVPs",
+    "pushEnabled": "Đã bật thông báo",
     "totalRsvps": "Tổng RSVP",
     "goingCount": "tham gia",
     "pushNotifications": "Thông báo đẩy",
@@ -648,5 +651,13 @@
     "joinedOn": "Tham gia {date}",
     "myTribes": "Bộ tộc của tôi",
     "pendingRequests": "Yêu cầu đang chờ"
+  },
+  "feed": {
+    "title": "Bảng tin",
+    "empty": "Chưa có khoảnh khắc nào",
+    "emptyDescription": "Nội dung từ các sự kiện đã qua sẽ xuất hiện ở đây",
+    "viewEvent": "Xem sự kiện",
+    "share": "Chia sẻ",
+    "shareSuccess": "Đã sao chép liên kết!"
   }
 }

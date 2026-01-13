@@ -323,6 +323,9 @@
     "activeToday": "actifs aujourd'hui",
     "lastLogin": "Dernière connexion",
     "vsLastWeek": "vs semaine dernière",
+    "events": "Événements",
+    "rsvps": "RSVPs",
+    "pushEnabled": "Push activé",
     "totalRsvps": "Total RSVPs",
     "goingCount": "participant(s)",
     "pushNotifications": "Notifications push",
@@ -648,5 +651,13 @@
     "joinedOn": "Rejoint le {date}",
     "myTribes": "Mes Tribus",
     "pendingRequests": "Demandes en attente"
+  },
+  "feed": {
+    "title": "Fil",
+    "empty": "Pas encore de moments",
+    "emptyDescription": "Le contenu des événements passés apparaîtra ici",
+    "viewEvent": "Voir l'événement",
+    "share": "Partager",
+    "shareSuccess": "Lien copié !"
   }
 }
