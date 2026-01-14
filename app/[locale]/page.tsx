@@ -227,10 +227,27 @@ export default async function Home({ searchParams }: PageProps) {
         {/* Header */}
         <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
           <div className="container flex h-14 max-w-4xl items-center justify-between mx-auto px-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Link href="/" className="font-bold text-lg">
                 dalat.app
               </Link>
+              <div className="flex items-center gap-1">
+                <Link href="/">
+                  <Button size="sm" variant="ghost" className="text-sm">
+                    Events
+                  </Button>
+                </Link>
+                <Link href="/map">
+                  <Button size="sm" variant="ghost" className="text-sm">
+                    Map
+                  </Button>
+                </Link>
+                <Link href="/calendar">
+                  <Button size="sm" variant="ghost" className="text-sm">
+                    Calendar
+                  </Button>
+                </Link>
+              </div>
               <LocalePicker />
             </div>
             <div className="flex items-center gap-2">
@@ -246,6 +263,7 @@ export default async function Home({ searchParams }: PageProps) {
             </div>
           </div>
         </nav>
+
 
         {/* Main content */}
         <div className="flex-1 container max-w-4xl mx-auto px-4 py-8">
