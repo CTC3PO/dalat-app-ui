@@ -334,7 +334,12 @@
     "unavailableDescription": "お使いのブラウザはプッシュ通知をサポートしていません。最新のブラウザを使用するかアプリをインストールしてください。",
     "blocked": "通知がブロックされています",
     "blockedDescription": "このアプリの通知をブロックしています。有効にするにはブラウザの設定を更新してください。",
-    "detailedInfo": "通知はロック画面と通知センターに音とバイブレーション（対応している場合）とともに表示されます。"
+    "detailedInfo": "通知はロック画面と通知センターに音とバイブレーション（対応している場合）とともに表示されます。",
+    "notificationStyle": "通知スタイル",
+    "soundAndVibration": "音とバイブ",
+    "soundOnly": "音のみ",
+    "vibrationOnly": "バイブのみ",
+    "silent": "サイレント"
   },
   "userMenu": {
     "editProfile": "プロフィールを編集",

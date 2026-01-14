@@ -334,7 +334,12 @@
     "unavailableDescription": "您的浏览器不支持推送通知。请尝试使用现代浏览器或安装应用。",
     "blocked": "通知已被阻止",
     "blockedDescription": "您已阻止此应用的通知。要启用，请更新您的浏览器设置。",
-    "detailedInfo": "通知将显示在您的锁屏和通知中心，并带有声音和振动（如支持）。"
+    "detailedInfo": "通知将显示在您的锁屏和通知中心，并带有声音和振动（如支持）。",
+    "notificationStyle": "通知样式",
+    "soundAndVibration": "声音和振动",
+    "soundOnly": "仅声音",
+    "vibrationOnly": "仅振动",
+    "silent": "静音"
   },
   "userMenu": {
     "editProfile": "编辑资料",

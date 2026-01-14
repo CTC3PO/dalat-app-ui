@@ -1,6 +1,16 @@
 // The Global Twelve - unified locale system for UI and content
 export type Locale = 'en' | 'vi' | 'ko' | 'zh' | 'ru' | 'fr' | 'ja' | 'ms' | 'th' | 'de' | 'es' | 'id';
 
+// Notification mode preferences
+export type NotificationMode = 'sound_and_vibration' | 'sound_only' | 'vibration_only' | 'silent';
+
+export const NOTIFICATION_MODES: NotificationMode[] = [
+  'sound_and_vibration',
+  'sound_only',
+  'vibration_only',
+  'silent',
+];
+
 // ContentLocale is now an alias for backwards compatibility
 export type ContentLocale = Locale;
 

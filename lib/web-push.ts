@@ -1,5 +1,6 @@
 import webpush from 'web-push';
 import { createClient } from '@/lib/supabase/server';
+import type { NotificationMode } from '@/lib/types';
 
 // Configure VAPID details
 if (process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
@@ -18,6 +19,7 @@ export interface PushNotificationPayload {
   badgeCount?: number;
   requireInteraction?: boolean;
   notificationId?: string;
+  notificationMode?: NotificationMode;
   actions?: Array<{
     action: string;
     title: string;
@@ -74,20 +76,15 @@ export async function sendPushToUser(
   const supabase = await createClient();
 
   // Get all subscriptions for this user (using service role bypasses RLS)
+  // Include notification_mode to pass to service worker
   const { data: subscriptions, error } = await supabase
     .from('push_subscriptions')
-    .select('id, endpoint, p256dh, auth')
+    .select('id, endpoint, p256dh, auth, notification_mode')
     .eq('user_id', userId);
 
   if (error || !subscriptions?.length) {
     return { sent: 0, failed: 0 };
   }
-
-  // Add default badge count of 1 if not specified (shows +1 on app icon)
-  const payloadWithBadge = {
-    ...payload,
-    badgeCount: payload.badgeCount ?? 1,
-  };
 
   let sent = 0;
   let failed = 0;
@@ -96,9 +93,16 @@ export async function sendPushToUser(
   // Send to all subscriptions in parallel
   await Promise.allSettled(
     subscriptions.map(async (sub) => {
+      // Include notification mode and badge count in payload
+      const payloadWithMode: PushNotificationPayload = {
+        ...payload,
+        badgeCount: payload.badgeCount ?? 1,
+        notificationMode: (sub.notification_mode as NotificationMode) || 'sound_and_vibration',
+      };
+
       const result = await sendPushNotification(
         { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
-        payloadWithBadge
+        payloadWithMode
       );
 
       if (result.success) {

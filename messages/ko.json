@@ -334,7 +334,12 @@
     "unavailableDescription": "브라우저가 푸시 알림을 지원하지 않습니다. 최신 브라우저를 사용하거나 앱을 설치해 주세요.",
     "blocked": "알림이 차단됨",
     "blockedDescription": "이 앱의 알림을 차단했습니다. 활성화하려면 브라우저 설정을 업데이트해 주세요.",
-    "detailedInfo": "알림은 잠금 화면과 알림 센터에 소리 및 진동과 함께 표시됩니다 (지원되는 경우)."
+    "detailedInfo": "알림은 잠금 화면과 알림 센터에 소리 및 진동과 함께 표시됩니다 (지원되는 경우).",
+    "notificationStyle": "알림 스타일",
+    "soundAndVibration": "소리와 진동",
+    "soundOnly": "소리만",
+    "vibrationOnly": "진동만",
+    "silent": "무음"
   },
   "userMenu": {
     "editProfile": "프로필 편집",

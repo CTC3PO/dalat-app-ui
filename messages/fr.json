@@ -341,7 +341,12 @@
     "unavailableDescription": "Votre navigateur ne supporte pas les notifications push. Essayez un navigateur moderne ou installez l'application.",
     "blocked": "Notifications bloquées",
     "blockedDescription": "Vous avez bloqué les notifications pour cette application. Pour les activer, modifiez les paramètres de votre navigateur.",
-    "detailedInfo": "Les notifications apparaîtront sur votre écran de verrouillage et centre de notifications avec son et vibration (si supporté)."
+    "detailedInfo": "Les notifications apparaîtront sur votre écran de verrouillage et centre de notifications avec son et vibration (si supporté).",
+    "notificationStyle": "Style de notification",
+    "soundAndVibration": "Son et vibration",
+    "soundOnly": "Son uniquement",
+    "vibrationOnly": "Vibration uniquement",
+    "silent": "Silencieux"
   },
   "userMenu": {
     "editProfile": "Modifier le profil",

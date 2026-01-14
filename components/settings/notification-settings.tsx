@@ -1,10 +1,45 @@
 "use client";
 
-import { Bell, BellOff, BellRing, Loader2, AlertCircle } from "lucide-react";
+import {
+  Bell,
+  BellOff,
+  BellRing,
+  Loader2,
+  AlertCircle,
+  Volume2,
+  Vibrate,
+  VolumeX,
+  Check,
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { usePushNotifications } from "@/lib/hooks/use-push-notifications";
 import { cn } from "@/lib/utils";
 import { triggerHaptic } from "@/lib/haptics";
+import { useState, useEffect, useTransition } from "react";
+import type { NotificationMode } from "@/lib/types";
+
+const NOTIFICATION_MODES = [
+  {
+    value: "sound_and_vibration" as NotificationMode,
+    labelKey: "soundAndVibration",
+    icon: BellRing,
+  },
+  {
+    value: "sound_only" as NotificationMode,
+    labelKey: "soundOnly",
+    icon: Volume2,
+  },
+  {
+    value: "vibration_only" as NotificationMode,
+    labelKey: "vibrationOnly",
+    icon: Vibrate,
+  },
+  {
+    value: "silent" as NotificationMode,
+    labelKey: "silent",
+    icon: VolumeX,
+  },
+] as const;
 
 export function NotificationSettings() {
   const t = useTranslations("notifications");
@@ -17,6 +52,19 @@ export function NotificationSettings() {
     isSupported,
   } = usePushNotifications();
 
+  const [mode, setMode] = useState<NotificationMode>("sound_and_vibration");
+  const [isPending, startTransition] = useTransition();
+
+  // Fetch current mode when subscribed
+  useEffect(() => {
+    if (isSubscribed) {
+      fetch("/api/push/preference")
+        .then((res) => res.json())
+        .then((data) => setMode(data.mode || "sound_and_vibration"))
+        .catch(() => {});
+    }
+  }, [isSubscribed]);
+
   const handleToggle = async () => {
     triggerHaptic("selection");
     if (isSubscribed) {
@@ -26,15 +74,28 @@ export function NotificationSettings() {
     }
   };
 
+  const handleModeChange = (newMode: NotificationMode) => {
+    if (newMode === mode || isPending) return;
+
+    triggerHaptic("selection");
+    setMode(newMode);
+
+    startTransition(async () => {
+      await fetch("/api/push/preference", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: newMode }),
+      });
+    });
+  };
+
   if (!isSupported) {
     return (
       <div className="flex items-start gap-3 p-4 rounded-lg bg-muted/50 text-muted-foreground">
         <AlertCircle className="w-5 h-5 mt-0.5 flex-shrink-0" />
         <div className="space-y-1">
           <p className="text-sm font-medium">{t("unavailable")}</p>
-          <p className="text-xs">
-            {t("unavailableDescription")}
-          </p>
+          <p className="text-xs">{t("unavailableDescription")}</p>
         </div>
       </div>
     );
@@ -46,9 +107,7 @@ export function NotificationSettings() {
         <BellOff className="w-5 h-5 mt-0.5 flex-shrink-0" />
         <div className="space-y-1">
           <p className="text-sm font-medium">{t("blocked")}</p>
-          <p className="text-xs opacity-80">
-            {t("blockedDescription")}
-          </p>
+          <p className="text-xs opacity-80">{t("blockedDescription")}</p>
         </div>
       </div>
     );
@@ -75,13 +134,16 @@ export function NotificationSettings() {
             <Bell className="w-5 h-5 text-muted-foreground" />
           )}
           <div className="text-left">
-            <p className={cn("text-sm font-medium", isSubscribed ? "text-primary" : "text-foreground")}>
+            <p
+              className={cn(
+                "text-sm font-medium",
+                isSubscribed ? "text-primary" : "text-foreground"
+              )}
+            >
               {isSubscribed ? t("enabled") : t("enable")}
             </p>
             <p className="text-xs text-muted-foreground">
-              {isSubscribed
-                ? t("enabledDescription")
-                : t("disabledDescription")}
+              {isSubscribed ? t("enabledDescription") : t("disabledDescription")}
             </p>
           </div>
         </div>
@@ -100,10 +162,54 @@ export function NotificationSettings() {
         </div>
       </button>
 
+      {/* Notification mode selector - only shown when subscribed */}
       {isSubscribed && (
-        <p className="text-xs text-muted-foreground px-1">
-          {t("detailedInfo")}
-        </p>
+        <div className="space-y-3 pt-2">
+          <p className="text-sm font-medium text-foreground">
+            {t("notificationStyle")}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            {NOTIFICATION_MODES.map((modeOption) => {
+              const Icon = modeOption.icon;
+              const isSelected = mode === modeOption.value;
+
+              return (
+                <button
+                  key={modeOption.value}
+                  onClick={() => handleModeChange(modeOption.value)}
+                  disabled={isPending}
+                  className={cn(
+                    "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all duration-200",
+                    isSelected
+                      ? "border-primary bg-primary/5 shadow-sm"
+                      : "border-border hover:border-primary/50 hover:bg-muted/50",
+                    isPending && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  <div className="relative">
+                    <Icon
+                      className={cn(
+                        "w-5 h-5",
+                        isSelected ? "text-primary" : "text-muted-foreground"
+                      )}
+                    />
+                    {isSelected && (
+                      <Check className="w-3 h-3 text-primary absolute -bottom-1 -right-1" />
+                    )}
+                  </div>
+                  <span
+                    className={cn(
+                      "text-sm font-medium text-center",
+                      isSelected ? "text-primary" : "text-muted-foreground"
+                    )}
+                  >
+                    {t(modeOption.labelKey)}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       )}
     </div>
   );

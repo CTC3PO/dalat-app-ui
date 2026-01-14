@@ -35,17 +35,28 @@ self.addEventListener('message', (event) => {
   }
 });
 
+// Vibration pattern: vibrate 100ms, pause 50ms, vibrate 100ms
+const VIBRATION_PATTERN = [100, 50, 100];
+
 // Handle push notifications
 self.addEventListener('push', (event) => {
   if (!event.data) return;
 
   const data = event.data.json();
 
+  // Notification mode: sound_and_vibration, sound_only, vibration_only, silent
+  const mode = data.notificationMode || 'sound_and_vibration';
+
+  // Determine vibration based on mode
+  const shouldVibrate = mode === 'sound_and_vibration' || mode === 'vibration_only';
+
+  // Determine if silent (no sound) based on mode
+  const shouldBeSilent = mode === 'vibration_only' || mode === 'silent';
+
   const options = {
     body: data.body,
     icon: '/android-chrome-192x192.png',
     badge: '/android-chrome-192x192.png',
-    vibrate: [100, 50, 100], // vibration pattern: vibrate, pause, vibrate
     data: {
       url: data.url || APP_URL,
       notificationId: data.notificationId,
@@ -54,7 +65,14 @@ self.addEventListener('push', (event) => {
     tag: data.tag || 'default', // Replaces notifications with same tag
     renotify: true, // Re-alert even if notification with same tag exists
     requireInteraction: data.requireInteraction || false,
+    // Apply notification mode settings
+    silent: shouldBeSilent,
   };
+
+  // Only add vibrate if mode allows vibration
+  if (shouldVibrate) {
+    options.vibrate = VIBRATION_PATTERN;
+  }
 
   // Set badge count if provided
   if (data.badgeCount !== undefined && 'setAppBadge' in navigator) {

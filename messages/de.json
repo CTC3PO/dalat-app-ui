@@ -334,7 +334,12 @@
     "unavailableDescription": "Dein Browser unterstützt keine Push-Benachrichtigungen. Verwende einen modernen Browser oder installiere die App.",
     "blocked": "Benachrichtigungen blockiert",
     "blockedDescription": "Du hast Benachrichtigungen für diese App blockiert. Aktualisiere deine Browsereinstellungen, um sie zu aktivieren.",
-    "detailedInfo": "Benachrichtigungen erscheinen auf deinem Sperrbildschirm und in der Mitteilungszentrale mit Ton und Vibration (falls unterstützt)."
+    "detailedInfo": "Benachrichtigungen erscheinen auf deinem Sperrbildschirm und in der Mitteilungszentrale mit Ton und Vibration (falls unterstützt).",
+    "notificationStyle": "Benachrichtigungsstil",
+    "soundAndVibration": "Ton und Vibration",
+    "soundOnly": "Nur Ton",
+    "vibrationOnly": "Nur Vibration",
+    "silent": "Lautlos"
   },
   "userMenu": {
     "editProfile": "Profil bearbeiten",

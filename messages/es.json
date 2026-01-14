@@ -334,7 +334,12 @@
     "unavailableDescription": "Tu navegador no soporta notificaciones push. Intenta usar un navegador moderno o instala la app.",
     "blocked": "Notificaciones bloqueadas",
     "blockedDescription": "Has bloqueado las notificaciones para esta app. Para habilitarlas, actualiza la configuración de tu navegador.",
-    "detailedInfo": "Las notificaciones aparecerán en tu pantalla de bloqueo y centro de notificaciones con sonido y vibración (donde sea compatible)."
+    "detailedInfo": "Las notificaciones aparecerán en tu pantalla de bloqueo y centro de notificaciones con sonido y vibración (donde sea compatible).",
+    "notificationStyle": "Estilo de notificación",
+    "soundAndVibration": "Sonido y vibración",
+    "soundOnly": "Solo sonido",
+    "vibrationOnly": "Solo vibración",
+    "silent": "Silencioso"
   },
   "userMenu": {
     "editProfile": "Editar perfil",

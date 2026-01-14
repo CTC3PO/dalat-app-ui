@@ -334,7 +334,12 @@
     "unavailableDescription": "Trình duyệt của bạn không hỗ trợ thông báo đẩy. Hãy thử sử dụng trình duyệt hiện đại hoặc cài đặt ứng dụng.",
     "blocked": "Thông báo bị chặn",
     "blockedDescription": "Bạn đã chặn thông báo cho ứng dụng này. Để bật, hãy cập nhật cài đặt trình duyệt.",
-    "detailedInfo": "Thông báo sẽ xuất hiện trên màn hình khóa và trung tâm thông báo với âm thanh và rung (nếu được hỗ trợ)."
+    "detailedInfo": "Thông báo sẽ xuất hiện trên màn hình khóa và trung tâm thông báo với âm thanh và rung (nếu được hỗ trợ).",
+    "notificationStyle": "Kiểu thông báo",
+    "soundAndVibration": "Âm thanh & Rung",
+    "soundOnly": "Chỉ âm thanh",
+    "vibrationOnly": "Chỉ rung",
+    "silent": "Im lặng"
   },
   "userMenu": {
     "editProfile": "Chỉnh sửa hồ sơ",

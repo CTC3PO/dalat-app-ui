@@ -334,7 +334,12 @@
     "unavailableDescription": "Browser Anda tidak mendukung notifikasi push. Coba gunakan browser modern atau instal aplikasi.",
     "blocked": "Notifikasi diblokir",
     "blockedDescription": "Anda telah memblokir notifikasi untuk aplikasi ini. Untuk mengaktifkan, perbarui pengaturan browser Anda.",
-    "detailedInfo": "Notifikasi akan muncul di layar kunci dan pusat notifikasi Anda dengan suara dan getaran (jika didukung)."
+    "detailedInfo": "Notifikasi akan muncul di layar kunci dan pusat notifikasi Anda dengan suara dan getaran (jika didukung).",
+    "notificationStyle": "Gaya notifikasi",
+    "soundAndVibration": "Suara dan getaran",
+    "soundOnly": "Suara saja",
+    "vibrationOnly": "Getaran saja",
+    "silent": "Senyap"
   },
   "userMenu": {
     "editProfile": "Edit profil",

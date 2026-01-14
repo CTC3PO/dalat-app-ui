@@ -334,7 +334,12 @@
     "unavailableDescription": "Pelayar anda tidak menyokong pemberitahuan push. Cuba gunakan pelayar moden atau pasang aplikasi.",
     "blocked": "Pemberitahuan disekat",
     "blockedDescription": "Anda telah menyekat pemberitahuan untuk aplikasi ini. Untuk mengaktifkan, kemaskini tetapan pelayar anda.",
-    "detailedInfo": "Pemberitahuan akan muncul di skrin kunci dan pusat pemberitahuan anda dengan bunyi dan getaran (jika disokong)."
+    "detailedInfo": "Pemberitahuan akan muncul di skrin kunci dan pusat pemberitahuan anda dengan bunyi dan getaran (jika disokong).",
+    "notificationStyle": "Gaya pemberitahuan",
+    "soundAndVibration": "Bunyi dan getaran",
+    "soundOnly": "Bunyi sahaja",
+    "vibrationOnly": "Getaran sahaja",
+    "silent": "Senyap"
   },
   "userMenu": {
     "editProfile": "Edit profil",
