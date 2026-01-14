@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +12,7 @@ import { Link } from "@/lib/i18n/routing";
 
 export function EmailAuthForm() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -61,6 +62,7 @@ export function EmailAuthForm() {
           password,
           options: {
             emailRedirectTo: `${window.location.origin}/auth/callback`,
+            data: { locale },
           },
         });
 
@@ -104,6 +106,7 @@ export function EmailAuthForm() {
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
+          data: { locale },
         },
       });
 

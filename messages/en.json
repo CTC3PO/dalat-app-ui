@@ -92,7 +92,14 @@
     "newPassword": "New password",
     "newPasswordPlaceholder": "Enter your new password",
     "setNewPassword": "Set new password",
-    "passwordResetSuccess": "Password reset successfully! You can now sign in."
+    "passwordResetSuccess": "Password reset successfully! You can now sign in.",
+    "verifyTitle": "Confirm your email",
+    "verifyDescription": "Click the button below to complete sign in to dalat.app",
+    "verifyButton": "Complete Sign In",
+    "verifyConfirming": "Confirming...",
+    "verifyHint": "This extra step prevents email security scanners from invalidating your link.",
+    "verifyInvalidTitle": "Invalid Link",
+    "verifyInvalidDescription": "This verification link is invalid or has expired."
   },
   "errors": {
     "somethingWentWrong": "Sorry, something went wrong.",

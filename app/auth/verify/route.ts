@@ -16,10 +16,11 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token");
   const type = url.searchParams.get("type") || "magiclink";
+  const locale = url.searchParams.get("locale") || "en";
   const redirectTo = url.searchParams.get("redirect_to") || `${url.origin}/auth/callback`;
 
   if (!token) {
-    return NextResponse.redirect(new URL("/en/auth/error?error=No token provided", url.origin));
+    return NextResponse.redirect(new URL(`/${locale}/auth/error?error=No token provided`, url.origin));
   }
 
   // Build the actual Supabase verification URL
@@ -27,7 +28,8 @@ export async function GET(request: NextRequest) {
   const verifyUrl = `${supabaseUrl}/auth/v1/verify?token=${token}&type=${type}&redirect_to=${encodeURIComponent(redirectTo)}`;
 
   // Redirect to our confirmation page with the encoded verification URL
-  const confirmPageUrl = new URL("/en/auth/verify", url.origin);
+  // Use the locale from the email template for proper localization
+  const confirmPageUrl = new URL(`/${locale}/auth/verify`, url.origin);
   confirmPageUrl.searchParams.set("url", encodeURIComponent(verifyUrl));
 
   return NextResponse.redirect(confirmPageUrl);

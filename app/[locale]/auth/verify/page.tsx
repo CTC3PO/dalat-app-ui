@@ -2,11 +2,13 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Sparkles } from "lucide-react";
 
 function VerifyContent() {
+  const t = useTranslations("auth");
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -26,11 +28,11 @@ function VerifyContent() {
         <div className="w-full max-w-sm">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Invalid Link</CardTitle>
+              <CardTitle className="text-2xl">{t("verifyInvalidTitle")}</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                This verification link is invalid or has expired.
+                {t("verifyInvalidDescription")}
               </p>
             </CardContent>
           </Card>
@@ -47,11 +49,11 @@ function VerifyContent() {
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
               <Sparkles className="h-6 w-6 text-primary" />
             </div>
-            <CardTitle className="text-2xl">Confirm your email</CardTitle>
+            <CardTitle className="text-2xl">{t("verifyTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground text-center">
-              Click the button below to complete sign in to dalat.app
+              {t("verifyDescription")}
             </p>
             <Button
               onClick={handleConfirm}
@@ -61,14 +63,14 @@ function VerifyContent() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Confirming...
+                  {t("verifyConfirming")}
                 </>
               ) : (
-                "Complete Sign In"
+                t("verifyButton")
               )}
             </Button>
             <p className="text-xs text-muted-foreground text-center">
-              This extra step prevents email security scanners from invalidating your link.
+              {t("verifyHint")}
             </p>
           </CardContent>
         </Card>

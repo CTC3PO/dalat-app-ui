@@ -92,7 +92,14 @@
     "emailRequired": "Veuillez entrer votre email",
     "or": "ou",
     "sendMagicLink": "Envoyez-moi un lien magique",
-    "magicLinkSent": "Lien magique envoyé ! Vérifiez votre email."
+    "magicLinkSent": "Lien magique envoyé ! Vérifiez votre email.",
+    "verifyTitle": "Confirmez votre email",
+    "verifyDescription": "Cliquez sur le bouton ci-dessous pour vous connecter à dalat.app",
+    "verifyButton": "Terminer la connexion",
+    "verifyConfirming": "Confirmation...",
+    "verifyHint": "Cette étape supplémentaire empêche les scanners de sécurité d'invalider votre lien.",
+    "verifyInvalidTitle": "Lien invalide",
+    "verifyInvalidDescription": "Ce lien de vérification est invalide ou a expiré."
   },
   "errors": {
     "somethingWentWrong": "Désolé, une erreur s'est produite.",
