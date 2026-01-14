@@ -1,9 +1,19 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { ImageIcon, X, Upload, Loader2 } from "lucide-react";
+import {
+  ImageIcon,
+  X,
+  Upload,
+  Loader2,
+  Link as LinkIcon,
+  Sparkles,
+  Check,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import {
   validateMediaFile,
@@ -13,15 +23,29 @@ import {
 
 interface EventMediaUploadProps {
   eventId: string;
+  eventTitle?: string;
   currentMediaUrl: string | null;
   onMediaChange: (url: string | null) => void;
 }
 
+// Generate default prompt from event data
+function generateDefaultPrompt(title: string): string {
+  return `Create a vibrant, eye-catching event poster background for "${title || "an event"}".
+
+Style: Modern event flyer aesthetic with warm Vietnamese highland colors.
+Setting: Inspired by Da Lat, Vietnam - misty mountains, pine forests, French colonial architecture, flower fields.
+Mood: Atmospheric, inviting, energetic yet sophisticated.
+Important: Do NOT include any text or lettering in the image. Create only the visual background.
+Aspect ratio: 2:1 landscape orientation.`;
+}
+
 export function EventMediaUpload({
   eventId,
+  eventTitle,
   currentMediaUrl,
   onMediaChange,
 }: EventMediaUploadProps) {
+  const t = useTranslations("flyerBuilder");
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentMediaUrl);
   const [previewIsVideo, setPreviewIsVideo] = useState<boolean>(
     isVideoUrl(currentMediaUrl)
@@ -30,6 +54,16 @@ export function EventMediaUpload({
   const [error, setError] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Link input state
+  const [showUrlInput, setShowUrlInput] = useState(false);
+  const [urlInput, setUrlInput] = useState("");
+  const [isLoadingUrl, setIsLoadingUrl] = useState(false);
+
+  // AI generation state
+  const [showPromptEditor, setShowPromptEditor] = useState(false);
+  const [prompt, setPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const uploadMedia = async (file: File) => {
     setError(null);
@@ -149,6 +183,82 @@ export function EventMediaUpload({
     }
   };
 
+  // Handle loading image from URL
+  const handleLoadUrl = async () => {
+    if (!urlInput.trim()) return;
+    setError(null);
+    setIsLoadingUrl(true);
+
+    try {
+      const url = new URL(urlInput.trim());
+      if (!url.protocol.startsWith("http")) throw new Error();
+
+      const img = new Image();
+      img.onload = () => {
+        setPreviewUrl(urlInput.trim());
+        setPreviewIsVideo(false);
+        onMediaChange(urlInput.trim());
+        setIsLoadingUrl(false);
+        setShowUrlInput(false);
+        setUrlInput("");
+      };
+      img.onerror = () => {
+        setError(t("invalidImage"));
+        setIsLoadingUrl(false);
+      };
+      img.src = urlInput.trim();
+    } catch {
+      setError(t("invalidUrl"));
+      setIsLoadingUrl(false);
+    }
+  };
+
+  // Open prompt editor with pre-generated prompt
+  const handleOpenPromptEditor = () => {
+    setError(null);
+    setPrompt(generateDefaultPrompt(eventTitle || ""));
+    setShowPromptEditor(true);
+    setShowUrlInput(false);
+  };
+
+  // Generate image with AI
+  const handleGenerate = async () => {
+    if (!prompt.trim()) {
+      setError(t("promptEmpty"));
+      return;
+    }
+    setError(null);
+    setIsGenerating(true);
+
+    try {
+      const response = await fetch("/api/generate-flyer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: eventTitle?.trim() || "",
+          customPrompt: prompt.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || t("generationFailed"));
+      }
+
+      const data = await response.json();
+      setPreviewUrl(data.imageUrl);
+      setPreviewIsVideo(false);
+      onMediaChange(data.imageUrl);
+      setShowPromptEditor(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t("generationFailed"));
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  const isLoading = isUploading || isLoadingUrl || isGenerating;
+
   return (
     <div className="space-y-3">
       {/* Media preview area */}
@@ -192,48 +302,166 @@ export function EventMediaUpload({
 
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          {isUploading ? (
+          {isLoading ? (
             <Loader2 className="w-8 h-8 text-white animate-spin" />
           ) : (
             <Upload className="w-8 h-8 text-white" />
           )}
         </div>
-      </div>
 
-      {/* Actions */}
-      <div className="flex gap-2">
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading}
-        >
-          {isUploading ? (
-            <>
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Uploading...
-            </>
-          ) : (
-            <>
-              <Upload className="w-4 h-4" />
-              {previewUrl ? "Replace" : "Upload"}
-            </>
-          )}
-        </Button>
-
+        {/* Remove button on image */}
         {previewUrl && (
-          <Button
+          <button
             type="button"
-            variant="ghost"
-            size="sm"
-            onClick={handleRemove}
-            disabled={isUploading}
-            className="text-muted-foreground hover:text-destructive"
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRemove();
+            }}
+            className="absolute top-2 right-2 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors"
           >
             <X className="w-4 h-4" />
-            Remove
-          </Button>
+          </button>
+        )}
+
+        {/* Loading overlay */}
+        {isLoading && (
+          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+            <Loader2 className="w-8 h-8 text-white animate-spin" />
+          </div>
+        )}
+      </div>
+
+      {/* Actions - conditionally show editors or buttons */}
+      <div className="space-y-3">
+        {showPromptEditor ? (
+          /* AI Prompt Editor */
+          <div className="space-y-2">
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              placeholder={t("promptPlaceholder")}
+              rows={6}
+              className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              autoFocus
+            />
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setShowPromptEditor(false);
+                  setPrompt("");
+                  setError(null);
+                }}
+                disabled={isGenerating}
+              >
+                {t("cancel")}
+              </Button>
+              <div className="flex-1" />
+              <Button
+                type="button"
+                size="sm"
+                onClick={handleGenerate}
+                disabled={isGenerating || !prompt.trim()}
+              >
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    {t("generating")}
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {t("generate")}
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        ) : showUrlInput ? (
+          /* URL Input */
+          <div className="flex gap-2">
+            <Input
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              placeholder="https://..."
+              className="flex-1 h-9"
+              autoFocus
+              onKeyDown={(e) => e.key === "Enter" && handleLoadUrl()}
+            />
+            <Button
+              type="button"
+              size="icon"
+              variant="ghost"
+              className="h-9 w-9 shrink-0"
+              onClick={() => {
+                setShowUrlInput(false);
+                setUrlInput("");
+              }}
+            >
+              <X className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              size="icon"
+              variant="outline"
+              className="h-9 w-9 shrink-0"
+              onClick={handleLoadUrl}
+              disabled={!urlInput.trim() || isLoadingUrl}
+            >
+              {isLoadingUrl ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4" />
+              )}
+            </Button>
+          </div>
+        ) : (
+          /* Default buttons */
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading}
+            >
+              {isUploading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <Upload className="w-4 h-4" />
+                  Upload
+                </>
+              )}
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setShowUrlInput(true)}
+              disabled={isLoading}
+            >
+              <LinkIcon className="w-4 h-4" />
+              Link
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleOpenPromptEditor}
+              disabled={isLoading}
+            >
+              <Sparkles className="w-4 h-4" />
+              AI
+            </Button>
+          </div>
         )}
       </div>
 

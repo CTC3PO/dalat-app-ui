@@ -509,6 +509,7 @@ export function EventForm({
             <>
               <EventMediaUpload
                 eventId={event.id}
+                eventTitle={title}
                 currentMediaUrl={imageUrl}
                 onMediaChange={setImageUrl}
               />
