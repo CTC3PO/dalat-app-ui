@@ -2,6 +2,9 @@ import { notFound, redirect } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
 import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
+
+// Increase serverless function timeout
+export const maxDuration = 60;
 import { EventForm } from "@/components/events/event-form";
 import type { Event, Sponsor, EventSponsor, UserRole } from "@/lib/types";
 

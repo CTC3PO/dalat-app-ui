@@ -96,7 +96,8 @@ export async function updateSession(request: NextRequest) {
     }
 
     // Handle /{locale}/@{username} -> /{locale}/{username} redirect (normalize @ prefix)
-    const localeAtUsernameMatch = pathname.match(/^\/(en|fr|vi)\/@([a-zA-Z0-9_]+)$/);
+    const localePattern = routing.locales.join('|');
+    const localeAtUsernameMatch = pathname.match(new RegExp(`^\\/(${localePattern})\\/@([a-zA-Z0-9_]+)$`));
     if (localeAtUsernameMatch) {
       const [, locale, username] = localeAtUsernameMatch;
       const url = new URL(`/${locale}/${username}`, request.url);
@@ -140,7 +141,8 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   // Public routes that don't require authentication (now with locale prefix)
-  const pathWithoutLocale = pathname.replace(/^\/(en|fr|vi)/, '');
+  const localeRegex = new RegExp(`^\\/(${routing.locales.join('|')})`);
+  const pathWithoutLocale = pathname.replace(localeRegex, '');
   const isPublicRoute =
     pathWithoutLocale === "/" ||
     pathWithoutLocale === "" ||
