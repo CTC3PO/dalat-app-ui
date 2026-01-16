@@ -9,6 +9,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { AuthButton } from "@/components/auth-button";
 import { LocalePicker } from "@/components/locale-picker";
+import { SiteHeader } from "@/components/site-header";
 import { EventCard } from "@/components/events/event-card";
 import { EventFeedImmersive } from "@/components/events/event-feed-immersive";
 import { EventFeedTabs, type EventLifecycle } from "@/components/events/event-feed-tabs";
@@ -269,28 +270,7 @@ export default async function Home({ params, searchParams }: PageProps) {
 
       {/* Desktop: Traditional layout with header/footer */}
       <main className="hidden lg:flex min-h-screen flex-col">
-        {/* Header */}
-        <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-          <div className="container flex h-14 max-w-4xl items-center justify-between mx-auto px-4">
-            <div className="flex items-center gap-2">
-              <Link href="/" className="font-bold text-lg">
-                dalat.app
-              </Link>
-              <LocalePicker />
-            </div>
-            <div className="flex items-center gap-2">
-              <Link href="/events/new" prefetch={false}>
-                <Button size="sm" variant="outline">
-                  <Plus className="w-4 h-4 mr-1" />
-                  {tNav("events")}
-                </Button>
-              </Link>
-              <Suspense>
-                <AuthButton />
-              </Suspense>
-            </div>
-          </div>
-        </nav>
+        <SiteHeader />
 
         {/* Main content */}
         <div className="flex-1 container max-w-4xl mx-auto px-4 py-8">
