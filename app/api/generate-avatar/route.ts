@@ -2,6 +2,9 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
+// Gemini image generation can take 30-60s
+export const maxDuration = 60;
+
 const RATE_LIMIT = 5; // requests per window
 const RATE_WINDOW_MS = 60 * 60 * 1000; // 1 hour
 

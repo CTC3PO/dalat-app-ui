@@ -2,6 +2,9 @@ import { notFound, redirect } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
 import { Suspense } from "react";
 import type { Metadata } from "next";
+
+// Increase serverless function timeout (Vercel Pro required for >10s)
+export const maxDuration = 60;
 import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, Link2, Repeat } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";

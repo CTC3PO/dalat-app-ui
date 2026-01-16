@@ -1,6 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
+// Gemini image generation can take 30-60s
+export const maxDuration = 60;
+
 export async function POST(request: Request) {
   try {
     const { title, customPrompt } = await request.json();
