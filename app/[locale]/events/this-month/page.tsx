@@ -1,5 +1,8 @@
 import { Suspense } from "react";
 import { ArrowLeft, Calendar } from "lucide-react";
+
+// Increase serverless function timeout (Vercel Pro required for >10s)
+export const maxDuration = 60;
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link } from "@/lib/i18n/routing";
 import { locales, type Locale } from "@/lib/i18n/routing";
