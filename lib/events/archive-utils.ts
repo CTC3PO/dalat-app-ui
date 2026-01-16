@@ -1,6 +1,6 @@
 /**
  * Utilities for time-based event archive pages
- * Supports SEO-friendly URLs like /events/2026/january
+ * Supports SEO-friendly URLs like /events/archive/2026/january
  */
 
 // Month slugs in English (used in URLs)
@@ -127,7 +127,7 @@ export function isPastMonth(year: number, month: number): boolean {
  * Build archive URL path
  */
 export function buildArchiveUrl(year: number, month: number): string {
-  return `/events/${year}/${getMonthSlug(month)}`;
+  return `/events/archive/${year}/${getMonthSlug(month)}`;
 }
 
 /**

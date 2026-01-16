@@ -3,7 +3,7 @@ import { buildArchiveUrl } from "@/lib/events/archive-utils";
 
 /**
  * /events/this-month redirects to the canonical archive URL
- * e.g., /events/2026/january
+ * e.g., /events/archive/2026/january
  *
  * This ensures:
  * - Single canonical URL per month (better for SEO/AEO/GEO)

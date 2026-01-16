@@ -8,6 +8,7 @@ import { NotificationPrompt } from "@/components/notification-prompt";
 import { SwUpdateHandler } from "@/components/sw-update-handler";
 import { GlobalFooter } from "@/components/global-footer";
 import { ScrollRestorationProvider } from "@/lib/contexts/scroll-restoration-context";
+import { PerformanceMonitor } from "@/components/performance-monitor";
 import { routing, type Locale } from "@/lib/i18n/routing";
 
 const siteUrl = "https://dalat.app";

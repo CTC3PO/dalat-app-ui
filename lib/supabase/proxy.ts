@@ -3,6 +3,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hasEnvVars } from "../utils";
 import { routing } from "../i18n/routing";
 
+// Pre-compiled regex patterns (avoid creating new RegExp per request)
+const localePattern = routing.locales.join('|');
+const localeAtUsernameRegex = new RegExp(`^\\/(${localePattern})\\/@([a-zA-Z0-9_]+)$`);
+const localeStripRegex = new RegExp(`^\\/(${localePattern})`);
+
 // Check if a string is a valid locale
 function isLocale(segment: string): boolean {
   return routing.locales.includes(segment as typeof routing.locales[number]);
@@ -51,7 +56,12 @@ function getLocaleFromPath(pathname: string): string | null {
 }
 
 export async function updateSession(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  // Normalize pathname by removing trailing slash (except for root "/")
+  // This prevents redirect loops with Next.js default trailingSlash: false
+  const rawPathname = request.nextUrl.pathname;
+  const pathname = rawPathname.length > 1 && rawPathname.endsWith('/')
+    ? rawPathname.slice(0, -1)
+    : rawPathname;
 
   // Skip locale handling for API routes and static files
   const shouldSkipLocale =
@@ -89,15 +99,15 @@ export async function updateSession(request: NextRequest) {
         }
       }
 
-      // Standard redirect to add locale prefix
-      const url = new URL(`/${preferredLocale}${pathname}`, request.url);
+      // Standard redirect to add locale prefix (ensure no double slashes)
+      const targetPath = pathname === '/' ? `/${preferredLocale}` : `/${preferredLocale}${pathname}`;
+      const url = new URL(targetPath, request.url);
       url.search = request.nextUrl.search;
       return NextResponse.redirect(url);
     }
 
     // Handle /{locale}/@{username} -> /{locale}/{username} redirect (normalize @ prefix)
-    const localePattern = routing.locales.join('|');
-    const localeAtUsernameMatch = pathname.match(new RegExp(`^\\/(${localePattern})\\/@([a-zA-Z0-9_]+)$`));
+    const localeAtUsernameMatch = pathname.match(localeAtUsernameRegex);
     if (localeAtUsernameMatch) {
       const [, locale, username] = localeAtUsernameMatch;
       const url = new URL(`/${locale}/${username}`, request.url);
@@ -141,8 +151,7 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   // Public routes that don't require authentication (now with locale prefix)
-  const localeRegex = new RegExp(`^\\/(${routing.locales.join('|')})`);
-  const pathWithoutLocale = pathname.replace(localeRegex, '');
+  const pathWithoutLocale = pathname.replace(localeStripRegex, '');
   const isPublicRoute =
     pathWithoutLocale === "/" ||
     pathWithoutLocale === "" ||
