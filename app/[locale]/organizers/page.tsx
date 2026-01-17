@@ -3,6 +3,8 @@ import { Link } from "@/lib/i18n/routing";
 import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+
 export default async function OrganizersPage() {
     const t = await getTranslations();
 
@@ -21,6 +23,7 @@ export default async function OrganizersPage() {
                         </Link>
                         <h1 className="font-bold text-lg">Event Organizers</h1>
                     </div>
+                    <ThemeToggle />
                 </div>
             </header>
 
@@ -31,7 +34,7 @@ export default async function OrganizersPage() {
                         <Users className="w-10 h-10 text-green-600" />
                     </div>
 
-                    <h2 className="text-3xl font-bold mb-4">Event Organizers</h2>
+                    <h2 className="text-4xl font-extrabold mb-4 tracking-tight text-foreground">Event Organizers</h2>
                     <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
                         Discover the amazing teams and individuals behind DaLat's vibrant event scene.
                         This section is currently under development.

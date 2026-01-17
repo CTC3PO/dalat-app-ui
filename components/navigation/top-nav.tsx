@@ -5,6 +5,7 @@ import { Users, Plus, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MAIN_NAV_ITEMS } from "@/lib/navigation";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export function TopNav() {
     const pathname = usePathname();
@@ -15,10 +16,11 @@ export function TopNav() {
                 <div className="flex items-center justify-between h-16">
                     {/* Logo/Brand */}
                     <div className="flex items-center gap-2">
-                        <Link href="/" className="font-bold text-xl text-gray-900">
+                        <Link href="/" className="font-bold text-xl text-foreground">
                             dalat.app
                         </Link>
                         <span className="text-xl">🇬🇧</span>
+                        <ThemeToggle />
                     </div>
 
                     {/* Navigation Tabs (Desktop) */}

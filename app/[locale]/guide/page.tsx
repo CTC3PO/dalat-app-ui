@@ -4,6 +4,8 @@ import { ArrowLeft, Book, Globe, Link2, Users, Briefcase, ChevronRight, External
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+
 export default async function GuidePage() {
     const t = await getTranslations();
 
@@ -81,6 +83,7 @@ export default async function GuidePage() {
                         </Link>
                         <h1 className="font-bold text-lg">Guide to Dalat</h1>
                     </div>
+                    <ThemeToggle />
                 </div>
             </header>
 
@@ -91,8 +94,8 @@ export default async function GuidePage() {
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 text-white mb-6 shadow-lg shadow-green-200">
                         <Book className="w-8 h-8" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-3 tracking-tight text-gray-900">Welcome to Da Lat</h2>
-                    <p className="text-lg text-gray-500 max-w-2xl mx-auto leading-relaxed">
+                    <h2 className="text-4xl font-extrabold mb-3 tracking-tight text-foreground">Welcome to Da Lat</h2>
+                    <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed font-medium">
                         Your comprehensive handbook for living, visiting, and thriving in the City of Eternal Spring.
                     </p>
                 </div>
