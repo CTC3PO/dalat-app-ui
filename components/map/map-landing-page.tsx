@@ -60,6 +60,7 @@ export function MapLandingPage({ events, counts }: MapLandingPageProps) {
                     events={events}
                     selectedEventId={selectedEvent?.id}
                     onEventSelect={handleEventSelect}
+                    className="h-full w-full"
                 />
 
                 {/* Floating Carousel at Bottom */}
