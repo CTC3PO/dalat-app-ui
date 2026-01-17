@@ -375,10 +375,13 @@ async function canUserPostMoment(eventId: string, userId: string | null, creator
   const supabase = await createClient();
   const settings = await getEventSettings(eventId);
 
-  // If no settings or not enabled, only creator can post
-  if (!settings?.moments_enabled) return false;
+  // If settings exist and moments_enabled is explicitly false, only creator can post
+  if (settings && !settings.moments_enabled) return false;
 
-  switch (settings.moments_who_can_post) {
+  // Default to 'anyone' if no settings exist (moments enabled by default)
+  const whoCanPost = settings?.moments_who_can_post ?? "anyone";
+
+  switch (whoCanPost) {
     case "anyone":
       return true;
     case "rsvp":

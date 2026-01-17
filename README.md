@@ -1,6 +1,6 @@
 # dalat.app
 
-Events · People · Memories · Love · Đà Lạt 🇻🇳
+Events · People · Moments · Love · Đà Lạt 🇻🇳
 
 ## Development
 

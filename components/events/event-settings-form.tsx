@@ -31,7 +31,7 @@ export function EventSettingsForm({
 
   // Form state
   const [momentsEnabled, setMomentsEnabled] = useState(
-    initialSettings?.moments_enabled ?? false
+    initialSettings?.moments_enabled ?? true
   );
   const [whoCanPost, setWhoCanPost] = useState<MomentsWhoCanPost>(
     initialSettings?.moments_who_can_post ?? "anyone"

@@ -65,8 +65,8 @@ async function canUserPost(eventId: string, userId: string): Promise<boolean> {
 
   const settings = await getEventSettings(eventId);
 
-  // If no settings, check if user is event creator
-  if (!settings) {
+  // If settings exist and moments_enabled is explicitly false, only creator can post
+  if (settings && !settings.moments_enabled) {
     const { data: event } = await supabase
       .from("events")
       .select("created_by")
@@ -76,10 +76,11 @@ async function canUserPost(eventId: string, userId: string): Promise<boolean> {
     return event?.created_by === userId;
   }
 
-  if (!settings.moments_enabled) return false;
+  // Default to 'anyone' if no settings exist (moments enabled by default)
+  const whoCanPost = settings?.moments_who_can_post ?? "anyone";
 
   // Check based on who_can_post
-  switch (settings.moments_who_can_post) {
+  switch (whoCanPost) {
     case "anyone":
       return true;
     case "rsvp":
