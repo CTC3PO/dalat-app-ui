@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
 import { SearchBar } from "@/components/search/search-bar";
 import { DatePresets } from "@/components/search/date-presets";
@@ -33,9 +33,9 @@ export function MapLandingPage({ events, counts }: MapLandingPageProps) {
     const [isMounted, setIsMounted] = useState(false);
 
     // Mount check for Leaflet
-    useState(() => {
+    useEffect(() => {
         setIsMounted(true);
-    });
+    }, []);
 
     // Default center: Da Lat, Vietnam
     const defaultCenter: [number, number] = [11.9404, 108.4583];
