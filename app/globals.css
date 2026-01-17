@@ -87,9 +87,9 @@ a[href="https://novu.co"] {
 }
 
 /* Lock body scroll when Novu popover is open */
-body:has([class*="nv-inbox__popover"]),
-body:has([class*="nv-popover"]),
-body:has([class*="nv-root"] [role="dialog"]) {
+body:has([class*="nv-popover"][data-state="open"]),
+body:has([class*="nv-inbox__popover"][data-state="open"]),
+body:has([class*="nv-root"] [role="dialog"][data-state="open"]) {
   overflow: hidden;
   overscroll-behavior: none;
 }
