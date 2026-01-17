@@ -55,7 +55,7 @@ export default function NotFound() {
 
           {/* Subtle decorative footer text */}
           <p className="text-xs text-muted-foreground/40 pt-8">
-            Events without the noise ✦ Da Lat, Vietnam
+            Events · People · Memories · Love · Đà Lạt 🇻🇳
           </p>
         </div>
       </main>
