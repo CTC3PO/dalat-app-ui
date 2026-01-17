@@ -91,6 +91,9 @@
     "passwordResetSuccess": "รีเซ็ตรหัสผ่านสำเร็จ! คุณสามารถเข้าสู่ระบบได้แล้ว",
     "emailRequired": "กรุณากรอกอีเมลของคุณ",
     "or": "หรือ",
+    "continueWithEmail": "ดำเนินการต่อด้วยอีเมล",
+    "wellEmailYouLink": "เราจะส่งลิงก์เข้าสู่ระบบให้คุณ",
+    "orUsePassword": "หรือเข้าสู่ระบบด้วยรหัสผ่าน",
     "sendMagicLink": "ส่งลิงก์วิเศษ",
     "magicLinkSent": "ส่งลิงก์แล้ว! ตรวจสอบอีเมลของคุณ"
   },
@@ -110,6 +113,7 @@
   },
   "events": {
     "going": "เข้าร่วม",
+    "went": "เข้าร่วมแล้ว",
     "interested": "สนใจ",
     "waitlist": "รายชื่อรอ",
     "onWaitlist": "อยู่ในรายชื่อรอ",
@@ -815,5 +819,39 @@
     "cancel": "ยกเลิก",
     "generating": "กำลังสร้าง...",
     "generate": "สร้าง"
+  },
+  "archive": {
+    "events": "กิจกรรม",
+    "eventsIn": "กิจกรรมใน{month} {year}",
+    "description": "ค้นพบกิจกรรมในดาลัด เวียดนาม ใน{month} {year}",
+    "thisMonth": "เดือนนี้",
+    "thisMonthDescription": "กิจกรรมเดือนนี้ในดาลัด",
+    "thisWeek": "สัปดาห์นี้",
+    "thisWeekDescription": "กิจกรรมสัปดาห์นี้ในดาลัด",
+    "noEvents": "ไม่มีกิจกรรมใน{month} {year}",
+    "noEventsThisMonth": "ไม่มีกิจกรรมเดือนนี้",
+    "noEventsThisWeek": "ไม่มีกิจกรรมสัปดาห์นี้",
+    "eventCount": "{count} กิจกรรม",
+    "previousMonth": "ก่อนหน้า",
+    "nextMonth": "ถัดไป",
+    "backToHome": "กลับ",
+    "browseAllEvents": "ดูกิจกรรมทั้งหมด",
+    "viewThisMonth": "ดูเดือนนี้",
+    "viewThisWeek": "ดูสัปดาห์นี้",
+    "browseArchive": "ดูคลังข้อมูล",
+    "months": {
+      "january": "มกราคม",
+      "february": "กุมภาพันธ์",
+      "march": "มีนาคม",
+      "april": "เมษายน",
+      "may": "พฤษภาคม",
+      "june": "มิถุนายน",
+      "july": "กรกฎาคม",
+      "august": "สิงหาคม",
+      "september": "กันยายน",
+      "october": "ตุลาคม",
+      "november": "พฤศจิกายน",
+      "december": "ธันวาคม"
+    }
   }
 }

@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { MapLandingPage } from "@/components/map/map-landing-page";
 import type { Event, EventCounts } from "@/lib/types";
 
+// Increase serverless function timeout
+export const maxDuration = 60;
+
 async function getUpcomingEvents() {
   const supabase = await createClient();
 

@@ -91,6 +91,9 @@
     "signInOrCreateHint": "Mới đến? Chúng tôi sẽ tự động tạo tài khoản cho bạn.",
     "emailRequired": "Vui lòng nhập email của bạn",
     "or": "hoặc",
+    "continueWithEmail": "Tiếp tục với email",
+    "wellEmailYouLink": "Chúng tôi sẽ gửi liên kết đăng nhập",
+    "orUsePassword": "hoặc đăng nhập bằng mật khẩu",
     "sendMagicLink": "Gửi liên kết đăng nhập",
     "magicLinkSent": "Đã gửi liên kết! Kiểm tra email của bạn."
   },
@@ -110,6 +113,7 @@
   },
   "events": {
     "going": "tham gia",
+    "went": "đã tham gia",
     "interested": "quan tâm",
     "waitlist": "chờ",
     "onWaitlist": "trong danh sách chờ",
@@ -121,6 +125,7 @@
     "moreFrom": "Thêm từ {organizer}",
     "viewAllEvents": "Xem tất cả sự kiện",
     "notFound": "Không tìm thấy sự kiện",
+    "partOfSeries": "Thuộc {seriesName}",
     "lifecycle": {
       "live": "Trực tiếp",
       "ended": "Đã kết thúc"
@@ -293,8 +298,8 @@
     "usernameTaken": "Tên người dùng đã được sử dụng",
     "usernameMinLength": "Tên người dùng phải có ít nhất 3 ký tự",
     "usernameMaxLength": "Tên người dùng tối đa 20 ký tự",
-    "usernameFormat": "Chỉ chữ thường, số và dấu gạch dưới",
-    "usernameHelp": "3-20 ký tự. Chỉ chữ cái, số và dấu gạch dưới.",
+    "usernameFormat": "Chữ cái, số, dấu chấm, gạch ngang, gạch dưới. Phải bắt đầu/kết thúc bằng chữ hoặc số.",
+    "usernameHelp": "3-20 ký tự. Chữ cái, số, dấu chấm, gạch ngang, gạch dưới.",
     "displayName": "Tên hiển thị",
     "displayNamePlaceholder": "Tên của bạn",
     "displayNameHelp": "Tên hiển thị trên sự kiện và hồ sơ của bạn",
@@ -815,5 +820,39 @@
     "cancel": "Hủy",
     "generating": "Đang tạo...",
     "generate": "Tạo"
+  },
+  "archive": {
+    "events": "Sự kiện",
+    "eventsIn": "Sự kiện trong {month} {year}",
+    "description": "Khám phá các sự kiện diễn ra vào {month} {year} tại Đà Lạt, Việt Nam",
+    "thisMonth": "Tháng này",
+    "thisMonthDescription": "Các sự kiện diễn ra trong tháng này tại Đà Lạt",
+    "thisWeek": "Tuần này",
+    "thisWeekDescription": "Các sự kiện diễn ra trong tuần này tại Đà Lạt",
+    "noEvents": "Không có sự kiện trong {month} {year}",
+    "noEventsThisMonth": "Không có sự kiện trong tháng này",
+    "noEventsThisWeek": "Không có sự kiện trong tuần này",
+    "eventCount": "{count, plural, one {# sự kiện} other {# sự kiện}}",
+    "previousMonth": "Trước",
+    "nextMonth": "Sau",
+    "backToHome": "Quay lại",
+    "browseAllEvents": "Xem tất cả sự kiện",
+    "viewThisMonth": "Xem tháng này",
+    "viewThisWeek": "Xem tuần này",
+    "browseArchive": "Xem lưu trữ",
+    "months": {
+      "january": "Tháng Một",
+      "february": "Tháng Hai",
+      "march": "Tháng Ba",
+      "april": "Tháng Tư",
+      "may": "Tháng Năm",
+      "june": "Tháng Sáu",
+      "july": "Tháng Bảy",
+      "august": "Tháng Tám",
+      "september": "Tháng Chín",
+      "october": "Tháng Mười",
+      "november": "Tháng Mười Một",
+      "december": "Tháng Mười Hai"
+    }
   }
 }

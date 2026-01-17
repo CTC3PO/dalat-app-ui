@@ -8,6 +8,8 @@ import { NotificationPrompt } from "@/components/notification-prompt";
 import { SwUpdateHandler } from "@/components/sw-update-handler";
 import { GlobalFooter } from "@/components/global-footer";
 import { BottomNav } from "@/components/navigation/bottom-nav";
+import { ScrollRestorationProvider } from "@/lib/contexts/scroll-restoration-context";
+import { PerformanceMonitor } from "@/components/performance-monitor";
 import { routing, type Locale } from "@/lib/i18n/routing";
 
 const siteUrl = "https://dalat.app";
@@ -70,14 +72,17 @@ export default async function LocaleLayout({ children, params }: Props) {
         enableSystem
         disableTransitionOnChange
       >
-        <div className="min-h-screen flex flex-col">
-          <BadgeClearer />
-          <NotificationPrompt />
-          <SwUpdateHandler />
-          <main className="flex-1 pb-16 lg:pb-0">{children}</main>
-          <GlobalFooter />
-          <BottomNav />
-        </div>
+        <ScrollRestorationProvider>
+          <div className="min-h-screen flex flex-col">
+            <PerformanceMonitor />
+            <BadgeClearer />
+            <NotificationPrompt />
+            <SwUpdateHandler />
+            <main className="flex-1 pb-16 lg:pb-0">{children}</main>
+            <GlobalFooter />
+            <BottomNav />
+          </div>
+        </ScrollRestorationProvider>
       </ThemeProvider>
     </NextIntlClientProvider>
   );

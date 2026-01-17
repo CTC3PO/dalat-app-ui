@@ -5,6 +5,7 @@ import { Calendar, MapPin, Users } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { EventDefaultImage } from "@/components/events/event-default-image";
+import { SeriesBadge } from "@/components/events/series-badge";
 import { formatInDaLat } from "@/lib/timezone";
 import { isVideoUrl, isDefaultImageUrl } from "@/lib/media-utils";
 import { triggerHaptic } from "@/lib/haptics";
@@ -13,9 +14,22 @@ import type { Event, EventCounts, Locale } from "@/lib/types";
 interface EventCardProps {
   event: Event;
   counts?: EventCounts;
+  seriesRrule?: string;
+  seriesSlug?: string;
 }
 
-export function EventCard({ event, counts }: EventCardProps) {
+// Check if event is past (same logic as rsvp-button)
+function isEventPast(startsAt: string, endsAt: string | null): boolean {
+  const now = new Date();
+  if (endsAt) {
+    return new Date(endsAt) < now;
+  }
+  const startDate = new Date(startsAt);
+  const defaultEnd = new Date(startDate.getTime() + 4 * 60 * 60 * 1000);
+  return defaultEnd < now;
+}
+
+export function EventCard({ event, counts, seriesRrule }: EventCardProps) {
   const t = useTranslations("events");
   const locale = useLocale() as Locale;
 
@@ -26,6 +40,8 @@ export function EventCard({ event, counts }: EventCardProps) {
   const isFull = event.capacity
     ? (counts?.going_spots ?? 0) >= event.capacity
     : false;
+
+  const isPast = isEventPast(event.starts_at, event.ends_at);
 
   const hasCustomImage = !!event.image_url && !isDefaultImageUrl(event.image_url);
   const imageIsVideo = isVideoUrl(event.image_url);
@@ -62,6 +78,12 @@ export function EventCard({ event, counts }: EventCardProps) {
               className="object-cover w-full h-full"
             />
           )}
+          {/* Series badge */}
+          {seriesRrule && (
+            <div className="absolute top-2 left-2">
+              <SeriesBadge rrule={seriesRrule} variant="overlay" />
+            </div>
+          )}
         </div>
 
         {/* Text area */}
@@ -89,7 +111,7 @@ export function EventCard({ event, counts }: EventCardProps) {
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4" />
               <span>
-                {spotsText} {t("going")}
+                {spotsText} {isPast ? t("went") : t("going")}
                 {isFull && (
                   <span className="ml-1 text-orange-500">({t("full")})</span>
                 )}

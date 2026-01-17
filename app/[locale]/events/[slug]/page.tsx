@@ -2,7 +2,10 @@ import { notFound, redirect } from "next/navigation";
 import { Link } from "@/lib/i18n/routing";
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { ArrowLeft, Calendar, MapPin, Users, ExternalLink, Link2 } from "lucide-react";
+
+// Increase serverless function timeout (Vercel Pro required for >10s)
+export const maxDuration = 60;
+import { Calendar, MapPin, Users, ExternalLink, Link2, Repeat } from "lucide-react";
 import { getTranslations, getLocale } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { getTranslationsWithFallback, isValidContentLocale } from "@/lib/translations";
@@ -11,6 +14,8 @@ import { JsonLd, generateEventSchema, generateBreadcrumbSchema } from "@/lib/str
 import { TranslatedFrom } from "@/components/ui/translation-badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { RsvpButton } from "@/components/events/rsvp-button";
+import { FeedbackBadge } from "@/components/events/event-feedback";
+import { SeriesBadge } from "@/components/events/series-badge";
 import { EventActions } from "@/components/events/event-actions";
 import { InviteModal } from "@/components/events/invite-modal";
 import { AddToCalendar } from "@/components/events/add-to-calendar";
@@ -24,7 +29,8 @@ import { MoreFromOrganizer } from "@/components/events/more-from-organizer";
 import { Linkify } from "@/lib/linkify";
 import { MomentsPreview } from "@/components/moments";
 import { SponsorDisplay } from "@/components/events/sponsor-display";
-import type { Event, EventCounts, Rsvp, Profile, Organizer, MomentWithProfile, MomentCounts, EventSettings, Sponsor, EventSponsor, UserRole } from "@/lib/types";
+import { SiteHeader } from "@/components/site-header";
+import type { Event, EventCounts, Rsvp, Profile, Organizer, MomentWithProfile, MomentCounts, EventSettings, Sponsor, EventSponsor, UserRole, EventSeries } from "@/lib/types";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -34,11 +40,12 @@ interface PageProps {
 // Generate dynamic OG metadata for social sharing
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  const locale = await getLocale();
   const supabase = await createClient();
 
   const { data: event } = await supabase
     .from("events")
-    .select("title, description, image_url, location_name, starts_at")
+    .select("id, title, description, image_url, location_name, starts_at")
     .eq("slug", slug)
     .single();
 
@@ -48,44 +55,71 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  // Get translated content for the current locale
+  const translations = isValidContentLocale(locale)
+    ? await getTranslationsWithFallback(
+        "event",
+        event.id,
+        locale as ContentLocale,
+        {
+          title: event.title,
+          description: event.description,
+          text_content: null,
+          bio: null,
+        }
+      )
+    : { title: event.title, description: event.description };
+
+  const title = translations.title || event.title;
+  const eventDescription = translations.description ?? event.description;
+
   const eventDate = formatInDaLat(event.starts_at, "EEE, MMM d 'at' h:mm a");
-  const description = event.description
-    ? `${event.description.slice(0, 150)}${event.description.length > 150 ? "..." : ""}`
+  const description = eventDescription
+    ? `${eventDescription.slice(0, 150)}${eventDescription.length > 150 ? "..." : ""}`
     : `${eventDate}${event.location_name ? ` · ${event.location_name}` : ""} · dalat.app`;
 
+  // Use absolute URL with locale for proper link previews on messaging apps
+  const canonicalUrl = `https://dalat.app/${locale}/events/${slug}`;
+
+  // Explicit OG image URL for WhatsApp compatibility
+  // WhatsApp requires explicit og:image meta tag (doesn't auto-detect opengraph-image.tsx)
+  const ogImageUrl = `https://dalat.app/${locale}/events/${slug}/opengraph-image`;
+
   return {
-    title: `${event.title} | dalat.app`,
+    title: `${title} | dalat.app`,
     description,
     openGraph: {
-      title: event.title,
+      title,
       description,
       type: "website",
-      url: `/events/${slug}`,
+      url: canonicalUrl,
       siteName: "dalat.app",
-      ...(event.image_url && {
-        images: [
-          {
-            url: event.image_url,
-            width: 1200,
-            height: 630,
-            alt: event.title,
-          },
-        ],
-      }),
+      images: [
+        {
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          type: "image/png",
+        },
+      ],
     },
     twitter: {
-      card: event.image_url ? "summary_large_image" : "summary",
-      title: event.title,
+      card: "summary_large_image",
+      title,
       description,
-      ...(event.image_url && {
-        images: [event.image_url],
-      }),
+      images: [ogImageUrl],
     },
   };
 }
 
+type EventWithJoins = Event & {
+  profiles: Profile;
+  organizers: Organizer | null;
+  event_series: Pick<EventSeries, "slug" | "title" | "rrule"> | null;
+};
+
 type GetEventResult =
-  | { type: "found"; event: Event & { profiles: Profile; organizers: Organizer | null } }
+  | { type: "found"; event: EventWithJoins }
   | { type: "redirect"; newSlug: string }
   | { type: "not_found" };
 
@@ -95,12 +129,12 @@ async function getEvent(slug: string): Promise<GetEventResult> {
   // First, try to find by current slug
   const { data: event, error } = await supabase
     .from("events")
-    .select("*, profiles(*), organizers(*)")
+    .select("*, profiles(*), organizers(*), event_series(slug, title, rrule)")
     .eq("slug", slug)
     .single();
 
   if (!error && event) {
-    return { type: "found", event: event as Event & { profiles: Profile; organizers: Organizer | null } };
+    return { type: "found", event: event as EventWithJoins };
   }
 
   // If not found, check if this is an old slug that needs redirect
@@ -142,6 +176,25 @@ async function getEventCounts(eventId: string): Promise<EventCounts | null> {
   return data as EventCounts | null;
 }
 
+interface FeedbackStats {
+  total: number;
+  positive_percentage: number | null;
+  amazing: number;
+  good: number;
+  okay: number;
+  not_great: number;
+}
+
+async function getFeedbackStats(eventId: string): Promise<FeedbackStats | null> {
+  const supabase = await createClient();
+
+  const { data } = await supabase.rpc("get_event_feedback_stats", {
+    p_event_id: eventId,
+  });
+
+  return data as FeedbackStats | null;
+}
+
 async function getCurrentUserRsvp(eventId: string): Promise<Rsvp | null> {
   const supabase = await createClient();
 
@@ -180,43 +233,72 @@ async function getWaitlistPosition(eventId: string, userId: string | null): Prom
   return position >= 0 ? position + 1 : null; // 1-indexed position
 }
 
-async function getAttendees(eventId: string): Promise<(Rsvp & { profiles: Profile })[]> {
-  const supabase = await createClient();
-
-  const { data } = await supabase
-    .from("rsvps")
-    .select("*, profiles(*)")
-    .eq("event_id", eventId)
-    .eq("status", "going")
-    .order("created_at", { ascending: true });
-
-  return (data ?? []) as (Rsvp & { profiles: Profile })[];
+interface UserFeedback {
+  rating?: string;
+  comment?: string;
+  marked_no_show?: boolean;
 }
 
-async function getWaitlist(eventId: string): Promise<(Rsvp & { profiles: Profile })[]> {
+async function getUserFeedback(eventId: string): Promise<UserFeedback | null> {
   const supabase = await createClient();
 
-  const { data } = await supabase
-    .from("rsvps")
-    .select("*, profiles(*)")
-    .eq("event_id", eventId)
-    .eq("status", "waitlist")
-    .order("created_at", { ascending: true });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  return (data ?? []) as (Rsvp & { profiles: Profile })[];
+  if (!user) return null;
+
+  // Check if user marked as no-show
+  const { data: rsvp } = await supabase
+    .from("rsvps")
+    .select("marked_no_show")
+    .eq("event_id", eventId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (rsvp?.marked_no_show) {
+    return { marked_no_show: true };
+  }
+
+  // Check for actual feedback
+  const { data: feedback } = await supabase
+    .from("event_feedback")
+    .select("rating, comment")
+    .eq("event_id", eventId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (feedback) {
+    return { rating: feedback.rating, comment: feedback.comment ?? undefined };
+  }
+
+  return null;
 }
 
-async function getInterestedUsers(eventId: string): Promise<(Rsvp & { profiles: Profile })[]> {
+// Combined RSVP fetch - reduces 3 parallel queries to 1
+interface AllRsvpsResult {
+  attendees: (Rsvp & { profiles: Profile })[];
+  waitlist: (Rsvp & { profiles: Profile })[];
+  interested: (Rsvp & { profiles: Profile })[];
+}
+
+async function getAllRsvps(eventId: string): Promise<AllRsvpsResult> {
   const supabase = await createClient();
 
   const { data } = await supabase
     .from("rsvps")
     .select("*, profiles(*)")
     .eq("event_id", eventId)
-    .eq("status", "interested")
+    .in("status", ["going", "waitlist", "interested"])
     .order("created_at", { ascending: true });
 
-  return (data ?? []) as (Rsvp & { profiles: Profile })[];
+  const rsvps = (data ?? []) as (Rsvp & { profiles: Profile })[];
+
+  return {
+    attendees: rsvps.filter((r) => r.status === "going"),
+    waitlist: rsvps.filter((r) => r.status === "waitlist"),
+    interested: rsvps.filter((r) => r.status === "interested"),
+  };
 }
 
 async function getCurrentUserId(): Promise<string | null> {
@@ -293,10 +375,13 @@ async function canUserPostMoment(eventId: string, userId: string | null, creator
   const supabase = await createClient();
   const settings = await getEventSettings(eventId);
 
-  // If no settings or not enabled, only creator can post
-  if (!settings?.moments_enabled) return false;
+  // If settings exist and moments_enabled is explicitly false, only creator can post
+  if (settings && !settings.moments_enabled) return false;
 
-  switch (settings.moments_who_can_post) {
+  // Default to 'anyone' if no settings exist (moments enabled by default)
+  const whoCanPost = settings?.moments_who_can_post ?? "anyone";
+
+  switch (whoCanPost) {
     case "anyone":
       return true;
     case "rsvp":
@@ -409,13 +494,14 @@ export default async function EventPage({ params, searchParams }: PageProps) {
   const currentUserId = await getCurrentUserId();
   const currentUserRole = await getCurrentUserRole(currentUserId);
 
-  const [counts, currentRsvp, attendees, waitlist, interested, waitlistPosition, organizerEvents, momentsPreview, momentCounts, canPostMoment, sponsors, eventTranslations] = await Promise.all([
+  // Optimized: Combined RSVP fetch (3 queries -> 1), plus other parallel fetches
+  const [counts, currentRsvp, allRsvps, waitlistPosition, userFeedback, feedbackStats, organizerEvents, momentsPreview, momentCounts, canPostMoment, sponsors, eventTranslations] = await Promise.all([
     getEventCounts(event.id),
     getCurrentUserRsvp(event.id),
-    getAttendees(event.id),
-    getWaitlist(event.id),
-    getInterestedUsers(event.id),
+    getAllRsvps(event.id), // Combined fetch for attendees, waitlist, interested
     getWaitlistPosition(event.id, currentUserId),
+    getUserFeedback(event.id),
+    getFeedbackStats(event.id),
     event.organizer_id ? getOrganizerEvents(event.organizer_id) : Promise.resolve([]),
     getMomentsPreview(event.id),
     getMomentCounts(event.id),
@@ -423,6 +509,9 @@ export default async function EventPage({ params, searchParams }: PageProps) {
     getEventSponsors(event.id),
     getEventTranslations(event.id, event.title, event.description, event.source_locale, locale),
   ]);
+
+  // Destructure combined RSVP result
+  const { attendees, waitlist, interested } = allRsvps;
 
   const isLoggedIn = !!currentUserId;
   const isCreator = currentUserId === event.created_by;
@@ -453,18 +542,10 @@ export default async function EventPage({ params, searchParams }: PageProps) {
         <ConfirmAttendanceHandler eventId={event.id} />
       </Suspense>
 
-      {/* Header */}
-      <nav className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className="container flex h-14 max-w-4xl items-center justify-between mx-auto px-4">
-          <Link
-            href="/"
-            className="-ml-3 flex items-center gap-2 text-muted-foreground hover:text-foreground active:text-foreground active:scale-95 transition-all px-3 py-2 rounded-lg"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            <span>{tCommon("back")}</span>
-          </Link>
-          {canManageEvent && (
-            <div className="flex items-center gap-2">
+      <SiteHeader
+        actions={
+          canManageEvent ? (
+            <>
               <InviteModal
                 eventSlug={event.slug}
                 eventTitle={event.title}
@@ -472,10 +553,10 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                 startsAt={event.starts_at}
               />
               <EventActions eventId={event.id} eventSlug={event.slug} />
-            </div>
-          )}
-        </div>
-      </nav>
+            </>
+          ) : undefined
+        }
+      />
 
       <div className="container max-w-4xl mx-auto px-4 py-8">
         <div className="grid gap-8 lg:grid-cols-3">
@@ -495,6 +576,21 @@ export default async function EventPage({ params, searchParams }: PageProps) {
             {/* Title and description */}
             <div>
               <h1 className="text-3xl font-bold mb-2">{eventTranslations.title}</h1>
+              {/* Series context - show if this event is part of a recurring series */}
+              {event.event_series && (
+                <Link
+                  href={`/series/${event.event_series.slug}`}
+                  className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-3 -mt-1"
+                >
+                  <Repeat className="w-3.5 h-3.5" />
+                  <span>
+                    {t("partOfSeries", { seriesName: event.event_series.title })}
+                  </span>
+                  {event.event_series.rrule && (
+                    <SeriesBadge rrule={event.event_series.rrule} className="ml-1" />
+                  )}
+                </Link>
+              )}
               {/* Show translation indicator with original */}
               {eventTranslations.isTranslated && eventTranslations.sourceLocale && (
                 <TranslatedFrom
@@ -613,12 +709,26 @@ export default async function EventPage({ params, searchParams }: PageProps) {
                 {/* RSVP button */}
                 <RsvpButton
                   eventId={event.id}
+                  eventTitle={event.title}
                   capacity={event.capacity}
                   goingSpots={counts?.going_spots ?? 0}
                   currentRsvp={currentRsvp}
                   isLoggedIn={isLoggedIn}
                   waitlistPosition={waitlistPosition}
+                  startsAt={event.starts_at}
+                  endsAt={event.ends_at}
+                  existingFeedback={userFeedback}
                 />
+
+                {/* Feedback stats for past events */}
+                {feedbackStats && feedbackStats.total > 0 && (
+                  <div className="flex justify-center">
+                    <FeedbackBadge
+                      positivePercentage={feedbackStats.positive_percentage}
+                      totalFeedback={feedbackStats.total}
+                    />
+                  </div>
+                )}
 
                 {/* Add to calendar */}
                 <AddToCalendar

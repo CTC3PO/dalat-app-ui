@@ -1,6 +1,9 @@
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
+
+// Increase serverless function timeout
+export const maxDuration = 60;
 import { ThemeSelector } from "@/components/settings/theme-selector";
 import { LanguageSelector } from "@/components/settings/language-selector";
 import { NotificationSettings } from "@/components/settings/notification-settings";

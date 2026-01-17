@@ -5,6 +5,7 @@ import { Calendar, MapPin, Users } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { EventDefaultImage } from "@/components/events/event-default-image";
 import { ImmersiveImage } from "@/components/events/immersive-image";
+import { SeriesBadge } from "@/components/events/series-badge";
 import { formatInDaLat } from "@/lib/timezone";
 import { isVideoUrl, isDefaultImageUrl } from "@/lib/media-utils";
 import { triggerHaptic } from "@/lib/haptics";
@@ -13,9 +14,23 @@ import type { Event, EventCounts, Locale } from "@/lib/types";
 interface EventCardImmersiveProps {
   event: Event;
   counts?: EventCounts;
+  seriesRrule?: string;
+  seriesSlug?: string;
+  priority?: boolean;
 }
 
-export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
+// Check if event is past (same logic as rsvp-button)
+function isEventPast(startsAt: string, endsAt: string | null): boolean {
+  const now = new Date();
+  if (endsAt) {
+    return new Date(endsAt) < now;
+  }
+  const startDate = new Date(startsAt);
+  const defaultEnd = new Date(startDate.getTime() + 4 * 60 * 60 * 1000);
+  return defaultEnd < now;
+}
+
+export function EventCardImmersive({ event, counts, seriesRrule, priority = false }: EventCardImmersiveProps) {
   const locale = useLocale() as Locale;
   const t = useTranslations("events");
 
@@ -26,6 +41,8 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
   const isFull = event.capacity
     ? (counts?.going_spots ?? 0) >= event.capacity
     : false;
+
+  const isPast = isEventPast(event.starts_at, event.ends_at);
 
   // Treat default image URLs as "no image" to use responsive EventDefaultImage
   const hasCustomImage = !!event.image_url && !isDefaultImageUrl(event.image_url);
@@ -51,7 +68,7 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
                 autoPlay
               />
             ) : (
-              <ImmersiveImage src={event.image_url!} alt={event.title} />
+              <ImmersiveImage src={event.image_url!} alt={event.title} priority={priority} />
             )
           ) : (
             <EventDefaultImage
@@ -59,6 +76,12 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
               className="absolute inset-0 w-full h-full object-contain"
               priority
             />
+          )}
+          {/* Series badge - positioned with safe area for notch */}
+          {seriesRrule && (
+            <div className="absolute top-[env(safe-area-inset-top,12px)] left-4 z-10 pt-3">
+              <SeriesBadge rrule={seriesRrule} variant="overlay" />
+            </div>
           )}
         </div>
 
@@ -88,7 +111,7 @@ export function EventCardImmersive({ event, counts }: EventCardImmersiveProps) {
               <div className="flex items-center gap-2.5 drop-shadow-md">
                 <Users className="w-4 h-4 flex-shrink-0" />
                 <span className="text-sm">
-                  {spotsText} {t("going")}
+                  {spotsText} {isPast ? t("went") : t("going")}
                   {isFull && (
                     <span className="ml-1 text-orange-400">({t("full")})</span>
                   )}

@@ -91,6 +91,9 @@
     "passwordResetSuccess": "Kata laluan berjaya diset semula! Anda boleh log masuk sekarang.",
     "emailRequired": "Sila masukkan emel anda",
     "or": "atau",
+    "continueWithEmail": "Teruskan dengan e-mel",
+    "wellEmailYouLink": "Kami akan hantar pautan log masuk",
+    "orUsePassword": "atau log masuk dengan kata laluan",
     "sendMagicLink": "Hantar pautan ajaib",
     "magicLinkSent": "Pautan ajaib dihantar! Semak emel anda."
   },
@@ -110,6 +113,7 @@
   },
   "events": {
     "going": "hadir",
+    "went": "telah hadir",
     "interested": "berminat",
     "waitlist": "senarai tunggu",
     "onWaitlist": "dalam senarai tunggu",
@@ -815,5 +819,39 @@
     "cancel": "Batal",
     "generating": "Menjana...",
     "generate": "Jana"
+  },
+  "archive": {
+    "events": "Acara",
+    "eventsIn": "Acara pada {month} {year}",
+    "description": "Temui acara di Da Lat, Vietnam pada {month} {year}",
+    "thisMonth": "Bulan Ini",
+    "thisMonthDescription": "Acara bulan ini di Da Lat",
+    "thisWeek": "Minggu Ini",
+    "thisWeekDescription": "Acara minggu ini di Da Lat",
+    "noEvents": "Tiada acara pada {month} {year}",
+    "noEventsThisMonth": "Tiada acara bulan ini",
+    "noEventsThisWeek": "Tiada acara minggu ini",
+    "eventCount": "{count} acara",
+    "previousMonth": "Sebelum",
+    "nextMonth": "Seterus",
+    "backToHome": "Kembali",
+    "browseAllEvents": "Lihat semua acara",
+    "viewThisMonth": "Lihat bulan ini",
+    "viewThisWeek": "Lihat minggu ini",
+    "browseArchive": "Layari arkib",
+    "months": {
+      "january": "Januari",
+      "february": "Februari",
+      "march": "Mac",
+      "april": "April",
+      "may": "Mei",
+      "june": "Jun",
+      "july": "Julai",
+      "august": "Ogos",
+      "september": "September",
+      "october": "Oktober",
+      "november": "November",
+      "december": "Disember"
+    }
   }
 }

@@ -2,29 +2,50 @@ import { Suspense } from "react";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { EventCardImmersive } from "./event-card-immersive";
+import { EventFeedImmersiveClient } from "./event-feed-immersive-client";
 import { EventFeedTabs, type EventLifecycle } from "./event-feed-tabs";
-import { PastContentFeed } from "@/components/feed";
-import type { Event, EventCounts } from "@/lib/types";
+import type { Event, EventCounts, EventWithSeriesData } from "@/lib/types";
 
 interface EventFeedImmersiveProps {
   lifecycle?: EventLifecycle;
   lifecycleCounts?: { upcoming: number; happening: number; past: number };
 }
 
-async function getEventsByLifecycle(lifecycle: EventLifecycle) {
+async function getEventsByLifecycle(lifecycle: EventLifecycle): Promise<EventWithSeriesData[]> {
   const supabase = await createClient();
 
-  const { data: events, error } = await supabase.rpc("get_events_by_lifecycle", {
+  // Try deduplicated RPC first, fallback to standard if not available
+  let { data: events, error } = await supabase.rpc("get_events_by_lifecycle_deduplicated", {
     p_lifecycle: lifecycle,
     p_limit: 20,
   });
+
+  // Fallback to non-deduplicated function if the new one doesn't exist
+  if (error?.code === "PGRST202") {
+    const fallback = await supabase.rpc("get_events_by_lifecycle", {
+      p_lifecycle: lifecycle,
+      p_limit: 20,
+    });
+    events = fallback.data;
+    error = fallback.error;
+    
+    // Map to expected format with null series data
+    if (events && !error) {
+      return (events as Event[]).map((e) => ({
+        ...e,
+        series_slug: null,
+        series_rrule: null,
+        is_recurring: !!e.series_id,
+      }));
+    }
+  }
 
   if (error) {
     console.error("Error fetching events:", error);
     return [];
   }
 
-  return events as Event[];
+  return events as EventWithSeriesData[];
 }
 
 async function getEventCounts(eventIds: string[]) {
@@ -127,36 +148,6 @@ export async function EventFeedImmersive({
     );
   }
 
-  // For Past tab, show content carousel first
-  if (lifecycle === "past") {
-    return (
-      <div className="h-[100dvh] relative flex flex-col bg-black">
-        {/* Floating tabs below the header */}
-        <div className="absolute top-14 left-0 right-0 z-40 px-3">
-          <FloatingTabs activeTab={lifecycle} lifecycleCounts={lifecycleCounts} labels={tabLabels} />
-        </div>
-
-        {/* Content carousel section */}
-        <div className="pt-28 pb-4 flex-shrink-0">
-          <Suspense fallback={null}>
-            <PastContentFeed />
-          </Suspense>
-        </div>
-
-        {/* Scrollable event cards */}
-        <div className="flex-1 overflow-y-auto snap-y snap-mandatory overscroll-contain scrollbar-hide">
-          {events.map((event) => (
-            <EventCardImmersive
-              key={event.id}
-              event={event}
-              counts={counts[event.id]}
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="h-[100dvh] relative">
       {/* Floating tabs below the header */}
@@ -164,16 +155,18 @@ export async function EventFeedImmersive({
         <FloatingTabs activeTab={lifecycle} lifecycleCounts={lifecycleCounts} labels={tabLabels} />
       </div>
 
-      {/* Scrollable event cards */}
-      <div className="h-[100dvh] overflow-y-auto snap-y snap-mandatory overscroll-contain scrollbar-hide">
-        {events.map((event) => (
+      {/* Scrollable event cards with scroll restoration */}
+      <EventFeedImmersiveClient eventCount={events.length} activeTab={lifecycle}>
+        {events.map((event, index) => (
           <EventCardImmersive
             key={event.id}
             event={event}
             counts={counts[event.id]}
+            seriesRrule={event.series_rrule ?? undefined}
+            priority={index === 0}
           />
         ))}
-      </div>
+      </EventFeedImmersiveClient>
     </div>
   );
 }

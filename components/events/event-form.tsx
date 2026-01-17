@@ -356,6 +356,7 @@ export function EventForm({
     const supabase = createClient();
 
     startTransition(async () => {
+      try {
       if (isEditing) {
         // Update existing event
         const updateData: Record<string, unknown> = {
@@ -497,6 +498,10 @@ export function EventForm({
           router.push(`/events/${data.slug}`);
         }
       }
+      } catch (err) {
+        console.error("Form submission error:", err);
+        setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      }
     });
   }
 
@@ -509,6 +514,7 @@ export function EventForm({
             <>
               <EventMediaUpload
                 eventId={event.id}
+                eventTitle={title}
                 currentMediaUrl={imageUrl}
                 onMediaChange={setImageUrl}
               />

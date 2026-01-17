@@ -8,7 +8,7 @@
 -- Event settings for moments configuration
 CREATE TABLE event_settings (
   event_id uuid PRIMARY KEY REFERENCES events ON DELETE CASCADE,
-  moments_enabled boolean DEFAULT false,
+  moments_enabled boolean DEFAULT true,
   -- who_can_post: 'anyone' | 'rsvp' | 'confirmed' (going status)
   moments_who_can_post text DEFAULT 'anyone' CHECK (moments_who_can_post IN ('anyone', 'rsvp', 'confirmed')),
   moments_require_approval boolean DEFAULT false,
@@ -137,21 +137,19 @@ BEGIN
   FROM event_settings
   WHERE event_id = p_event_id;
 
-  -- If no settings, check if event exists (allow with defaults for event creator)
+  -- If no settings exist, default to 'anyone' can post (moments enabled by default)
   IF NOT FOUND THEN
-    -- Check if user is event creator
-    IF EXISTS (SELECT 1 FROM events WHERE id = p_event_id AND created_by = v_uid) THEN
-      RETURN true;
-    END IF;
-    RETURN false;
+    v_moments_enabled := true;
+    v_who_can_post := 'anyone';
   END IF;
 
+  -- If moments_enabled is explicitly false, only creator can post
   IF NOT v_moments_enabled THEN
-    RETURN false;
+    RETURN EXISTS (SELECT 1 FROM events WHERE id = p_event_id AND created_by = v_uid);
   END IF;
 
-  -- Check permission based on who_can_post setting
-  CASE v_who_can_post
+  -- Check permission based on who_can_post setting (defaults to 'anyone')
+  CASE COALESCE(v_who_can_post, 'anyone')
     WHEN 'anyone' THEN
       RETURN true;
     WHEN 'rsvp' THEN

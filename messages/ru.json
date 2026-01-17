@@ -91,6 +91,9 @@
     "passwordResetSuccess": "Пароль успешно сброшен! Теперь вы можете войти.",
     "emailRequired": "Пожалуйста, введите email",
     "or": "или",
+    "continueWithEmail": "Продолжить с email",
+    "wellEmailYouLink": "Мы отправим вам ссылку для входа",
+    "orUsePassword": "или войти с паролем",
     "sendMagicLink": "Отправить magic link",
     "magicLinkSent": "Magic link отправлен! Проверьте почту."
   },
@@ -110,6 +113,7 @@
   },
   "events": {
     "going": "пойдут",
+    "went": "пошли",
     "interested": "интересуются",
     "waitlist": "в очереди",
     "onWaitlist": "в очереди",
@@ -815,5 +819,39 @@
     "cancel": "Отмена",
     "generating": "Генерация...",
     "generate": "Сгенерировать"
+  },
+  "archive": {
+    "events": "События",
+    "eventsIn": "События за {month} {year}",
+    "description": "Откройте для себя события в Далате, Вьетнам в {month} {year}",
+    "thisMonth": "В этом месяце",
+    "thisMonthDescription": "События в этом месяце в Далате",
+    "thisWeek": "На этой неделе",
+    "thisWeekDescription": "События на этой неделе в Далате",
+    "noEvents": "Нет событий за {month} {year}",
+    "noEventsThisMonth": "В этом месяце нет событий",
+    "noEventsThisWeek": "На этой неделе нет событий",
+    "eventCount": "{count, plural, one {# событие} few {# события} other {# событий}}",
+    "previousMonth": "Назад",
+    "nextMonth": "Вперёд",
+    "backToHome": "Назад",
+    "browseAllEvents": "Все события",
+    "viewThisMonth": "Этот месяц",
+    "viewThisWeek": "Эта неделя",
+    "browseArchive": "Архив",
+    "months": {
+      "january": "Январь",
+      "february": "Февраль",
+      "march": "Март",
+      "april": "Апрель",
+      "may": "Май",
+      "june": "Июнь",
+      "july": "Июль",
+      "august": "Август",
+      "september": "Сентябрь",
+      "october": "Октябрь",
+      "november": "Ноябрь",
+      "december": "Декабрь"
+    }
   }
 }
