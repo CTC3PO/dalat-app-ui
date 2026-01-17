@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Calendar, Briefcase, Grid, User } from "lucide-react";
+import { Home, Calendar, Briefcase, Grid, User, Book, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { BOTTOM_NAV_ITEMS } from "@/lib/navigation";
 
@@ -12,6 +12,8 @@ const Icons = {
     Briefcase,
     Grid,
     User,
+    Book,
+    Users,
 } as const;
 
 export function BottomNav() {

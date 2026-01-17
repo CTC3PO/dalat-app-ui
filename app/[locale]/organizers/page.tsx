@@ -1,9 +1,9 @@
 import { getTranslations } from "next-intl/server";
-import Link from "next/link";
-import { ArrowLeft, Briefcase } from "lucide-react";
+import { Link } from "@/lib/i18n/routing";
+import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export default async function BusinessPage() {
+export default async function OrganizersPage() {
     const t = await getTranslations();
 
     return (
@@ -19,7 +19,7 @@ export default async function BusinessPage() {
                             <ArrowLeft className="w-4 h-4" />
                             Back
                         </Link>
-                        <h1 className="font-bold text-lg">Business Directory</h1>
+                        <h1 className="font-bold text-lg">Event Organizers</h1>
                     </div>
                 </div>
             </header>
@@ -28,12 +28,12 @@ export default async function BusinessPage() {
             <main className="container max-w-4xl mx-auto px-4 py-16">
                 <div className="text-center">
                     <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-100 mb-6">
-                        <Briefcase className="w-10 h-10 text-green-600" />
+                        <Users className="w-10 h-10 text-green-600" />
                     </div>
 
-                    <h2 className="text-3xl font-bold mb-4">Business Directory</h2>
+                    <h2 className="text-3xl font-bold mb-4">Event Organizers</h2>
                     <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                        Discover local businesses, coworking spaces, and professional services in DaLat.
+                        Discover the amazing teams and individuals behind DaLat's vibrant event scene.
                         This section is currently under development.
                     </p>
 
@@ -53,11 +53,11 @@ export default async function BusinessPage() {
                     <div className="mt-16 p-8 bg-white rounded-lg border border-gray-200 max-w-2xl mx-auto">
                         <h3 className="font-semibold text-lg mb-4">Coming Soon</h3>
                         <ul className="text-left space-y-2 text-gray-600">
-                            <li>• Business listings and profiles</li>
-                            <li>• Coworking spaces directory</li>
-                            <li>• Professional services</li>
-                            <li>• Networking events</li>
-                            <li>• Business resources</li>
+                            <li>• Organizer profiles and portfolios</li>
+                            <li>• Past events gallery</li>
+                            <li>• Subscription options</li>
+                            <li>• Contact information</li>
+                            <li>• Collaboration opportunities</li>
                         </ul>
                     </div>
                 </div>
