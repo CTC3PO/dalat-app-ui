@@ -17,6 +17,12 @@ export function EventsFeed({ events }: EventsPageProps) {
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [filterType, setFilterType] = useState<"upcoming" | "past">("upcoming");
 
+    // Filter events based on filterType
+    const filteredEvents = events.filter(event => {
+        const isPast = new Date(event.starts_at) < new Date();
+        return filterType === "upcoming" ? !isPast : isPast;
+    });
+
     // Group events by date for List View
     const groupedEvents = events.reduce((acc, event) => {
         const dateKey = format(new Date(event.starts_at), "yyyy-MM-dd");
