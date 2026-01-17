@@ -4,14 +4,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Calendar, Briefcase, Grid, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { BOTTOM_NAV_ITEMS } from "@/lib/navigation";
 
-const NAV_ITEMS = [
-    { href: "/", icon: Home, label: "Home" },
-    { href: "/", icon: Calendar, label: "Events" },
-    { href: "/business", icon: Briefcase, label: "Business" },
-    { href: "/services", icon: Grid, label: "Services" },
-    { href: "/settings", icon: User, label: "Profile" },
-] as const;
+const Icons = {
+    Home,
+    Calendar,
+    Briefcase,
+    Grid,
+    User,
+} as const;
 
 export function BottomNav() {
     const pathname = usePathname();
@@ -22,11 +23,11 @@ export function BottomNav() {
     return (
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 pb-safe">
             <div className="grid grid-cols-5 h-16">
-                {NAV_ITEMS.map((item) => {
+                {BOTTOM_NAV_ITEMS.map((item) => {
                     const isActive =
                         currentPath === item.href ||
                         (item.href !== "/" && currentPath.startsWith(item.href));
-                    const Icon = item.icon;
+                    const Icon = Icons[item.icon];
 
                     return (
                         <Link
