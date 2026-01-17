@@ -7,6 +7,7 @@ import { BottomSheet } from "@/components/map/bottom-sheet";
 import { FilterPanel } from "@/components/events/filter-panel";
 import { UnifiedMap } from "@/components/map/unified-map";
 import { EventCarousel } from "@/components/events/event-carousel";
+import { TopNav } from "@/components/navigation/top-nav";
 import type { Event, EventCounts } from "@/lib/types";
 
 interface MapLandingPageProps {
@@ -25,8 +26,11 @@ export function MapLandingPage({ events, counts }: MapLandingPageProps) {
 
     return (
         <div className="relative h-screen overflow-hidden bg-gray-50 flex flex-col">
-            {/* Header Section */}
-            <div className="absolute top-0 left-0 right-0 z-[1000] bg-white border-b border-gray-100 shadow-sm">
+            {/* Top Navigation */}
+            <TopNav />
+
+            {/* Map Header Section */}
+            <div className="relative z-[1000] bg-white border-b border-gray-100 shadow-sm">
                 <div className="px-4 pt-4 pb-3">
                     {/* Title & Subtitle */}
                     <div className="mb-4">
@@ -49,8 +53,8 @@ export function MapLandingPage({ events, counts }: MapLandingPageProps) {
                 </div>
             </div>
 
-            {/* Map Area - Fills remaining space but respects header */}
-            <div className="flex-1 relative mt-[185px] mb-16 lg:mb-0">
+            {/* Map Area - Fills remaining space */}
+            <div className="flex-1 relative mb-16 lg:mb-0">
                 <UnifiedMap
                     provider="leaflet" // Can be switched to "google"
                     events={events}

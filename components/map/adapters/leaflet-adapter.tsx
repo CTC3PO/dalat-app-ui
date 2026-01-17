@@ -3,7 +3,37 @@
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import type { MapAdapterProps } from "../types";
-import { Icon } from "leaflet";
+import L from "leaflet"; // Import Leaflet for types and static methods
+
+// Fix for default Leaflet marker icons in Next.js
+const defaultIcon = L.icon({
+    iconUrl: '/images/marker-icon.png',
+    iconRetinaUrl: '/images/marker-icon-2x.png',
+    shadowUrl: '/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41]
+});
+
+// Google-like marker icon (red pin with drop shadow)
+// Using a custom div icon or an image would be best. 
+// For now, let's use a nice SVG pin or similar if we have it locally. 
+// Or better: use a DivIcon with Tailwind classes to make a CSS pin.
+
+const createCustomIcon = (isSelected: boolean) => {
+    return L.divIcon({
+        className: 'custom-marker',
+        html: `<div class="${isSelected ? 'scale-125 z-50' : 'hover:scale-110'} transition-transform duration-200">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));">
+                    <path d="M12 0C7.58 0 4 3.58 4 8C4 13.54 12 24 12 24C12 24 20 13.54 20 8C20 3.58 16.42 0 12 0ZM12 11C10.34 11 9 9.66 9 8C9 6.34 10.34 5 12 5C13.66 5 15 6.34 15 8C15 9.66 13.66 11 12 11Z" fill="${isSelected ? '#EA4335' : '#FBBC04'}"/>
+                </svg>
+               </div>`,
+        iconSize: [36, 36],
+        iconAnchor: [18, 36],
+    });
+};
 
 // Leaflet specific imports handling
 const MapContainer = dynamic(
@@ -60,21 +90,24 @@ export function LeafletAdapter({
                 zoomControl={false}
             >
                 <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+                    url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
                 />
 
-                {eventsWithCoords.map((event) => (
-                    <Marker
-                        key={event.id}
-                        position={[event.latitude!, event.longitude!]}
-                        eventHandlers={{
-                            click: () => onEventSelect(event),
-                        }}
-                    // Highlight selected marker logic would go here
-                    // We'd need a custom icon for selected state
-                    />
-                ))}
+                {eventsWithCoords.map((event) => {
+                    const isSelected = selectedEventId === event.id;
+                    return (
+                        <Marker
+                            key={event.id}
+                            position={[event.latitude!, event.longitude!]}
+                            icon={createCustomIcon(isSelected)}
+                            eventHandlers={{
+                                click: () => onEventSelect(event),
+                            }}
+                            zIndexOffset={isSelected ? 1000 : 0}
+                        />
+                    );
+                })}
             </MapContainer>
         </div>
     );
