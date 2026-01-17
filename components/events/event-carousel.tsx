@@ -52,12 +52,13 @@ export function EventCarousel({
                 const isSelected = selectedEventId === event.id;
 
                 return (
-                    <div
+                    <Link
                         key={event.id}
                         id={`carousel-item-${event.id}`}
-                        onClick={() => onEventSelect(event)}
+                        href={`/events/${event.slug || event.id}`}
+                        onMouseEnter={() => onEventSelect(event)}
                         className={cn(
-                            "flex-shrink-0 w-[280px] bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden snap-center transition-all duration-300 cursor-pointer",
+                            "flex-shrink-0 w-[280px] bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden snap-center transition-all duration-300 cursor-pointer block",
                             isSelected ? "ring-2 ring-green-600 shadow-lg scale-[1.02]" : "hover:shadow-lg"
                         )}
                     >
@@ -111,7 +112,7 @@ export function EventCarousel({
                                 )}
                             </div>
                         </div>
-                    </div>
+                    </Link>
                 );
             })}
 

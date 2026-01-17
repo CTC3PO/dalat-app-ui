@@ -82,6 +82,39 @@ const RecenterControl = dynamic(
     { ssr: false }
 );
 
+// Custom Zoom Control Component
+const CustomZoomControl = dynamic(
+    () => import("react-leaflet").then((mod) => {
+        const { useMap } = mod;
+        return function CustomZoomControlInner() {
+            const map = useMap();
+            return (
+                <div className="leaflet-bottom leaflet-right" style={{ marginBottom: "130px", marginRight: "10px", pointerEvents: "auto", zIndex: 1000 }}>
+                    <div className="flex flex-col gap-2">
+                        <button
+                            className="bg-white hover:bg-gray-50 text-gray-600 font-light text-2xl p-0 cursor-pointer flex items-center justify-center w-[34px] h-[34px] bg-white rounded-sm shadow-md"
+                            onClick={() => map.zoomIn()}
+                            title="Zoom In"
+                            type="button"
+                        >
+                            +
+                        </button>
+                        <button
+                            className="bg-white hover:bg-gray-50 text-gray-600 font-light text-2xl p-0 cursor-pointer flex items-center justify-center w-[34px] h-[34px] bg-white rounded-sm shadow-md"
+                            onClick={() => map.zoomOut()}
+                            title="Zoom Out"
+                            type="button"
+                        >
+                            −
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+    }),
+    { ssr: false }
+);
+
 // Inner component for Leaflet specifics requiring static imports
 export function LeafletAdapter({
     events,
@@ -120,8 +153,9 @@ export function LeafletAdapter({
                 zoom={defaultZoom}
                 className="h-full w-full"
                 style={{ background: "#f9fafb" }}
-                zoomControl={true}
+                zoomControl={false}
             >
+                <CustomZoomControl />
                 <RecenterControl center={lakesideCenter} />
 
                 <TileLayer

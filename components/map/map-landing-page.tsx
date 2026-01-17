@@ -95,7 +95,11 @@ export function MapLandingPage({ events, counts }: MapLandingPageProps) {
                     />
 
                     {/* Date Presets */}
-                    <DatePresets />
+                    <DatePresets
+                        onDateSelect={(range) => {
+                            handleApplyFilters({ dateRange: range });
+                        }}
+                    />
                 </div>
             </div>
 

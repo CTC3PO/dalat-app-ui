@@ -1,9 +1,10 @@
 "use client";
 
 import { Link, usePathname } from "@/lib/i18n/routing"; // Adjust import path if needed
-import { Users, Plus } from "lucide-react";
+import { Users, Plus, Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MAIN_NAV_ITEMS } from "@/lib/navigation";
+import { Button } from "@/components/ui/button";
 
 export function TopNav() {
     const pathname = usePathname();
@@ -33,7 +34,7 @@ export function TopNav() {
                                     className={cn(
                                         "px-3 py-2 text-sm font-medium transition-colors",
                                         isActive
-                                            ? "text-gray-900 border-b-2 border-black"
+                                            ? "text-gray-900 border-b-2 border-green-600" // Updated to green accent
                                             : "text-gray-500 hover:text-gray-900"
                                     )}
                                 >
@@ -45,18 +46,20 @@ export function TopNav() {
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-3">
-                        <button className="hidden sm:flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-gray-50 text-gray-700">
-                            <Plus className="w-4 h-4" />
-                            <span>Events</span>
-                        </button>
-                        <button className="p-2 text-gray-500 hover:text-gray-900">
-                            <span className="sr-only">Notifications</span>
-                            🔔
+                        <Button className="hidden sm:flex bg-[#16a34a] hover:bg-[#15803d] text-white rounded-full px-4 h-9">
+                            + Add Event
+                        </Button>
+
+                        {/* Notification Bell - Minimalist White/Gray style */}
+                        <button className="p-2 text-gray-400 hover:text-[#16a34a] transition-colors rounded-full hover:bg-gray-50">
+                            <Bell className="w-5 h-5" />
                         </button>
 
                         {/* Profile Icon */}
-                        <Link href="/settings" className="h-9 w-9 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200 transition-colors">
-                            <Users className="w-5 h-5" />
+                        <Link href="/settings" className="block">
+                            <div className="w-8 h-8 rounded-full bg-gray-100 overflow-hidden border border-gray-200 flex items-center justify-center hover:border-gray-300 transition-colors">
+                                <Users className="w-4 h-4 text-gray-500" />
+                            </div>
                         </Link>
                     </div>
                 </div>
